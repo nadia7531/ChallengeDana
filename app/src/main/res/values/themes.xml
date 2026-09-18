@@ -1,0 +1,7 @@
+<resources>
+<style name="Theme.ChallengeDana" parent="android:style/Theme.Material.Light.NoActionBar">
+    <item name="android:fontFamily">sans</item><item name="android:colorAccent">#FFC107</item>
+    <item name="android:navigationBarColor">#071A3D</item><item name="android:statusBarColor">#071A3D</item>
+    <item name="android:windowLightStatusBar">false</item>
+</style>
+</resources>
