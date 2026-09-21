@@ -316,58 +316,233 @@ public class MainActivity extends Activity {
         {"کدام شهر ایران به کاشی‌کاری و معماری تاریخی شهرت دارد؟","🕌","یزد","زاهدان","بندرعباس","ساری"}
     };
 
-    @Override public void onCreate(Bundle b){super.onCreate(b); getWindow().setStatusBarColor(Color.rgb(5,12,38)); buildQuestions(); showHome();}
+    FrameLayout screen;
+    ArrayList<Button> answerButtons = new ArrayList<>();
+    android.media.ToneGenerator tone;
+    boolean inGame = false;
+    int currentBackground = 0;
+
+    @Override public void onCreate(Bundle b){
+        super.onCreate(b);
+        getWindow().setStatusBarColor(Color.rgb(5,12,38));
+        getWindow().setNavigationBarColor(Color.rgb(5,12,38));
+        tone = new android.media.ToneGenerator(android.media.AudioManager.STREAM_MUSIC, 85);
+        buildQuestions();
+        showHome();
+    }
+
+    @Override public void onBackPressed(){
+        if(inGame){ inGame=false; showHome(); }
+        else super.onBackPressed();
+    }
 
     String fa(int n){String s=""+n; String en="0123456789"; String fa="۰۱۲۳۴۵۶۷۸۹"; StringBuilder r=new StringBuilder(); for(char c:s.toCharArray()){int i=en.indexOf(c); r.append(i>=0?fa.charAt(i):c);} return r.toString();}
     int dp(int x){return (int)(x*getResources().getDisplayMetrics().density+0.5f);}
     TextView text(String s,float size){TextView v=new TextView(this);v.setText(s);v.setTextSize(size);v.setTextColor(Color.WHITE);v.setGravity(Gravity.CENTER);v.setTypeface(Typeface.DEFAULT,Typeface.BOLD);v.setPadding(dp(12),dp(8),dp(12),dp(8));v.setLayoutDirection(View.LAYOUT_DIRECTION_RTL);return v;}
-    GradientDrawable bg(int c1,int c2,float r){GradientDrawable g=new GradientDrawable(GradientDrawable.Orientation.TL_BR,new int[]{c1,c2});g.setCornerRadius(dp((int)r));g.setStroke(dp(1),Color.argb(110,255,255,255));return g;}
-    Button button(String s){Button b=new Button(this);b.setText(s);b.setTextSize(17);b.setTextColor(Color.WHITE);b.setAllCaps(false);b.setGravity(Gravity.CENTER);b.setTypeface(Typeface.DEFAULT,Typeface.BOLD);b.setLayoutDirection(View.LAYOUT_DIRECTION_RTL);b.setPadding(dp(10),0,dp(10),0);b.setBackground(bg(Color.rgb(18,91,190),Color.rgb(10,45,112),26));LinearLayout.LayoutParams p=new LinearLayout.LayoutParams(-1,dp(58));p.setMargins(dp(8),dp(7),dp(8),dp(7));b.setLayoutParams(p);return b;}
-    void base(int c1,int c2){root=new LinearLayout(this);root.setOrientation(LinearLayout.VERTICAL);root.setGravity(Gravity.CENTER_HORIZONTAL);root.setPadding(dp(14),dp(18),dp(14),dp(14));root.setLayoutDirection(View.LAYOUT_DIRECTION_RTL);root.setBackground(bg(c1,c2,0));ScrollView scroll=new ScrollView(this);scroll.setFillViewport(true);scroll.setLayoutDirection(View.LAYOUT_DIRECTION_RTL);content=new LinearLayout(this);content.setOrientation(LinearLayout.VERTICAL);content.setGravity(Gravity.CENTER_HORIZONTAL);content.setLayoutDirection(View.LAYOUT_DIRECTION_RTL);scroll.addView(content);setContentView(scroll);root=content;}
+    GradientDrawable bg(int c1,int c2,float r){GradientDrawable g=new GradientDrawable(GradientDrawable.Orientation.TL_BR,new int[]{c1,c2});g.setCornerRadius(dp((int)r));g.setStroke(dp(1),Color.argb(100,255,255,255));return g;}
+    Button button(String s){Button b=new Button(this);b.setText(s);b.setTextSize(17);b.setTextColor(Color.WHITE);b.setAllCaps(false);b.setGravity(Gravity.CENTER);b.setTypeface(Typeface.DEFAULT,Typeface.BOLD);b.setLayoutDirection(View.LAYOUT_DIRECTION_RTL);b.setPadding(dp(10),0,dp(10),0);b.setBackground(bg(Color.rgb(30,105,210),Color.rgb(18,45,125),24));LinearLayout.LayoutParams p=new LinearLayout.LayoutParams(-1,dp(58));p.setMargins(dp(8),dp(6),dp(8),dp(6));b.setLayoutParams(p);return b;}
+    Button smallButton(String s){Button b=button(s);b.setTextSize(16);b.setTextColor(Color.WHITE);b.setBackground(bg(Color.argb(175,12,45,100),Color.argb(175,8,25,65),20));b.setLayoutParams(new LinearLayout.LayoutParams(dp(54),dp(48)));return b;}
 
-    void showHome(){base(Color.rgb(5,18,58),Color.rgb(20,4,65));
-        TextView icon=text("🧠\nچالش دانا",34); icon.setTextColor(Color.rgb(255,202,62)); root.addView(icon,new LinearLayout.LayoutParams(-1,dp(170)));
-        root.addView(text("با دانش، دنیا را بهتر ببین!",19),new LinearLayout.LayoutParams(-1,dp(48)));
-        Button start=button("▶   شروع بازی");start.setTextColor(Color.rgb(45,25,0));start.setBackground(bg(Color.rgb(255,218,92),Color.rgb(245,151,22),28));start.setOnClickListener(v->startGame());root.addView(start);
-        Button daily=button("✨   چالش ویژه امروز");daily.setOnClickListener(v->startGame());root.addView(daily);
-        Button cats=button("▦   دسته‌بندی‌ها");cats.setOnClickListener(v->Toast.makeText(this,"ایران و جهان • تاریخ • علم • فضا • طبیعت • حیوانات • ورزش • هنر • فناوری • منطق",Toast.LENGTH_LONG).show());root.addView(cats);
-        Button record=button("🏆   آمار و رکورد من");record.setOnClickListener(v->showResult());root.addView(record);
-        root.addView(text("بیش از ۱۰۰۰ سؤال متنوع • بخش ویژه حقایق ایران 🇮🇷 • مراحل جذاب",15),new LinearLayout.LayoutParams(-1,dp(65)));
+    int backgroundRes(){int[] r={R.drawable.bg_space,R.drawable.bg_nature,R.drawable.bg_iran,R.drawable.bg_ocean};return r[currentBackground%r.length];}
+    void base(){
+        screen=new FrameLayout(this);
+        ImageView image=new ImageView(this);
+        image.setImageResource(backgroundRes());
+        image.setScaleType(ImageView.ScaleType.CENTER_CROP);
+        screen.addView(image,new FrameLayout.LayoutParams(-1,-1));
+        View shade=new View(this); shade.setBackgroundColor(Color.argb(55,2,10,35));
+        screen.addView(shade,new FrameLayout.LayoutParams(-1,-1));
+        ScrollView scroll=new ScrollView(this); scroll.setFillViewport(true); scroll.setClipToPadding(false);
+        root=new LinearLayout(this); root.setOrientation(LinearLayout.VERTICAL); root.setGravity(Gravity.CENTER_HORIZONTAL); root.setPadding(dp(14),dp(10),dp(14),dp(20)); root.setLayoutDirection(View.LAYOUT_DIRECTION_RTL);
+        scroll.addView(root); FrameLayout.LayoutParams sp=new FrameLayout.LayoutParams(-1,-1); screen.addView(scroll,sp); setContentView(screen);
+    }
+
+    ImageView imageView(int res,int h){ImageView v=new ImageView(this);v.setImageResource(res);v.setScaleType(ImageView.ScaleType.CENTER_CROP);v.setBackground(bg(Color.argb(120,0,0,0),Color.argb(80,0,0,0),28));v.setPadding(dp(3),dp(3),dp(3),dp(3));root.addView(v,new LinearLayout.LayoutParams(-1,dp(h)));return v;}
+
+
+    TextView title(String s, float size){
+        TextView v=text(s,size);
+        v.setTextColor(Color.WHITE);
+        v.setShadowLayer(dp(5),0,dp(2),Color.argb(170,0,0,0));
+        return v;
+    }
+
+    LinearLayout stageCard(int imageRes, String stage, String name, int c1, int c2){
+        LinearLayout card=new LinearLayout(this);
+        card.setOrientation(LinearLayout.HORIZONTAL);
+        card.setGravity(Gravity.CENTER_VERTICAL);
+        card.setPadding(dp(8),dp(8),dp(8),dp(8));
+        card.setLayoutDirection(View.LAYOUT_DIRECTION_RTL);
+        card.setBackground(bg(Color.argb(235,c1>>16&255,c1>>8&255,c1&255),
+                              Color.argb(235,c2>>16&255,c2>>8&255,c2&255),24));
+        LinearLayout.LayoutParams cp=new LinearLayout.LayoutParams(-1,dp(86));
+        cp.setMargins(0,dp(6),0,dp(6));
+        card.setLayoutParams(cp);
+
+        ImageView im=new ImageView(this);
+        im.setImageResource(imageRes);
+        im.setScaleType(ImageView.ScaleType.CENTER_CROP);
+        LinearLayout.LayoutParams ip=new LinearLayout.LayoutParams(dp(72),dp(70));
+        ip.setMargins(dp(4),0,dp(8),0);
+        card.addView(im,ip);
+
+        LinearLayout labels=new LinearLayout(this);
+        labels.setOrientation(LinearLayout.VERTICAL);
+        labels.setGravity(Gravity.CENTER_VERTICAL|Gravity.RIGHT);
+        labels.setLayoutDirection(View.LAYOUT_DIRECTION_RTL);
+        TextView st=text(stage,14); st.setGravity(Gravity.RIGHT|Gravity.CENTER_VERTICAL);
+        TextView nm=text(name,19); nm.setGravity(Gravity.RIGHT|Gravity.CENTER_VERTICAL);
+        labels.addView(st,new LinearLayout.LayoutParams(-1,dp(28)));
+        labels.addView(nm,new LinearLayout.LayoutParams(-1,dp(34)));
+        card.addView(labels,new LinearLayout.LayoutParams(0,-1,1));
+
+        TextView play=text("▶",24);
+        play.setTextColor(Color.WHITE);
+        play.setBackground(bg(Color.argb(120,255,255,255),Color.argb(40,255,255,255),50));
+        LinearLayout.LayoutParams pp=new LinearLayout.LayoutParams(dp(48),dp(48));
+        pp.setMargins(dp(4),0,0,0);
+        card.addView(play,pp);
+        card.setOnClickListener(v->startGame());
+        return card;
+    }
+
+    void showHome(){
+        inGame=false; currentBackground=1; base();
+
+        ImageView logo=new ImageView(this);
+        logo.setImageResource(R.drawable.icon_dana);
+        logo.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
+        root.addView(logo,new LinearLayout.LayoutParams(-1,dp(132)));
+
+        root.addView(title("چالش دانا",30),new LinearLayout.LayoutParams(-1,dp(46)));
+        root.addView(text("دانش، کلید دنیای بهتر است",15),new LinearLayout.LayoutParams(-1,dp(36)));
+
+        root.addView(stageCard(R.drawable.bg_nature,"مرحله ۱","عمومی",0x18BBD6,0x0B7FBE));
+        root.addView(stageCard(R.drawable.bg_iran,"مرحله ۲","ایران 🇮🇷",0xFFB51D,0xE56A00));
+        root.addView(stageCard(R.drawable.bg_space,"مرحله ۳","علم و فناوری",0x8E45E8,0x4C21B5));
+        root.addView(stageCard(R.drawable.bg_ocean,"مرحله ۴","سرگرمی",0xEF4B9B,0xC91F6B));
+
+        LinearLayout nav=new LinearLayout(this);
+        nav.setOrientation(LinearLayout.HORIZONTAL);
+        nav.setGravity(Gravity.CENTER);
+        nav.setPadding(dp(6),dp(4),dp(6),dp(4));
+        nav.setBackground(bg(Color.argb(225,5,44,75),Color.argb(225,4,22,50),22));
+        String[] labels={"⌂
+خانه","🏆
+رتبه‌ها","★
+علاقه‌مندی‌ها"};
+        for(String lab:labels){
+            TextView n=text(lab,14);
+            n.setTextColor(Color.WHITE);
+            nav.addView(n,new LinearLayout.LayoutParams(0,dp(62),1));
+        }
+        LinearLayout.LayoutParams np=new LinearLayout.LayoutParams(-1,dp(72));
+        np.setMargins(0,dp(12),0,0);
+        root.addView(nav,np);
     }
 
     void buildQuestions(){
         questions.clear();
-        String[] templates={
-            "%s","یک سؤال دانستنی: %s","چالش دانا می‌پرسد: %s","می‌توانی پاسخ درست را پیدا کنی؟ %s",
-            "ذهن خودت را امتحان کن؛ %s","وقت یک سؤال جذاب است: %s","دانش عمومی تو چقدر است؟ %s","سؤال این مرحله: %s"
-        };
-        ArrayList<String[]> all=new ArrayList<>();
-        all.addAll(Arrays.asList(facts));
-        all.addAll(Arrays.asList(iranFacts));
-        Random rnd=new Random(20260919L);
-        for(int t=0;t<templates.length;t++) for(String[] f:all){
-            String[] opts={f[2],f[3],f[4],f[5]};
-            ArrayList<String> shuffled=new ArrayList<>(Arrays.asList(opts));
-            Collections.shuffle(shuffled,rnd);
-            int correct=shuffled.indexOf(f[2]);
-            questions.add(new Question(String.format(templates[t],f[0]),f[1],shuffled.toArray(new String[0]),correct));
+        ArrayList<String[]> all=new ArrayList<>(); all.addAll(Arrays.asList(facts)); all.addAll(Arrays.asList(iranFacts));
+        Random rnd=new Random(20260921L);
+        // No introductory filler: the question itself is shown.
+        for(String[] f:all){
+            String[] opts={f[2],f[3],f[4],f[5]}; ArrayList<String> shuffled=new ArrayList<>(Arrays.asList(opts)); Collections.shuffle(shuffled,rnd);
+            int correct=shuffled.indexOf(f[2]); questions.add(new Question(f[0],f[1],shuffled.toArray(new String[0]),correct));
         }
         Collections.shuffle(questions,rnd);
+        // Repeat with fresh option order to keep a large pool without changing the wording.
+        ArrayList<Question> copy=new ArrayList<>(questions);
+        for(Question q:copy){String[] opts=q.a.clone();ArrayList<String> sh=new ArrayList<>(Arrays.asList(opts));Collections.shuffle(sh,rnd);int c=sh.indexOf(q.a[q.correct]);questions.add(new Question(q.q,q.icon,sh.toArray(new String[0]),c));}
     }
 
-    void startGame(){index=0;score=0;coin=50;Collections.shuffle(questions);showQuestion();}
+    void startGame(){index=0;score=0;coin=50;inGame=true;Collections.shuffle(questions);showQuestion();}
 
-    void showQuestion(){answered=false; Question q=questions.get(index); int[][] colors={{6,22,72},{17,8,65},{4,46,69},{45,15,58},{10,38,75},{54,23,10}}; int[] c=colors[index%6];base(Color.rgb(c[0],c[1],c[2]),Color.rgb(Math.max(0,c[0]-2),Math.max(0,c[1]-4),Math.min(80,c[2]+5)));
-        LinearLayout top=new LinearLayout(this);top.setOrientation(LinearLayout.HORIZONTAL);top.setGravity(Gravity.CENTER_VERTICAL);top.setLayoutDirection(View.LAYOUT_DIRECTION_RTL);
-        coins=text("🪙 "+fa(coin),18); coins.setGravity(Gravity.RIGHT);top.addView(coins,new LinearLayout.LayoutParams(0,dp(48),1));
-        progress=text("مرحله "+fa(index+1)+" از "+fa(questions.size()),16);progress.setGravity(Gravity.LEFT);top.addView(progress,new LinearLayout.LayoutParams(0,dp(48),1));root.addView(top);
-        ProgressBar pb=new ProgressBar(this,null,android.R.attr.progressBarStyleHorizontal);pb.setMax(questions.size());pb.setProgress(index+1);pb.setProgressDrawable(bg(Color.rgb(30,210,220),Color.rgb(20,105,190),20));root.addView(pb,new LinearLayout.LayoutParams(-1,dp(9)));
-        picture=text(q.icon,62);picture.setBackground(bg(Color.argb(110,20,90,180),Color.argb(70,10,30,90),28));root.addView(picture,new LinearLayout.LayoutParams(-1,dp(145)));
-        questionText=text(q.q,21);questionText.setTextColor(Color.WHITE);questionText.setBackground(bg(Color.rgb(12,49,105),Color.rgb(7,25,70),24));LinearLayout.LayoutParams qp=new LinearLayout.LayoutParams(-1,dp(125));qp.setMargins(0,dp(10),0,dp(8));root.addView(questionText,qp);
-        for(int i=0;i<4;i++){final int n=i;Button b=button(fa(i+1)+"   "+q.a[i]);b.setOnClickListener(v->answer(n,b));root.addView(b);} 
+    void showQuestion(){
+        answered=false; currentBackground=index; Question q=questions.get(index); base();
+
+        LinearLayout top=new LinearLayout(this);
+        top.setOrientation(LinearLayout.HORIZONTAL);
+        top.setGravity(Gravity.CENTER_VERTICAL);
+        top.setLayoutDirection(View.LAYOUT_DIRECTION_RTL);
+
+        TextView badge=text("🏆 "+fa(score),15);
+        badge.setBackground(bg(Color.argb(205,10,35,75),Color.argb(205,5,18,50),22));
+        top.addView(badge,new LinearLayout.LayoutParams(dp(82),dp(44)));
+
+        progress=text("مرحله "+fa((index/15)+1)+"   "+fa((index%15)+1)+"/"+fa(15),15);
+        progress.setBackground(bg(Color.argb(205,10,35,75),Color.argb(205,5,18,50),22));
+        LinearLayout.LayoutParams mid=new LinearLayout.LayoutParams(0,dp(44),1);
+        mid.setMargins(dp(6),0,dp(6),0);
+        top.addView(progress,mid);
+
+        Button back=smallButton("‹");
+        back.setTextSize(25);
+        back.setOnClickListener(v->{inGame=false;showHome();});
+        top.addView(back,new LinearLayout.LayoutParams(dp(54),dp(44)));
+        root.addView(top);
+
+        ProgressBar pb=new ProgressBar(this,null,android.R.attr.progressBarStyleHorizontal);
+        pb.setMax(15); pb.setProgress((index%15)+1);
+        pb.setProgressDrawable(bg(Color.rgb(255,196,45),Color.rgb(245,120,20),20));
+        LinearLayout.LayoutParams pp=new LinearLayout.LayoutParams(-1,dp(8));
+        pp.setMargins(dp(8),dp(8),dp(8),dp(12));
+        root.addView(pb,pp);
+
+        questionText=text(q.q,23);
+        questionText.setTextColor(Color.rgb(25,32,75));
+        questionText.setBackground(bg(Color.rgb(255,255,255),Color.rgb(241,247,255),26));
+        questionText.setGravity(Gravity.CENTER);
+        LinearLayout.LayoutParams qp=new LinearLayout.LayoutParams(-1,dp(132));
+        qp.setMargins(0,dp(8),0,dp(12));
+        root.addView(questionText,qp);
+
+        answerButtons.clear();
+        for(int i=0;i<4;i++){
+            final int n=i;
+            Button b=button(q.a[i]);
+            b.setTextColor(Color.rgb(25,32,75));
+            b.setTextSize(17);
+            b.setBackground(bg(Color.rgb(255,255,255),Color.rgb(238,246,255),24));
+            b.setOnClickListener(v->answer(n,b));
+            answerButtons.add(b);
+            root.addView(b);
+        }
     }
 
-    void answer(int n,Button chosen){if(answered)return;answered=true;Question q=questions.get(index);boolean ok=n==q.correct;if(ok){score+=10;coin+=5;chosen.setBackground(bg(Color.rgb(15,190,115),Color.rgb(4,105,70),25));chosen.setText("✓  "+chosen.getText());}else{coin=Math.max(0,coin-5);chosen.setBackground(bg(Color.rgb(210,62,82),Color.rgb(110,20,45),25));chosen.setText("✕  "+chosen.getText());}Toast.makeText(this,ok?"✓ پاسخ درست است!  +۱۰ امتیاز":"✕ پاسخ درست نیست",Toast.LENGTH_SHORT).show();new android.os.Handler().postDelayed(()->{index++;if(index<questions.size())showQuestion();else showResult();},1300);}
+    void answer(int n,Button chosen){
+        if(answered)return; answered=true; Question q=questions.get(index); boolean ok=n==q.correct;
+        try{tone.startTone(ok?android.media.ToneGenerator.TONE_PROP_ACK:android.media.ToneGenerator.TONE_PROP_NACK,180);}catch(Exception ignored){}
+        if(ok){score+=10;coin+=5;chosen.setBackground(bg(Color.rgb(35,205,130),Color.rgb(10,125,80),25));chosen.setTextColor(Color.WHITE);}
+        else{coin=Math.max(0,coin-5);chosen.setBackground(bg(Color.rgb(235,78,95),Color.rgb(145,25,55),25));chosen.setTextColor(Color.WHITE);}
+        new android.os.Handler().postDelayed(()->{index++;if(index<questions.size())showQuestion();else showResult();},1800);
+    }
 
-    void showResult(){base(Color.rgb(8,20,60),Color.rgb(32,7,62));root.addView(text("🏆  پایان چالش",32),new LinearLayout.LayoutParams(-1,dp(90)));root.addView(text("امتیاز شما:  "+fa(score),25));root.addView(text("سکه‌های شما:  "+fa(coin),21));root.addView(text("تعداد سؤال‌ها:  "+fa(questions.size()),18));Button again=button("🔄   دوباره بازی کن");again.setOnClickListener(v->startGame());root.addView(again);Button home=button("⌂   بازگشت به خانه");home.setOnClickListener(v->showHome());root.addView(home);}
+    void showResult(){
+        inGame=false; currentBackground=2; base();
+
+        ImageView trophy=new ImageView(this);
+        trophy.setImageResource(R.drawable.icon_dana);
+        trophy.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
+        root.addView(trophy,new LinearLayout.LayoutParams(-1,dp(170)));
+
+        root.addView(title("عالی بود! 🏆",30),new LinearLayout.LayoutParams(-1,dp(60)));
+        root.addView(text("به مرحله بعدی رسیدی",19),new LinearLayout.LayoutParams(-1,dp(44)));
+
+        TextView scoreBox=text("امتیاز این مرحله:  "+fa(score)+" ⭐
+سکه‌ها:  "+fa(coin)+" 🪙",18);
+        scoreBox.setBackground(bg(Color.argb(220,30,12,90),Color.argb(220,10,10,55),24));
+        root.addView(scoreBox,new LinearLayout.LayoutParams(-1,dp(100)));
+
+        Button again=button("▶   مرحله بعد");
+        again.setBackground(bg(Color.rgb(255,215,70),Color.rgb(240,140,15),28));
+        again.setTextColor(Color.rgb(50,25,0));
+        again.setOnClickListener(v->startGame());
+        root.addView(again);
+
+        Button home=button("⌂   بازگشت به منو");
+        home.setBackground(bg(Color.rgb(35,130,235),Color.rgb(20,70,180),28));
+        home.setOnClickListener(v->showHome());
+        root.addView(home);
+    }
 }
