@@ -1,6 +1,7 @@
 package com.chalshdana.app;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.graphics.Color;
@@ -552,7 +553,6 @@ public class MainActivity extends Activity {
 
     FrameLayout screen;
     ArrayList<Button> answerButtons = new ArrayList<>();
-    android.media.ToneGenerator tone;
     boolean inGame = false;
     int currentBackground = 0;
     final int PICK_PROFILE_IMAGE = 2001;
