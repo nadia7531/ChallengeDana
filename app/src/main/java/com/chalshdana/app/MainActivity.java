@@ -569,19 +569,18 @@ public class MainActivity extends Activity {
         getWindow().setStatusBarColor(Color.rgb(5,12,38));
         getWindow().setNavigationBarColor(Color.rgb(5,12,38));
         tone = new android.media.ToneGenerator(android.media.AudioManager.STREAM_MUSIC, 85);
-        try { persianFont = Typeface.createFromAsset(getAssets(), "fonts/NotoSansArabic-Bold.ttf"); } catch(Exception e) { persianFont = Typeface.create("sans-serif", Typeface.BOLD); }
+        persianFont = Typeface.create("sans-serif", Typeface.NORMAL);
         prefs = getSharedPreferences("dana_profile", MODE_PRIVATE);
         profileName = prefs.getString("name", "");
         profileImageUri = prefs.getString("image", "");
         favorites.addAll(prefs.getStringSet("favorites", new HashSet<String>()));
-        tone = new android.media.ToneGenerator(android.media.AudioManager.STREAM_MUSIC, 90);
         buildQuestions();
         showHome();
     }
 
     @Override public void onBackPressed(){
         long now=System.currentTimeMillis();
-        if(inGame){ inGame=false; backArmed=false; showHome(); return; }
+        if(inGame){ inGame=false; backArmed=false; if(questionTimer!=null){questionTimer.cancel(); questionTimer=null;} showHome(); return; }
         if(!backArmed || now-lastBack>1800){
             backArmed=true; lastBack=now;
             Toast.makeText(this,"برای خروج دوباره دکمه برگشت را بزنید",Toast.LENGTH_SHORT).show();
@@ -592,9 +591,9 @@ public class MainActivity extends Activity {
 
     String fa(int n){String s=""+n; String en="0123456789"; String fa="۰۱۲۳۴۵۶۷۸۹"; StringBuilder r=new StringBuilder(); for(char c:s.toCharArray()){int i=en.indexOf(c); r.append(i>=0?fa.charAt(i):c);} return r.toString();}
     int dp(int x){return (int)(x*getResources().getDisplayMetrics().density+0.5f);}
-    TextView text(String s,float size){TextView v=new TextView(this);v.setText(s);v.setTextSize(size);v.setTextColor(Color.WHITE);v.setGravity(Gravity.CENTER);v.setTypeface(persianFont != null ? persianFont : Typeface.DEFAULT_BOLD);v.setIncludeFontPadding(true);v.setLineSpacing(0f,1.05f);v.setPadding(dp(12),dp(8),dp(12),dp(8));v.setLayoutDirection(View.LAYOUT_DIRECTION_RTL);v.setTextDirection(View.TEXT_DIRECTION_RTL);return v;}
+    TextView text(String s,float size){TextView v=new TextView(this);v.setText(s);v.setTextSize(size);v.setTextColor(Color.WHITE);v.setGravity(Gravity.CENTER);v.setTypeface(Typeface.create("sans-serif",Typeface.NORMAL));v.setIncludeFontPadding(true);v.setLineSpacing(0f,1.08f);v.setPadding(dp(10),dp(6),dp(10),dp(6));v.setLayoutDirection(View.LAYOUT_DIRECTION_RTL);v.setTextDirection(View.TEXT_DIRECTION_RTL);v.setBreakStrategy(android.text.Layout.BREAK_STRATEGY_HIGH_QUALITY);v.setHyphenationFrequency(android.text.Layout.HYPHENATION_FREQUENCY_NONE);return v;}
     GradientDrawable bg(int c1,int c2,float r){GradientDrawable g=new GradientDrawable(GradientDrawable.Orientation.TL_BR,new int[]{c1,c2});g.setCornerRadius(dp((int)r));g.setStroke(dp(1),Color.argb(100,255,255,255));return g;}
-    Button button(String s){Button b=new Button(this);b.setText(s);b.setTextSize(19);b.setTextColor(Color.WHITE);b.setAllCaps(false);b.setGravity(Gravity.CENTER);b.setTypeface(Typeface.DEFAULT,Typeface.BOLD);b.setLayoutDirection(View.LAYOUT_DIRECTION_RTL);b.setPadding(dp(10),0,dp(10),0);b.setBackground(bg(Color.rgb(30,105,210),Color.rgb(18,45,125),24));LinearLayout.LayoutParams p=new LinearLayout.LayoutParams(-1,dp(54));p.setMargins(dp(8),dp(6),dp(8),dp(6));b.setLayoutParams(p);return b;}
+    Button button(String s){Button b=new Button(this);b.setText(s);b.setTextSize(17);b.setTextColor(Color.WHITE);b.setAllCaps(false);b.setGravity(Gravity.CENTER);b.setTypeface(Typeface.create("sans-serif",Typeface.NORMAL));b.setLayoutDirection(View.LAYOUT_DIRECTION_RTL);b.setPadding(dp(12),dp(8),dp(12),dp(8));b.setSingleLine(false);b.setMaxLines(3);b.setEllipsize(null);b.setHorizontallyScrolling(false);b.setMinHeight(dp(58));b.setMinimumHeight(dp(58));b.setBackground(bg(Color.rgb(30,105,210),Color.rgb(18,45,125),24));LinearLayout.LayoutParams p=new LinearLayout.LayoutParams(-1,dp(64));p.setMargins(dp(6),dp(5),dp(6),dp(5));b.setLayoutParams(p);return b;}
     Button smallButton(String s){Button b=button(s);b.setTextSize(16);b.setTextColor(Color.WHITE);b.setBackground(bg(Color.argb(175,12,45,100),Color.argb(175,8,25,65),20));b.setLayoutParams(new LinearLayout.LayoutParams(dp(54),dp(48)));return b;}
 
     int backgroundRes(){int[] r={R.drawable.bg_space,R.drawable.bg_nature,R.drawable.bg_iran,R.drawable.bg_ocean};return r[currentBackground%r.length];}
@@ -644,8 +643,8 @@ public class MainActivity extends Activity {
         labels.setOrientation(LinearLayout.VERTICAL);
         labels.setGravity(Gravity.CENTER_VERTICAL|Gravity.RIGHT);
         labels.setLayoutDirection(View.LAYOUT_DIRECTION_RTL);
-        TextView st=text(stage,16); st.setGravity(Gravity.RIGHT|Gravity.CENTER_VERTICAL);
-        TextView nm=text(name,21); nm.setGravity(Gravity.RIGHT|Gravity.CENTER_VERTICAL);
+        TextView st=text(stage,14); st.setGravity(Gravity.RIGHT|Gravity.CENTER_VERTICAL);
+        TextView nm=text(name,18); nm.setGravity(Gravity.RIGHT|Gravity.CENTER_VERTICAL);
         labels.addView(st,new LinearLayout.LayoutParams(-1,dp(28)));
         labels.addView(nm,new LinearLayout.LayoutParams(-1,dp(34)));
         card.addView(labels,new LinearLayout.LayoutParams(0,-1,1));
@@ -695,14 +694,15 @@ public class MainActivity extends Activity {
         else {avatar.setImageResource(R.drawable.icon_dana); avatar.setPadding(dp(8),dp(8),dp(8),dp(8));}
         card.addView(avatar,new LinearLayout.LayoutParams(dp(68),dp(68)));
         LinearLayout info=new LinearLayout(this); info.setOrientation(LinearLayout.VERTICAL); info.setGravity(Gravity.CENTER_VERTICAL|Gravity.RIGHT); info.setPadding(dp(12),0,dp(8),0); info.setLayoutDirection(View.LAYOUT_DIRECTION_RTL);
-        TextView n=text(profileName.isEmpty()?"ساخت پروفایل":"سلام، "+profileName,19); n.setGravity(Gravity.RIGHT|Gravity.CENTER_VERTICAL); TextView sub=text(profileName.isEmpty()?"نام و عکس خودت را اضافه کن":"پروفایل من",13); sub.setTextColor(Color.rgb(220,230,255)); sub.setGravity(Gravity.RIGHT|Gravity.CENTER_VERTICAL); info.addView(n,new LinearLayout.LayoutParams(-1,dp(34))); info.addView(sub,new LinearLayout.LayoutParams(-1,dp(28))); card.addView(info,new LinearLayout.LayoutParams(0,-1,1));
+        TextView n=text(profileName.isEmpty()?"ساخت پروفایل":"سلام، "+profileName,17); n.setGravity(Gravity.RIGHT|Gravity.CENTER_VERTICAL); TextView sub=text(profileName.isEmpty()?"نام و عکس خودت را اضافه کن":"پروفایل من",12); sub.setTextColor(Color.rgb(220,230,255)); sub.setGravity(Gravity.RIGHT|Gravity.CENTER_VERTICAL); info.addView(n,new LinearLayout.LayoutParams(-1,dp(34))); info.addView(sub,new LinearLayout.LayoutParams(-1,dp(28))); card.addView(info,new LinearLayout.LayoutParams(0,-1,1));
         TextView edit=text("✎",26); edit.setTextColor(Color.rgb(255,215,75)); card.addView(edit,new LinearLayout.LayoutParams(dp(48),dp(48)));
         card.setOnClickListener(v->showProfileEditor());
-        LinearLayout.LayoutParams cp=new LinearLayout.LayoutParams(-1,dp(92)); cp.setMargins(0,dp(6),0,dp(10)); root.addView(card,cp);
+        LinearLayout.LayoutParams cp=new LinearLayout.LayoutParams(-1,dp(88)); cp.setMargins(0,dp(6),0,dp(10)); root.addView(card,cp);
     }
 
     void showHome(){
-        inGame=false; backArmed=false; currentBackground=1; base();
+        inGame=false;
+        if(questionTimer!=null){questionTimer.cancel(); questionTimer=null;} backArmed=false; currentBackground=1; base();
 
         LinearLayout header=new LinearLayout(this);
         header.setOrientation(LinearLayout.HORIZONTAL);
@@ -710,7 +710,7 @@ public class MainActivity extends Activity {
         header.setLayoutDirection(View.LAYOUT_DIRECTION_RTL);
         header.setPadding(dp(8),dp(4),dp(8),dp(4));
 
-        TextView coinPill=text("🪙  "+fa(coin)+" سکه",15);
+        TextView coinPill=text(fa(coin)+" سکه",16);
         coinPill.setTextColor(Color.rgb(255,232,150));
         coinPill.setBackground(bg(Color.argb(230,55,39,8),Color.argb(230,25,20,5),22));
         header.addView(coinPill,new LinearLayout.LayoutParams(dp(112),dp(48)));
@@ -878,7 +878,7 @@ public class MainActivity extends Activity {
 
         Button back=smallButton("‹");
         back.setTextSize(25);
-        back.setOnClickListener(v->{inGame=false;showHome();});
+        back.setOnClickListener(v->{inGame=false; if(questionTimer!=null){questionTimer.cancel(); questionTimer=null;} showHome();});
         top.addView(back,new LinearLayout.LayoutParams(dp(54),dp(44)));
         root.addView(top);
 
@@ -905,24 +905,31 @@ public class MainActivity extends Activity {
         GradientDrawable sceneBg=bg(Color.argb(90,8,25,70),Color.argb(45,8,25,70),24);
         scene.setBackground(sceneBg);
         scene.setClipToOutline(true);
-        LinearLayout.LayoutParams sceneLp=new LinearLayout.LayoutParams(-1,dp(92));
+        LinearLayout.LayoutParams sceneLp=new LinearLayout.LayoutParams(-1,dp(72));
         sceneLp.setMargins(dp(4),0,dp(4),dp(8));
         root.addView(scene,sceneLp);
 
-        questionText=text(q.q,26);
+        questionText=text(q.q,20);
         questionText.setTextColor(Color.rgb(25,32,75));
         questionText.setBackground(bg(Color.argb(218,255,255,255),Color.argb(190,241,247,255),26));
         questionText.setGravity(Gravity.CENTER);
-        LinearLayout.LayoutParams qp=new LinearLayout.LayoutParams(-1,dp(126));
+        LinearLayout.LayoutParams qp=new LinearLayout.LayoutParams(-1,dp(112));
         qp.setMargins(0,dp(8),0,dp(12));
-        root.addView(questionText,qp);
+        questionText.setMinHeight(dp(96)); questionText.setMaxLines(5); root.addView(questionText,qp);
 
         answerButtons.clear();
         for(int i=0;i<4;i++){
             final int n=i;
             Button b=button(q.a[i]);
             b.setTextColor(Color.rgb(25,32,75));
-            b.setTextSize(19);
+            b.setTextSize(17);
+            b.setTypeface(Typeface.create("sans-serif",Typeface.NORMAL));
+            b.setMinHeight(dp(58));
+            b.setMinimumHeight(dp(58));
+            b.setSingleLine(false);
+            b.setMaxLines(3);
+            b.setEllipsize(null);
+            b.setHorizontallyScrolling(false);
             b.setBackground(bg(Color.argb(190,255,255,255),Color.argb(165,238,246,255),24));
             b.setOnClickListener(v->answer(n,b));
             answerButtons.add(b);
@@ -944,7 +951,7 @@ public class MainActivity extends Activity {
                 answered=true;
                 if(timerView!=null){ timerView.setText("⏱ ۰"); timerView.setBackground(bg(Color.rgb(235,78,95),Color.rgb(145,25,55),24)); }
                 try{tone.startTone(android.media.ToneGenerator.TONE_CDMA_ALERT_CALL_GUARD,260);}catch(Exception ignored){}
-                new android.os.Handler().postDelayed(()->{index++; if(index<questions.size())showQuestion(); else showResult();},700);
+                new android.os.Handler().postDelayed(()->{if(!inGame)return; index++; if(index<questions.size())showQuestion(); else showResult();},700);
             }
         }.start();
     }
@@ -956,11 +963,12 @@ public class MainActivity extends Activity {
         try{tone.startTone(ok?android.media.ToneGenerator.TONE_PROP_ACK:android.media.ToneGenerator.TONE_PROP_NACK,180);}catch(Exception ignored){}
         if(ok){if(timerView!=null) timerView.setBackground(bg(Color.rgb(35,170,115),Color.rgb(10,105,75),24));score+=10;coin+=5;chosen.setBackground(bg(Color.rgb(35,205,130),Color.rgb(10,125,80),25));chosen.setTextColor(Color.WHITE);chosen.setText("✓  "+chosen.getText());}
         else{if(timerView!=null) timerView.setBackground(bg(Color.rgb(235,78,95),Color.rgb(145,25,55),24));coin=Math.max(0,coin-5);chosen.setBackground(bg(Color.rgb(235,78,95),Color.rgb(145,25,55),25));chosen.setTextColor(Color.WHITE);chosen.setText("✕  "+chosen.getText()); Button correct=answerButtons.get(q.correct);correct.setBackground(bg(Color.rgb(35,205,130),Color.rgb(10,125,80),25));correct.setTextColor(Color.WHITE);correct.setText("✓  "+correct.getText());}
-        new android.os.Handler().postDelayed(()->{index++;if(index<questions.size())showQuestion();else showResult();},1800);
+        new android.os.Handler().postDelayed(()->{if(!inGame)return; index++; if(index<questions.size())showQuestion(); else showResult();},1800);
     }
 
     void showResult(){
-        inGame=false; currentBackground=2; base();
+        inGame=false;
+        if(questionTimer!=null){questionTimer.cancel(); questionTimer=null;} currentBackground=2; base();
 
         ImageView trophy=new ImageView(this);
         trophy.setImageResource(R.drawable.icon_dana);
