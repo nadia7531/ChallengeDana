@@ -427,10 +427,7 @@ public class MainActivity extends Activity {
         nav.setGravity(Gravity.CENTER);
         nav.setPadding(dp(6),dp(4),dp(6),dp(4));
         nav.setBackground(bg(Color.argb(225,5,44,75),Color.argb(225,4,22,50),22));
-        String[] labels={"⌂
-خانه","🏆
-رتبه‌ها","★
-علاقه‌مندی‌ها"};
+        String[] labels={"⌂ خانه","🏆 رتبه‌ها","★ علاقه‌مندی‌ها"};
         for(String lab:labels){
             TextView n=text(lab,14);
             n.setTextColor(Color.WHITE);
@@ -513,8 +510,8 @@ public class MainActivity extends Activity {
     void answer(int n,Button chosen){
         if(answered)return; answered=true; Question q=questions.get(index); boolean ok=n==q.correct;
         try{tone.startTone(ok?android.media.ToneGenerator.TONE_PROP_ACK:android.media.ToneGenerator.TONE_PROP_NACK,180);}catch(Exception ignored){}
-        if(ok){score+=10;coin+=5;chosen.setBackground(bg(Color.rgb(35,205,130),Color.rgb(10,125,80),25));chosen.setTextColor(Color.WHITE);}
-        else{coin=Math.max(0,coin-5);chosen.setBackground(bg(Color.rgb(235,78,95),Color.rgb(145,25,55),25));chosen.setTextColor(Color.WHITE);}
+        if(ok){score+=10;coin+=5;chosen.setBackground(bg(Color.rgb(35,205,130),Color.rgb(10,125,80),25));chosen.setTextColor(Color.WHITE);chosen.setText("✓  "+chosen.getText());}
+        else{coin=Math.max(0,coin-5);chosen.setBackground(bg(Color.rgb(235,78,95),Color.rgb(145,25,55),25));chosen.setTextColor(Color.WHITE);chosen.setText("✕  "+chosen.getText()); Button correct=answerButtons.get(q.correct);correct.setBackground(bg(Color.rgb(35,205,130),Color.rgb(10,125,80),25));correct.setTextColor(Color.WHITE);correct.setText("✓  "+correct.getText());}
         new android.os.Handler().postDelayed(()->{index++;if(index<questions.size())showQuestion();else showResult();},1800);
     }
 
@@ -529,8 +526,7 @@ public class MainActivity extends Activity {
         root.addView(title("عالی بود! 🏆",30),new LinearLayout.LayoutParams(-1,dp(60)));
         root.addView(text("به مرحله بعدی رسیدی",19),new LinearLayout.LayoutParams(-1,dp(44)));
 
-        TextView scoreBox=text("امتیاز این مرحله:  "+fa(score)+" ⭐
-سکه‌ها:  "+fa(coin)+" 🪙",18);
+        TextView scoreBox=text("امتیاز این مرحله:  "+fa(score)+" ⭐\nسکه‌ها:  "+fa(coin)+" 🪙",18);
         scoreBox.setBackground(bg(Color.argb(220,30,12,90),Color.argb(220,10,10,55),24));
         root.addView(scoreBox,new LinearLayout.LayoutParams(-1,dp(100)));
 
