@@ -359,8 +359,8 @@ public class MainActivity extends Activity {
 
     void showQuestion(){answered=false; Question q=questions.get(index); int[][] colors={{6,22,72},{17,8,65},{4,46,69},{45,15,58},{10,38,75},{54,23,10}}; int[] c=colors[index%6];base(Color.rgb(c[0],c[1],c[2]),Color.rgb(Math.max(0,c[0]-2),Math.max(0,c[1]-4),Math.min(80,c[2]+5)));
         LinearLayout top=new LinearLayout(this);top.setOrientation(LinearLayout.HORIZONTAL);top.setGravity(Gravity.CENTER_VERTICAL);top.setLayoutDirection(View.LAYOUT_DIRECTION_RTL);
-        coins=text("🪙 "+fa(coin),18); coins.setGravity(Gravity.CENTER_RIGHT);top.addView(coins,new LinearLayout.LayoutParams(0,dp(48),1));
-        progress=text("مرحله "+fa(index+1)+" از "+fa(questions.size()),16);progress.setGravity(Gravity.CENTER_LEFT);top.addView(progress,new LinearLayout.LayoutParams(0,dp(48),1));root.addView(top);
+        coins=text("🪙 "+fa(coin),18); coins.setGravity(Gravity.RIGHT);top.addView(coins,new LinearLayout.LayoutParams(0,dp(48),1));
+        progress=text("مرحله "+fa(index+1)+" از "+fa(questions.size()),16);progress.setGravity(Gravity.LEFT);top.addView(progress,new LinearLayout.LayoutParams(0,dp(48),1));root.addView(top);
         ProgressBar pb=new ProgressBar(this,null,android.R.attr.progressBarStyleHorizontal);pb.setMax(questions.size());pb.setProgress(index+1);pb.setProgressDrawable(bg(Color.rgb(30,210,220),Color.rgb(20,105,190),20));root.addView(pb,new LinearLayout.LayoutParams(-1,dp(9)));
         picture=text(q.icon,62);picture.setBackground(bg(Color.argb(110,20,90,180),Color.argb(70,10,30,90),28));root.addView(picture,new LinearLayout.LayoutParams(-1,dp(145)));
         questionText=text(q.q,21);questionText.setTextColor(Color.WHITE);questionText.setBackground(bg(Color.rgb(12,49,105),Color.rgb(7,25,70),24));LinearLayout.LayoutParams qp=new LinearLayout.LayoutParams(-1,dp(125));qp.setMargins(0,dp(10),0,dp(8));root.addView(questionText,qp);
