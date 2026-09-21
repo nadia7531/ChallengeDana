@@ -2,11 +2,15 @@ package com.chalshdana.app;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.GradientDrawable;
 import android.view.Gravity;
 import android.view.View;
+import android.content.*;
+import android.net.Uri;
+import android.provider.Settings;
 import android.widget.*;
 import java.util.*;
 
@@ -15,6 +19,9 @@ public class MainActivity extends Activity {
     TextView progress, coins, questionText, picture;
     int index = 0, score = 0, coin = 50;
     boolean answered = false;
+    CountDownTimer questionTimer;
+    TextView timerView;
+    android.media.ToneGenerator tone;
     ArrayList<Question> questions = new ArrayList<>();
 
     static class Question {
@@ -97,6 +104,233 @@ public class MainActivity extends Activity {
         {"تلسکوپ بیشتر برای مشاهده چه چیزی استفاده می‌شود؟","🔭","جرم‌های آسمانی","سلول‌ها","صدا","دما"},
         {"میکروسکوپ برای دیدن چه چیزهایی مناسب است؟","🔬","اجسام بسیار ریز","ستاره‌ها","کوه‌ها","ابرها"},
         {"کدام اختراع امکان تماس بی‌سیم با اینترنت را فراهم می‌کند؟","📱","وای‌فای","چراغ قوه","بلندگو","چاپگر"}
+    };
+
+    final String[][] specializedFacts = {
+        {"نماد شیمیایی اکسیژن چیست؟","⚗️","O","H","N","C"},
+        {"نماد شیمیایی کربن چیست؟","⚗️","C","Ca","Co","Cr"},
+        {"نماد شیمیایی سدیم چیست؟","⚗️","Na","S","N","Si"},
+        {"نماد شیمیایی پتاسیم چیست؟","⚗️","K","P","Pt","Kr"},
+        {"نماد شیمیایی آهن چیست؟","⚗️","Fe","F","Ir","In"},
+        {"نماد شیمیایی مس چیست؟","⚗️","Cu","C","Co","Ca"},
+        {"نماد شیمیایی کلسیم چیست؟","⚗️","Ca","Cl","C","K"},
+        {"عدد اتمی کربن چند است؟","⚗️","۶","۱۲","۸","۱۴"},
+        {"عدد اتمی اکسیژن چند است؟","⚗️","۸","۶","۷","۱۰"},
+        {"عدد اتمی نیتروژن چند است؟","⚗️","۷","۸","۶","۹"},
+        {"فرمول شیمیایی دی‌اکسیدکربن چیست؟","⚗️","CO₂","H₂O","O₂","CH₄"},
+        {"فرمول شیمیایی آب چیست؟","⚗️","H₂O","CO₂","O₃","NaCl"},
+        {"فرمول شیمیایی نمک خوراکی چیست؟","⚗️","NaCl","KCl","HCl","NaOH"},
+        {"کدام گاز برای فتوسنتز مصرف می‌شود؟","⚗️","دی‌اکسیدکربن","اکسیژن","هیدروژن","هلیوم"},
+        {"pH کمتر از ۷ معمولاً نشان‌دهنده چیست؟","⚗️","اسیدی بودن","بازی بودن","خنثی بودن","فلزی بودن"},
+        {"pH آب خالص در شرایط معمول تقریباً چند است؟","⚗️","۷","۵","۹","۱۲"},
+        {"کدام عنصر در دمای اتاق مایع و فلزی است؟","⚗️","جیوه","آهن","سدیم","آلومینیوم"},
+        {"کدام عنصر سبک‌ترین عنصر است؟","⚗️","هیدروژن","اکسیژن","هلیوم","کربن"},
+        {"کدام گاز نجیب است؟","⚗️","هلیوم","اکسیژن","کلر","نیتروژن"},
+        {"کدام ماده یک باز قوی شناخته‌شده است؟","⚗️","سدیم هیدروکسید","آب","دی‌اکسیدکربن","اکسیژن"},
+        {"جدول تناوبی عناصر توسط چه دانشمندی سامان‌دهی شد؟","⚗️","مندلیف","نیوتن","داروین","پاستور"},
+        {"عدد اتمی طلا چند است؟","⚗️","۷۹","۴۷","۸۰","۷۸"},
+        {"عدد اتمی نقره چند است؟","⚗️","۴۷","۷۹","۲۹","۸۰"},
+        {"عدد اتمی آهن چند است؟","⚗️","۲۶","۲۴","۲۸","۳۲"},
+        {"کدام عنصر نماد He دارد؟","⚗️","هلیوم","هیدروژن","هالوژن","هافنیم"},
+        {"کدام عنصر نماد Ne دارد؟","⚗️","نئون","نیکل","نیتروژن","نپتونیم"},
+        {"کدام عنصر نماد Cl دارد؟","⚗️","کلر","کلسیم","کربن","کبالت"},
+        {"کدام گاز برای تنفس هوازی سلول‌ها ضروری است؟","⚗️","اکسیژن","نیتروژن","هلیوم","نئون"},
+        {"کدام ماده در ساخت شیشه معمولی نقش مهمی دارد؟","⚗️","سیلیس","آهن","طلا","سدیم خالص"},
+        {"واکنش سوختن معمولاً به حضور کدام گاز نیاز دارد؟","⚗️","اکسیژن","نیتروژن","هلیوم","نئون"},
+        {"واحد نیرو در SI چیست؟","⚛️","نیوتن","ژول","وات","پاسکال"},
+        {"واحد انرژی در SI چیست؟","⚛️","ژول","نیوتن","وات","ولت"},
+        {"واحد توان چیست؟","⚛️","وات","ژول","آمپر","اهم"},
+        {"واحد فشار در SI چیست؟","⚛️","پاسکال","نیوتن","وات","ژول"},
+        {"سرعت نور در خلأ تقریباً چقدر است؟","⚛️","۳۰۰ هزار کیلومتر بر ثانیه","۳۰ هزار کیلومتر بر ثانیه","۳ میلیون کیلومتر بر ثانیه","۳ هزار کیلومتر بر ثانیه"},
+        {"شتاب گرانش زمین تقریباً چند متر بر مجذور ثانیه است؟","⚛️","۹٫۸","۱٫۶","۲۲","۳۲"},
+        {"قانون اول حرکت با نام کدام دانشمند شناخته می‌شود؟","⚛️","نیوتن","گالیله","فارادی","پلانک"},
+        {"واحد مقاومت الکتریکی چیست؟","⚛️","اهم","ولت","وات","آمپر"},
+        {"واحد بار الکتریکی چیست؟","⚛️","کولن","وات","اهم","تسلا"},
+        {"واحد فرکانس چیست؟","⚛️","هرتز","ژول","کولن","نیوتن"},
+        {"واحد میدان مغناطیسی در SI چیست؟","⚛️","تسلا","وات","پاسکال","کولن"},
+        {"انرژی جنبشی به چه چیزی وابسته است؟","⚛️","جرم و سرعت","فقط دما","فقط فشار","فقط حجم"},
+        {"کدام موج برای انتقال صدا به محیط مادی نیاز دارد؟","⚛️","موج صوتی","نور","امواج رادیویی","مایکروویو"},
+        {"نور مرئی بخشی از کدام پدیده است؟","⚛️","طیف الکترومغناطیسی","امواج مکانیکی","امواج لرزه‌ای","جریان الکتریکی"},
+        {"آینه تخت چه نوع تصویری ایجاد می‌کند؟","⚛️","مجازی و هم‌اندازه","حقیقی و بزرگ‌تر","حقیقی و کوچک‌تر","مجازی و وارونه"},
+        {"کدام ذره بار منفی دارد؟","⚛️","الکترون","پروتون","نوترون","نوترینو"},
+        {"کدام ذره بار مثبت دارد؟","⚛️","پروتون","الکترون","نوترون","فوتون"},
+        {"کدام ذره در هسته اتم بدون بار الکتریکی است؟","⚛️","نوترون","پروتون","الکترون","یون"},
+        {"کدام قانون رابطه ولتاژ، جریان و مقاومت را بیان می‌کند؟","⚛️","قانون اهم","قانون ارشمیدس","قانون بویل","قانون هوک"},
+        {"در مدار سری، جریان در همه اجزا چگونه است؟","⚛️","یکسان است","صفر است","همیشه دو برابر است","فقط در مقاومت‌هاست"},
+        {"کدام وسیله انرژی الکتریکی را به نور تبدیل می‌کند؟","⚛️","لامپ","موتور","بلندگو","ترانسفورماتور"},
+        {"کدام وسیله انرژی الکتریکی را به حرکت تبدیل می‌کند؟","⚛️","موتور الکتریکی","لامپ","باتری","مقاومت"},
+        {"واحد دما در SI چیست؟","⚛️","کلوین","سلسیوس","فارنهایت","ژول"},
+        {"کدام پدیده باعث جدا شدن رنگ‌های نور سفید در منشور می‌شود؟","⚛️","پاشندگی","انعکاس کامل","تبخیر","هدایت"},
+        {"قانون کنش و واکنش متعلق به کدام دانشمند است؟","⚛️","نیوتن","ماکسول","پاستور","مندلیف"},
+        {"انرژی پتانسیل گرانشی با افزایش ارتفاع چه می‌شود؟","⚛️","افزایش می‌یابد","کاهش می‌یابد","همیشه صفر می‌شود","به جرم وابسته نیست"},
+        {"کدام وسیله برای اندازه‌گیری جریان الکتریکی به کار می‌رود؟","⚛️","آمپرمتر","ولت‌متر","دماسنج","فشارسنج"},
+        {"کدام وسیله برای اندازه‌گیری اختلاف پتانسیل به کار می‌رود؟","⚛️","ولت‌متر","آمپرمتر","ترازو","بارومتر"},
+        {"کدام نوع انتقال گرما در خلأ نیز امکان‌پذیر است؟","⚛️","تابش","رسانش","همرفت","هیچ‌کدام"},
+        {"صوت در کدام محیط سریع‌تر از هوا حرکت می‌کند؟","⚛️","جامدات","خلأ","همان سرعت","فقط آب"},
+        {"واحد بنیادی ساختار و عملکرد جانداران چیست؟","🧬","سلول","بافت","اندام","مولکول"},
+        {"کدام اندامک محل اصلی تولید ATP در سلول است؟","🧬","میتوکندری","ریبوزوم","هسته","لیزوزوم"},
+        {"کدام اندامک محل ساخت پروتئین است؟","🧬","ریبوزوم","میتوکندری","واکوئول","سانتریول"},
+        {"DNA بیشتر در کدام بخش سلول‌های یوکاریوتی قرار دارد؟","🧬","هسته","دیواره سلولی","واکوئول","غشای سلولی"},
+        {"گیاهان برای فتوسنتز بیشتر از کدام رنگدانه استفاده می‌کنند؟","🧬","کلروفیل","هموگلوبین","ملانین","کراتین"},
+        {"کدام گاز در فتوسنتز آزاد می‌شود؟","🧬","اکسیژن","نیتروژن","متان","هلیوم"},
+        {"کدام اندام مسئول تبادل گازها در بدن انسان است؟","🧬","ریه","کبد","کلیه","معده"},
+        {"کدام اندام بیشترین نقش را در تصفیه خون و تولید ادرار دارد؟","🧬","کلیه","قلب","ریه","مغز"},
+        {"گلبول قرمز بیشتر چه چیزی را حمل می‌کند؟","🧬","اکسیژن","صفرا","انسولین","هورمون رشد"},
+        {"هموگلوبین در کدام سلول خون قرار دارد؟","🧬","گلبول قرمز","پلاکت","گلبول سفید","سلول عصبی"},
+        {"پلاکت‌ها بیشتر در چه فرایندی نقش دارند؟","🧬","انعقاد خون","تنفس","هضم","بینایی"},
+        {"کدام دستگاه بدن غذا را هضم می‌کند؟","🧬","دستگاه گوارش","دستگاه عصبی","دستگاه تنفسی","دستگاه اسکلتی"},
+        {"کدام بخش دستگاه عصبی مرکز اصلی کنترل بدن است؟","🧬","مغز","کبد","قلب","معده"},
+        {"کدام بخش چشم نور را به پیام عصبی تبدیل می‌کند؟","🧬","شبکیه","قرنیه","عنبیه","عدسی"},
+        {"عنبیه چه چیزی را تنظیم می‌کند؟","🧬","مقدار نور ورودی به چشم","ضربان قلب","حرکت پا","تولید صفرا"},
+        {"کدام هورمون قند خون را کاهش می‌دهد؟","🧬","انسولین","آدرنالین","تیروکسین","ملاتونین"},
+        {"کدام غده هورمون تیروکسین را تولید می‌کند؟","🧬","تیروئید","هیپوفیز","فوق کلیه","پانکراس"},
+        {"انسولین در کدام اندام تولید می‌شود؟","🧬","پانکراس","کبد","کلیه","طحال"},
+        {"کدام ویتامین برای جذب کلسیم اهمیت دارد؟","🧬","ویتامین D","ویتامین C","ویتامین K","ویتامین B1"},
+        {"کدام ویتامین در لخته‌شدن خون نقش دارد؟","🧬","ویتامین K","ویتامین C","ویتامین D","ویتامین B12"},
+        {"کدام بخش استخوان محل مهم تولید سلول‌های خونی است؟","🧬","مغز استخوان","مینای دندان","غضروف","رباط"},
+        {"بزرگ‌ترین اندام بدن انسان کدام است؟","🧬","پوست","کبد","قلب","مغز"},
+        {"بزرگ‌ترین اندام داخلی بدن انسان چیست؟","🧬","کبد","قلب","ریه","کلیه"},
+        {"کدام جانور ستون فقرات دارد؟","🧬","گربه","هشت‌پا","کرم خاکی","عروس دریایی"},
+        {"کدام گروه جانوران معمولاً با آبشش تنفس می‌کنند؟","🧬","ماهی‌ها","پرندگان","پستانداران","خزندگان"},
+        {"کدام جانور دوزیست است؟","🧬","قورباغه","عقاب","مار","دلفین"},
+        {"کدام جانور پستاندار است؟","🧬","نهنگ","کوسه","اختاپوس","مار"},
+        {"کدام بخش گیاه آب و مواد معدنی را جذب می‌کند؟","🧬","ریشه","گل","میوه","دانه"},
+        {"دانه پس از جوانه‌زنی ابتدا معمولاً چه ساختاری را رشد می‌دهد؟","🧬","ریشه","میوه","گل","پوست"},
+        {"CPU در رایانه چه نام دارد؟","💻","واحد پردازش مرکزی","حافظه تصویری","واحد ذخیره‌سازی","کارت صدا"},
+        {"RAM چه نوع حافظه‌ای است؟","💻","حافظه موقت","حافظه نوری دائمی","حافظه فقط خواندنی دائمی","حافظه کاغذی"},
+        {"کدام مورد سیستم‌عامل است؟","💻","Linux","HTML","JPEG","USB"},
+        {"کدام زبان بیشتر برای ساختار صفحات وب استفاده می‌شود؟","💻","HTML","SQL","Python","C"},
+        {"CSS بیشتر برای چه کاری در وب استفاده می‌شود؟","💻","ظاهر و سبک صفحه","ذخیره داده","مدیریت پردازنده","فشرده‌سازی صدا"},
+        {"JavaScript بیشتر برای چه چیزی در صفحات وب کاربرد دارد؟","💻","تعامل و رفتار پویا","چاپ اسناد","خنک‌کردن CPU","ذخیره برق"},
+        {"SQL برای چه کاری استفاده می‌شود؟","💻","کار با پایگاه داده","ویرایش عکس","پخش موسیقی","طراحی مدار"},
+        {"IP در شبکه بیشتر به چه چیزی اشاره دارد؟","💻","نشانی شبکه","نوع پردازنده","فرمت تصویر","حجم باتری"},
+        {"HTTP بیشتر مربوط به چیست؟","💻","انتقال داده وب","پردازش تصویر","ساخت فایل صوتی","مدیریت باتری"},
+        {"HTTPS چه مزیتی نسبت به HTTP دارد؟","💻","ارتباط رمزنگاری‌شده","سرعت پردازنده بیشتر","حافظه بیشتر","صفحه بزرگ‌تر"},
+        {"کدام پسوند معمولاً برای تصویر JPEG است؟","💻",".jpg",".mp3",".txt",".exe"},
+        {"کدام پسوند معمولاً برای فایل متنی ساده است؟","💻",".txt",".png",".mp4",".apk"},
+        {"APK معمولاً فایل نصب چه چیزی است؟","💻","برنامه اندروید","فایل صوتی","فایل اکسل","صفحه وب"},
+        {"Git برای چه کاری معروف است؟","💻","کنترل نسخه","پخش ویدئو","ویرایش عکس","مدیریت چاپگر"},
+        {"GitHub بیشتر برای چه چیزی استفاده می‌شود؟","💻","میزبانی و همکاری روی کد","تماشای فیلم","خرید سخت‌افزار","ویرایش صدا"},
+        {"کدام ساختار داده از مفهوم صف استفاده می‌کند؟","💻","Queue","Stack","Tree","Graph"},
+        {"در Stack کدام اصل رایج است؟","💻","LIFO","FIFO","Random","Circular only"},
+        {"در Queue کدام اصل رایج است؟","💻","FIFO","LIFO","Random","Binary"},
+        {"عدد دودویی ۱۰ در مبنای ده چند است؟","💻","۲","۳","۴","۸"},
+        {"عدد دودویی ۱۱ در مبنای ده چند است؟","💻","۳","۲","۴","۵"},
+        {"کدام مورد یک مرورگر وب است؟","💻","Firefox","Linux","Python","Git"},
+        {"کدام مورد یک پایگاه داده است؟","💻","SQLite","HTML","CSS","JPEG"},
+        {"کدام واحد برای اندازه‌گیری ظرفیت داده رایج است؟","💻","بایت","وات","هرتز","ولت"},
+        {"یک بایت چند بیت دارد؟","💻","۸","۴","۱۶","۳۲"},
+        {"کدام الگوریتم برای مرتب‌سازی داده‌ها به کار می‌رود؟","💻","Quick Sort","JPEG","HTTP","USB"},
+        {"عدد پی تقریباً چند است؟","➗","۳٫۱۴","۲٫۱۴","۴٫۱۴","۱٫۴۱"},
+        {"جذر ۸۱ چند است؟","➗","۹","۸","۷","۶"},
+        {"حاصل ۷ ضربدر ۹ چند است؟","➗","۶۳","۵۶","۷۲","۶۹"},
+        {"حاصل ۱۴۴ تقسیم بر ۱۲ چند است؟","➗","۱۲","۱۰","۱۴","۱۶"},
+        {"۲۰ درصد از ۵۰ چند است؟","➗","۱۰","۵","۱۵","۲۰"},
+        {"نصف ۷۸ چند است؟","➗","۳۹","۳۸","۴۰","۴۲"},
+        {"یک‌چهارم ۱۰۰ چند است؟","➗","۲۵","۲۰","۳۰","۴۰"},
+        {"مجموع زوایای چهارضلعی چند درجه است؟","➗","۳۶۰","۱۸۰","۲۷۰","۹۰"},
+        {"مساحت مربع با ضلع ۵ چند است؟","➗","۲۵","۲۰","۱۰","۳۰"},
+        {"محیط مربع با ضلع ۵ چند است؟","➗","۲۰","۲۵","۱۵","۱۰"},
+        {"مساحت مستطیل با طول ۶ و عرض ۴ چند است؟","➗","۲۴","۲۰","۱۰","۳۰"},
+        {"حاصل ۲ به توان ۵ چند است؟","➗","۳۲","۲۵","۱۶","۶۴"},
+        {"عدد اول کدام است؟","➗","۲۹","۲۱","۲۷","۳۳"},
+        {"کوچک‌ترین عدد اول چیست؟","➗","۲","۱","۰","۳"},
+        {"حاصل ۱۰۰ منهای ۳۷ چند است؟","➗","۶۳","۶۷","۵۷","۷۳"},
+        {"حاصل ۲۵ جمع با ۴۸ چند است؟","➗","۷۳","۶۳","۷۸","۶۸"},
+        {"اگر x=5 باشد، 2x+3 چند است؟","➗","۱۳","۱۰","۸","۱۵"},
+        {"میانگین ۱۰ و ۲۰ چند است؟","➗","۱۵","۱۲","۱۴","۱۸"},
+        {"عدد ۰٫۵ معادل کدام کسر است؟","➗","۱/۲","۱/۳","۲/۵","۳/۵"},
+        {"سه‌چهارم معادل چند درصد است؟","➗","۷۵٪","۵۰٪","۶۰٪","۸۰٪"},
+        {"کدام عدد بر ۳ بخش‌پذیر است؟","➗","۱۲۳","۱۲۴","۱۲۵","۱۲۷"},
+        {"کدام عدد بر ۵ بخش‌پذیر است؟","➗","۳۵","۳۶","۳۷","۳۸"},
+        {"مجموع اعداد ۱ تا ۱۰ چند است؟","➗","۵۵","۵۰","۶۰","۴۵"},
+        {"تعداد اضلاع پنج‌ضلعی چند است؟","➗","۵","۴","۶","۷"},
+        {"تعداد قطرهای مربع چند است؟","➗","۲","۴","۱","۳"},
+        {"پایتخت کانادا چیست؟","🌍","اتاوا","تورنتو","ونکوور","مونترال"},
+        {"پایتخت استرالیا چیست؟","🌍","کانبرا","سیدنی","ملبورن","پرت"},
+        {"پایتخت برزیل چیست؟","🌍","برازیلیا","ریودوژانیرو","سائوپائولو","سالوادور"},
+        {"پایتخت مصر چیست؟","🌍","قاهره","اسکندریه","جیزه","لوکسور"},
+        {"پایتخت ترکیه چیست؟","🌍","آنکارا","استانبول","ازمیر","آنتالیا"},
+        {"پایتخت اسپانیا چیست؟","🌍","مادرید","بارسلونا","سویا","والنسیا"},
+        {"پایتخت پرتغال چیست؟","🌍","لیسبون","پورتو","براگا","فارو"},
+        {"پایتخت یونان چیست؟","🌍","آتن","تسالونیکی","پاتراس","رودس"},
+        {"پایتخت کره جنوبی چیست؟","🌍","سئول","بوسان","اینچئون","دئگو"},
+        {"پایتخت هند چیست؟","🌍","دهلی نو","بمبئی","کلکته","بنگلور"},
+        {"پایتخت چین چیست؟","🌍","پکن","شانگهای","شنژن","گوانگژو"},
+        {"پایتخت مکزیک چیست؟","🌍","مکزیکوسیتی","کانکون","گوادالاخارا","مونتری"},
+        {"پایتخت آرژانتین چیست؟","🌍","بوئنوس آیرس","کوردوبا","مندوزا","روساریو"},
+        {"پایتخت نروژ چیست؟","🌍","اسلو","برگن","تروندهایم","استاوانگر"},
+        {"پایتخت سوئد چیست؟","🌍","استکهلم","گوتنبرگ","مالمو","اوپسالا"},
+        {"پایتخت فنلاند چیست؟","🌍","هلسینکی","تورکو","تامپره","اسپو"},
+        {"بزرگ‌ترین قاره جهان کدام است؟","🌍","آسیا","آفریقا","اروپا","آمریکای جنوبی"},
+        {"بزرگ‌ترین اقیانوس جهان کدام است؟","🌍","آرام","اطلس","هند","منجمد شمالی"},
+        {"بلندترین آبشار جهان کدام است؟","🌍","آنجل","نیاگارا","ویکتوریا","ایگوازو"},
+        {"رود نیل بیشتر در کدام قاره جریان دارد؟","🌍","آفریقا","آسیا","اروپا","آمریکای جنوبی"},
+        {"صحرای بزرگ آفریقا در کدام قاره است؟","🌍","آفریقا","آسیا","استرالیا","اروپا"},
+        {"کوه اورست در کدام رشته‌کوه قرار دارد؟","🌍","هیمالیا","آلپ","آند","راکی"},
+        {"رشته‌کوه آند بیشتر در کدام قاره است؟","🌍","آمریکای جنوبی","اروپا","آسیا","آفریقا"},
+        {"دریای مدیترانه بین کدام مناطق قرار دارد؟","🌍","اروپا، آفریقا و آسیا","آمریکا و آسیا","استرالیا و آفریقا","قطب شمال و اروپا"},
+        {"کدام کشور جزیره‌ای در شرق چین قرار دارد؟","🌍","ژاپن","هند","نپال","پاکستان"},
+        {"انقلاب صنعتی ابتدا در کدام کشور آغاز شد؟","📚","بریتانیا","فرانسه","آلمان","اسپانیا"},
+        {"خط میخی در کدام منطقه باستانی به‌طور گسترده استفاده می‌شد؟","📚","بین‌النهرین","اسکاندیناوی","آمریکای جنوبی","استرالیا"},
+        {"تمدن مصر باستان در کنار کدام رود شکل گرفت؟","📚","نیل","دانوب","گنگ","آمازون"},
+        {"دموکراسی کلاسیک باستانی بیشتر با کدام شهر یونان پیوند دارد؟","📚","آتن","اسپارت","تبس","کورینت"},
+        {"امپراتوری روم باستان مرکز خود را در کدام شهر داشت؟","📚","رم","آتن","پاریس","لندن"},
+        {"چاپ با حروف متحرک در اروپا با نام چه کسی پیوند دارد؟","📚","گوتنبرگ","کپرنیک","گالیله","نیوتن"},
+        {"کپرنیک بیشتر به کدام دیدگاه نجومی مشهور است؟","📚","خورشیدمرکزی","زمین‌مرکزی","ماه‌مرکزی","ستاره‌مرکزی"},
+        {"گالیله از کدام ابزار برای رصد آسمان استفاده کرد؟","📚","تلسکوپ","میکروسکوپ","بارومتر","قطب‌نما"},
+        {"داروین نظریه تکامل را بیشتر بر پایه چه مفهومی توضیح داد؟","📚","انتخاب طبیعی","گرانش","الکترومغناطیس","تبخیر"},
+        {"پاستور در کدام حوزه علمی شهرت دارد؟","📚","میکروب‌شناسی","نجوم","زمین‌شناسی","اخترفیزیک"},
+        {"ماری کوری در پژوهش‌هایش با کدام حوزه ارتباط داشت؟","📚","رادیواکتیویته","نسبیت","ژنتیک گیاهی","اقیانوس‌شناسی"},
+        {"آلبرت اینشتین با کدام نظریه مشهور است؟","📚","نسبیت","تکامل","صفحات زمین‌ساختی","نظریه سلول"},
+        {"لئوناردو داوینچی به جز نقاشی در چه حوزه‌هایی نیز فعالیت داشت؟","📚","علوم و مهندسی","فقط موسیقی","فقط کشاورزی","فقط سیاست"},
+        {"شکسپیر بیشتر به عنوان چه شناخته می‌شود؟","📚","نمایشنامه‌نویس","فیزیکدان","نقاش","جغرافی‌دان"},
+        {"هومر در سنت ادبی یونان باستان با کدام آثار پیوند دارد؟","📚","ایلیاد و ادیسه","کمدی الهی","شاهنامه","مهابهاراتا"},
+        {"کمدی الهی اثر کدام شاعر است؟","📚","دانته","شکسپیر","هومر","گوته"},
+        {"شاهنامه اثر کدام شاعر ایرانی است؟","📚","فردوسی","حافظ","سعدی","مولانا"},
+        {"بوستان اثر کدام شاعر ایرانی است؟","📚","سعدی","فردوسی","حافظ","خیام"},
+        {"دیوان حافظ بیشتر شامل چه نوع آثاری است؟","📚","غزل","رمان","نمایشنامه","حماسه منظوم"},
+        {"رباعیات خیام معمولاً در چه قالبی هستند؟","📚","رباعی","غزل","مثنوی","قصیده"},
+        {"تورم به چه معناست؟","💼","افزایش عمومی و مستمر سطح قیمت‌ها","کاهش جمعیت","افزایش تولید یک کالا","کاهش نرخ بارش"},
+        {"GDP مخفف چیست؟","💼","تولید ناخالص داخلی","درآمد خالص جهانی","قیمت عمومی کالا","ذخیره ارزی دولت"},
+        {"بانک مرکزی معمولاً چه نقشی دارد؟","💼","سیاست پولی و مدیریت پول","تولید خودرو","ساخت جاده","مدیریت مدارس"},
+        {"عرضه و تقاضا بیشتر در کدام حوزه مطرح است؟","💼","اقتصاد","نجوم","زیست‌شناسی","ادبیات"},
+        {"وقتی تقاضا برای کالایی افزایش یابد و عرضه ثابت بماند، فشار بر قیمت معمولاً چگونه است؟","💼","رو به افزایش","رو به کاهش","همیشه صفر","بدون ارتباط"},
+        {"مالیات چیست؟","💼","پرداخت قانونی به دولت","وام بانکی","هدیه خصوصی","حقوق بازنشستگی"},
+        {"سهام نشان‌دهنده چیست؟","💼","مالکیت بخشی از شرکت","قرض شخصی","مالیات","بیمه خودرو"},
+        {"اوراق قرضه بیشتر نشان‌دهنده چیست؟","💼","تعهد بدهی","مالکیت خانه","سهام شرکت","پول نقد"},
+        {"درآمد و هزینه برای محاسبه چه چیزی مهم‌اند؟","💼","سود یا زیان","قدرت گرانش","سرعت نور","دمای جو"},
+        {"بیمه برای چه منظوری طراحی شده است؟","💼","مدیریت ریسک مالی","افزایش وزن","تغییر آب‌وهوا","افزایش سرعت اینترنت"},
+        {"بودجه چیست؟","💼","برنامه درآمد و هزینه","نوع ارز","مالیات بر ارزش افزوده","قرارداد استخدام"},
+        {"سرمایه‌گذاری به‌طور کلی به چه معناست؟","💼","اختصاص منابع برای بازده آینده","خرج کردن همه پول","حذف هزینه‌ها","تغییر نام شرکت"},
+        {"دارایی چیست؟","💼","منبع دارای ارزش اقتصادی","فقط بدهی","فقط مالیات","فقط حقوق"},
+        {"بدهی چیست؟","💼","تعهد مالی","درآمد","دارایی","سرمایه انسانی"},
+        {"نقدینگی به چه چیزی اشاره دارد؟","💼","سهولت تبدیل دارایی به پول","قیمت طلا","تعداد کارکنان","مقدار مالیات"},
+        {"بازار رقابتی معمولاً چه ویژگی دارد؟","💼","وجود خریداران و فروشندگان متعدد","فقط یک فروشنده","فقط یک خریدار","نبود قیمت"},
+        {"ارزش افزوده چیست؟","💼","ارزش ایجادشده در فرایند تولید","مالیات ثابت","وام بانکی","هزینه حمل"},
+        {"کارآفرینی بیشتر به چه چیزی مربوط است؟","💼","ایجاد و توسعه کسب‌وکار و نوآوری","فقط پس‌انداز","فقط خرید کالا","فقط مالیات"},
+        {"برند چیست؟","💼","هویت و نشانه متمایزکننده یک کسب‌وکار یا محصول","نوع مالیات","نوع وام","نوع قرارداد"},
+        {"بازاریابی چه هدفی دارد؟","💼","شناخت بازار و جذب و حفظ مشتری","تولید برق","محاسبه شتاب","اندازه‌گیری فشار"},
+        {"کدام سیاره به دلیل داشتن حلقه‌های بزرگ مشهور است؟","🧠","زحل","مریخ","عطارد","زمین"},
+        {"کدام اندامک در سلول گیاهی فتوسنتز را انجام می‌دهد؟","🧠","کلروپلاست","میتوکندری","ریبوزوم","هسته"},
+        {"کدام نوع DNA دو رشته‌ای است؟","🧠","DNA معمولی سلولی","RNA پیام‌رسان","RNA ناقل","RNA ریبوزومی"},
+        {"کدام عدد مکعب کامل است؟","🧠","۲۷","۲۵","۳۶","۴۸"},
+        {"کدام کشور مبدأ بازی‌های المپیک باستانی بود؟","🧠","یونان","ایتالیا","مصر","چین"},
+        {"کدام قاره بیشترین تعداد کشور را دارد؟","🧠","آفریقا","اروپا","آسیا","آمریکای شمالی"},
+        {"کدام اقیانوس بین آفریقا و استرالیا قرار دارد؟","🧠","هند","آرام","اطلس","منجمد شمالی"},
+        {"کدام زبان بیشترین گویشور بومی را در جهان دارد؟","🧠","چینی ماندارین","انگلیسی","اسپانیایی","فرانسوی"},
+        {"کدام ساز موسیقی دارای کلیدهای سیاه و سفید است؟","🧠","پیانو","ویولن","فلوت","دف"},
+        {"کدام هنر با ساخت تصویر از قطعات کوچک رنگی شناخته می‌شود؟","🧠","موزاییک","خوشنویسی","مجسمه‌سازی","عکاسی"},
+        {"کدام بخش رایانه داده‌ها را برای پردازش نگه می‌دارد؟","🧠","حافظه","نمایشگر","بلندگو","چاپگر"},
+        {"کدام واحد برای سرعت انتقال داده در شبکه رایج است؟","🧠","بیت بر ثانیه","وات","ولت","نیوتن"},
+        {"کدام مورد نمونه انرژی تجدیدپذیر است؟","🧠","انرژی خورشیدی","زغال‌سنگ","نفت","گاز طبیعی"},
+        {"کدام گاز گلخانه‌ای مهم حاصل از سوختن سوخت‌های فسیلی است؟","🧠","دی‌اکسیدکربن","هلیوم","نئون","آرگون"},
+        {"کدام لایه جو بیشتر پدیده‌های آب‌وهوایی در آن رخ می‌دهد؟","🧠","تروپوسفر","استراتوسفر","مزوسفر","ترموسفر"},
+        {"لایه اوزون بیشتر در کدام لایه جو قرار دارد؟","🧠","استراتوسفر","تروپوسفر","مزوسفر","اگزوسفر"},
+        {"کدام سیاره بیشترین دمای سطحی میان سیارات منظومه شمسی را دارد؟","🧠","زهره","عطارد","مریخ","مشتری"},
+        {"کدام قمر متعلق به زمین است؟","🧠","ماه","تیتان","اروپا","گانیمد"},
+        {"کدام روش علمی بر آزمایش و مشاهده تکیه دارد؟","🧠","روش تجربی","حدس بدون آزمون","قرعه‌کشی","شانس"},
+        {"کدام وسیله برای اندازه‌گیری جرم به کار می‌رود؟","🧠","ترازو","دماسنج","بارومتر","ولت‌متر"},
     };
 
     final String[][] iranFacts = {
@@ -321,26 +555,46 @@ public class MainActivity extends Activity {
     android.media.ToneGenerator tone;
     boolean inGame = false;
     int currentBackground = 0;
+    final int PICK_PROFILE_IMAGE = 2001;
+    String profileName = "";
+    String profileImageUri = "";
+    SharedPreferences prefs;
+    Typeface persianFont;
+    boolean backArmed = false;
+    long lastBack = 0L;
+    Set<String> favorites = new HashSet<>();
 
     @Override public void onCreate(Bundle b){
         super.onCreate(b);
         getWindow().setStatusBarColor(Color.rgb(5,12,38));
         getWindow().setNavigationBarColor(Color.rgb(5,12,38));
         tone = new android.media.ToneGenerator(android.media.AudioManager.STREAM_MUSIC, 85);
+        try { persianFont = Typeface.createFromAsset(getAssets(), "fonts/NotoSansArabic-Bold.ttf"); } catch(Exception e) { persianFont = Typeface.create("sans-serif", Typeface.BOLD); }
+        prefs = getSharedPreferences("dana_profile", MODE_PRIVATE);
+        profileName = prefs.getString("name", "");
+        profileImageUri = prefs.getString("image", "");
+        favorites.addAll(prefs.getStringSet("favorites", new HashSet<String>()));
+        tone = new android.media.ToneGenerator(android.media.AudioManager.STREAM_MUSIC, 90);
         buildQuestions();
         showHome();
     }
 
     @Override public void onBackPressed(){
-        if(inGame){ inGame=false; showHome(); }
-        else super.onBackPressed();
+        long now=System.currentTimeMillis();
+        if(inGame){ inGame=false; backArmed=false; showHome(); return; }
+        if(!backArmed || now-lastBack>1800){
+            backArmed=true; lastBack=now;
+            Toast.makeText(this,"برای خروج دوباره دکمه برگشت را بزنید",Toast.LENGTH_SHORT).show();
+        }else{
+            super.onBackPressed();
+        }
     }
 
     String fa(int n){String s=""+n; String en="0123456789"; String fa="۰۱۲۳۴۵۶۷۸۹"; StringBuilder r=new StringBuilder(); for(char c:s.toCharArray()){int i=en.indexOf(c); r.append(i>=0?fa.charAt(i):c);} return r.toString();}
     int dp(int x){return (int)(x*getResources().getDisplayMetrics().density+0.5f);}
-    TextView text(String s,float size){TextView v=new TextView(this);v.setText(s);v.setTextSize(size);v.setTextColor(Color.WHITE);v.setGravity(Gravity.CENTER);v.setTypeface(Typeface.DEFAULT,Typeface.BOLD);v.setPadding(dp(12),dp(8),dp(12),dp(8));v.setLayoutDirection(View.LAYOUT_DIRECTION_RTL);return v;}
+    TextView text(String s,float size){TextView v=new TextView(this);v.setText(s);v.setTextSize(size);v.setTextColor(Color.WHITE);v.setGravity(Gravity.CENTER);v.setTypeface(persianFont != null ? persianFont : Typeface.DEFAULT_BOLD);v.setIncludeFontPadding(true);v.setLineSpacing(0f,1.05f);v.setPadding(dp(12),dp(8),dp(12),dp(8));v.setLayoutDirection(View.LAYOUT_DIRECTION_RTL);v.setTextDirection(View.TEXT_DIRECTION_RTL);return v;}
     GradientDrawable bg(int c1,int c2,float r){GradientDrawable g=new GradientDrawable(GradientDrawable.Orientation.TL_BR,new int[]{c1,c2});g.setCornerRadius(dp((int)r));g.setStroke(dp(1),Color.argb(100,255,255,255));return g;}
-    Button button(String s){Button b=new Button(this);b.setText(s);b.setTextSize(17);b.setTextColor(Color.WHITE);b.setAllCaps(false);b.setGravity(Gravity.CENTER);b.setTypeface(Typeface.DEFAULT,Typeface.BOLD);b.setLayoutDirection(View.LAYOUT_DIRECTION_RTL);b.setPadding(dp(10),0,dp(10),0);b.setBackground(bg(Color.rgb(30,105,210),Color.rgb(18,45,125),24));LinearLayout.LayoutParams p=new LinearLayout.LayoutParams(-1,dp(58));p.setMargins(dp(8),dp(6),dp(8),dp(6));b.setLayoutParams(p);return b;}
+    Button button(String s){Button b=new Button(this);b.setText(s);b.setTextSize(19);b.setTextColor(Color.WHITE);b.setAllCaps(false);b.setGravity(Gravity.CENTER);b.setTypeface(Typeface.DEFAULT,Typeface.BOLD);b.setLayoutDirection(View.LAYOUT_DIRECTION_RTL);b.setPadding(dp(10),0,dp(10),0);b.setBackground(bg(Color.rgb(30,105,210),Color.rgb(18,45,125),24));LinearLayout.LayoutParams p=new LinearLayout.LayoutParams(-1,dp(54));p.setMargins(dp(8),dp(6),dp(8),dp(6));b.setLayoutParams(p);return b;}
     Button smallButton(String s){Button b=button(s);b.setTextSize(16);b.setTextColor(Color.WHITE);b.setBackground(bg(Color.argb(175,12,45,100),Color.argb(175,8,25,65),20));b.setLayoutParams(new LinearLayout.LayoutParams(dp(54),dp(48)));return b;}
 
     int backgroundRes(){int[] r={R.drawable.bg_space,R.drawable.bg_nature,R.drawable.bg_iran,R.drawable.bg_ocean};return r[currentBackground%r.length];}
@@ -350,7 +604,7 @@ public class MainActivity extends Activity {
         image.setImageResource(backgroundRes());
         image.setScaleType(ImageView.ScaleType.CENTER_CROP);
         screen.addView(image,new FrameLayout.LayoutParams(-1,-1));
-        View shade=new View(this); shade.setBackgroundColor(Color.argb(55,2,10,35));
+        View shade=new View(this); shade.setBackgroundColor(Color.argb(28,2,10,35));
         screen.addView(shade,new FrameLayout.LayoutParams(-1,-1));
         ScrollView scroll=new ScrollView(this); scroll.setFillViewport(true); scroll.setClipToPadding(false);
         root=new LinearLayout(this); root.setOrientation(LinearLayout.VERTICAL); root.setGravity(Gravity.CENTER_HORIZONTAL); root.setPadding(dp(14),dp(10),dp(14),dp(20)); root.setLayoutDirection(View.LAYOUT_DIRECTION_RTL);
@@ -375,14 +629,14 @@ public class MainActivity extends Activity {
         card.setLayoutDirection(View.LAYOUT_DIRECTION_RTL);
         card.setBackground(bg(Color.argb(235,c1>>16&255,c1>>8&255,c1&255),
                               Color.argb(235,c2>>16&255,c2>>8&255,c2&255),24));
-        LinearLayout.LayoutParams cp=new LinearLayout.LayoutParams(-1,dp(86));
+        LinearLayout.LayoutParams cp=new LinearLayout.LayoutParams(-1,dp(98));
         cp.setMargins(0,dp(6),0,dp(6));
         card.setLayoutParams(cp);
 
         ImageView im=new ImageView(this);
         im.setImageResource(imageRes);
         im.setScaleType(ImageView.ScaleType.CENTER_CROP);
-        LinearLayout.LayoutParams ip=new LinearLayout.LayoutParams(dp(72),dp(70));
+        LinearLayout.LayoutParams ip=new LinearLayout.LayoutParams(dp(84),dp(82));
         ip.setMargins(dp(4),0,dp(8),0);
         card.addView(im,ip);
 
@@ -390,8 +644,8 @@ public class MainActivity extends Activity {
         labels.setOrientation(LinearLayout.VERTICAL);
         labels.setGravity(Gravity.CENTER_VERTICAL|Gravity.RIGHT);
         labels.setLayoutDirection(View.LAYOUT_DIRECTION_RTL);
-        TextView st=text(stage,14); st.setGravity(Gravity.RIGHT|Gravity.CENTER_VERTICAL);
-        TextView nm=text(name,19); nm.setGravity(Gravity.RIGHT|Gravity.CENTER_VERTICAL);
+        TextView st=text(stage,16); st.setGravity(Gravity.RIGHT|Gravity.CENTER_VERTICAL);
+        TextView nm=text(name,21); nm.setGravity(Gravity.RIGHT|Gravity.CENTER_VERTICAL);
         labels.addView(st,new LinearLayout.LayoutParams(-1,dp(28)));
         labels.addView(nm,new LinearLayout.LayoutParams(-1,dp(34)));
         card.addView(labels,new LinearLayout.LayoutParams(0,-1,1));
@@ -406,16 +660,75 @@ public class MainActivity extends Activity {
         return card;
     }
 
+    void openProfilePicker(){
+        Intent i=new Intent(Intent.ACTION_OPEN_DOCUMENT); i.setType("image/*"); i.addCategory(Intent.CATEGORY_OPENABLE);
+        try{startActivityForResult(i,PICK_PROFILE_IMAGE);}catch(Exception ignored){}
+    }
+
+    @Override protected void onActivityResult(int requestCode,int resultCode,Intent data){
+        super.onActivityResult(requestCode,resultCode,data);
+        if(requestCode==PICK_PROFILE_IMAGE && resultCode==RESULT_OK && data!=null && data.getData()!=null){
+            Uri u=data.getData(); profileImageUri=u.toString();
+            try{getContentResolver().takePersistableUriPermission(u,Intent.FLAG_GRANT_READ_URI_PERMISSION);}catch(Exception ignored){}
+            prefs.edit().putString("image",profileImageUri).apply(); showHome();
+        }
+    }
+
+    void showProfileEditor(){
+        final LinearLayout box=new LinearLayout(this); box.setOrientation(LinearLayout.VERTICAL); box.setGravity(Gravity.CENTER_HORIZONTAL); box.setPadding(dp(20),dp(8),dp(20),dp(8)); box.setLayoutDirection(View.LAYOUT_DIRECTION_RTL);
+        final ImageView avatar=new ImageView(this); avatar.setScaleType(ImageView.ScaleType.CENTER_CROP); avatar.setBackground(bg(Color.rgb(25,75,145),Color.rgb(8,30,75),80));
+        LinearLayout.LayoutParams ap=new LinearLayout.LayoutParams(dp(112),dp(112)); ap.setMargins(0,0,0,dp(12)); box.addView(avatar,ap);
+        if(!profileImageUri.isEmpty()) try{avatar.setImageURI(Uri.parse(profileImageUri));}catch(Exception ignored){}
+        else {avatar.setImageResource(R.drawable.icon_dana); avatar.setPadding(dp(12),dp(12),dp(12),dp(12));}
+        avatar.setOnClickListener(v->openProfilePicker());
+        TextView hint=text("برای انتخاب عکس روی تصویر بزن",13); hint.setTextColor(Color.LTGRAY); box.addView(hint,new LinearLayout.LayoutParams(-1,dp(32)));
+        EditText name=new EditText(this); name.setText(profileName); name.setHint("نام شما"); name.setTextSize(18); name.setGravity(Gravity.RIGHT|Gravity.CENTER_VERTICAL); name.setSingleLine(true); name.setTextColor(Color.WHITE); name.setHintTextColor(Color.LTGRAY); name.setPadding(dp(14),0,dp(14),0); name.setBackground(bg(Color.rgb(25,65,120),Color.rgb(10,30,70),18)); box.addView(name,new LinearLayout.LayoutParams(-1,dp(54)));
+        AlertDialog d=new AlertDialog.Builder(this).setTitle("پروفایل من").setView(box).setNegativeButton("انصراف",null).setPositiveButton("ذخیره",null).create();
+        d.setOnShowListener(x->d.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v->{profileName=name.getText().toString().trim(); if(profileName.isEmpty()) profileName="دانای جدید"; prefs.edit().putString("name",profileName).apply(); d.dismiss(); showHome();}));
+        d.show();
+    }
+
+    void addProfileCard(){
+        LinearLayout card=new LinearLayout(this); card.setOrientation(LinearLayout.HORIZONTAL); card.setGravity(Gravity.CENTER_VERTICAL); card.setPadding(dp(12),dp(10),dp(12),dp(10)); card.setLayoutDirection(View.LAYOUT_DIRECTION_RTL); card.setBackground(bg(Color.argb(225,20,53,105),Color.argb(225,7,22,60),26));
+        ImageView avatar=new ImageView(this); avatar.setScaleType(ImageView.ScaleType.CENTER_CROP); avatar.setBackground(bg(Color.rgb(255,197,55),Color.rgb(180,105,12),80));
+        if(!profileImageUri.isEmpty()) try{avatar.setImageURI(Uri.parse(profileImageUri));}catch(Exception ignored){}
+        else {avatar.setImageResource(R.drawable.icon_dana); avatar.setPadding(dp(8),dp(8),dp(8),dp(8));}
+        card.addView(avatar,new LinearLayout.LayoutParams(dp(68),dp(68)));
+        LinearLayout info=new LinearLayout(this); info.setOrientation(LinearLayout.VERTICAL); info.setGravity(Gravity.CENTER_VERTICAL|Gravity.RIGHT); info.setPadding(dp(12),0,dp(8),0); info.setLayoutDirection(View.LAYOUT_DIRECTION_RTL);
+        TextView n=text(profileName.isEmpty()?"ساخت پروفایل":"سلام، "+profileName,19); n.setGravity(Gravity.RIGHT|Gravity.CENTER_VERTICAL); TextView sub=text(profileName.isEmpty()?"نام و عکس خودت را اضافه کن":"پروفایل من",13); sub.setTextColor(Color.rgb(220,230,255)); sub.setGravity(Gravity.RIGHT|Gravity.CENTER_VERTICAL); info.addView(n,new LinearLayout.LayoutParams(-1,dp(34))); info.addView(sub,new LinearLayout.LayoutParams(-1,dp(28))); card.addView(info,new LinearLayout.LayoutParams(0,-1,1));
+        TextView edit=text("✎",26); edit.setTextColor(Color.rgb(255,215,75)); card.addView(edit,new LinearLayout.LayoutParams(dp(48),dp(48)));
+        card.setOnClickListener(v->showProfileEditor());
+        LinearLayout.LayoutParams cp=new LinearLayout.LayoutParams(-1,dp(92)); cp.setMargins(0,dp(6),0,dp(10)); root.addView(card,cp);
+    }
+
     void showHome(){
-        inGame=false; currentBackground=1; base();
+        inGame=false; backArmed=false; currentBackground=1; base();
+
+        LinearLayout header=new LinearLayout(this);
+        header.setOrientation(LinearLayout.HORIZONTAL);
+        header.setGravity(Gravity.CENTER_VERTICAL);
+        header.setLayoutDirection(View.LAYOUT_DIRECTION_RTL);
+        header.setPadding(dp(8),dp(4),dp(8),dp(4));
+
+        TextView coinPill=text("🪙  "+fa(coin)+" سکه",15);
+        coinPill.setTextColor(Color.rgb(255,232,150));
+        coinPill.setBackground(bg(Color.argb(230,55,39,8),Color.argb(230,25,20,5),22));
+        header.addView(coinPill,new LinearLayout.LayoutParams(dp(112),dp(48)));
 
         ImageView logo=new ImageView(this);
         logo.setImageResource(R.drawable.icon_dana);
-        logo.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
-        root.addView(logo,new LinearLayout.LayoutParams(-1,dp(132)));
+        logo.setScaleType(ImageView.ScaleType.FIT_CENTER);
+        LinearLayout.LayoutParams lp=new LinearLayout.LayoutParams(dp(132),dp(132));
+        lp.gravity=Gravity.CENTER;
+        header.addView(logo,lp);
 
-        root.addView(title("چالش دانا",30),new LinearLayout.LayoutParams(-1,dp(46)));
+        Space spacer=new Space(this);
+        header.addView(spacer,new LinearLayout.LayoutParams(0,dp(48),1));
+        root.addView(header,new LinearLayout.LayoutParams(-1,dp(142)));
+
+        root.addView(title("چالش دانا",34),new LinearLayout.LayoutParams(-1,dp(54)));
         root.addView(text("دانش، کلید دنیای بهتر است",15),new LinearLayout.LayoutParams(-1,dp(36)));
+        addProfileCard();
 
         root.addView(stageCard(R.drawable.bg_nature,"مرحله ۱","عمومی",0x18BBD6,0x0B7FBE));
         root.addView(stageCard(R.drawable.bg_iran,"مرحله ۲","ایران 🇮🇷",0xFFB51D,0xE56A00));
@@ -427,20 +740,93 @@ public class MainActivity extends Activity {
         nav.setGravity(Gravity.CENTER);
         nav.setPadding(dp(6),dp(4),dp(6),dp(4));
         nav.setBackground(bg(Color.argb(225,5,44,75),Color.argb(225,4,22,50),22));
-        String[] labels={"⌂ خانه","🏆 رتبه‌ها","★ علاقه‌مندی‌ها"};
+        String[] labels={"⌂\nخانه","🏆\nرتبه‌ها","★\nعلاقه‌مندی‌ها","👤\nپروفایل"};
         for(String lab:labels){
             TextView n=text(lab,14);
             n.setTextColor(Color.WHITE);
-            nav.addView(n,new LinearLayout.LayoutParams(0,dp(62),1));
+            n.setGravity(Gravity.CENTER);
+            nav.addView(n,new LinearLayout.LayoutParams(0,dp(66),1));
+            if(lab.contains("رتبه")) n.setOnClickListener(v->showRankings());
+            else if(lab.contains("علاقه")) n.setOnClickListener(v->showFavorites());
+            else if(lab.contains("پروفایل")) n.setOnClickListener(v->showProfileEditor());
+            else n.setOnClickListener(v->showHome());
         }
-        LinearLayout.LayoutParams np=new LinearLayout.LayoutParams(-1,dp(72));
-        np.setMargins(0,dp(12),0,0);
+        LinearLayout.LayoutParams np=new LinearLayout.LayoutParams(-1,dp(78));
+        np.setMargins(0,dp(12),0,dp(4));
         root.addView(nav,np);
     }
 
+    void addPageHeader(String heading){
+        LinearLayout bar=new LinearLayout(this);
+        bar.setOrientation(LinearLayout.HORIZONTAL);
+        bar.setGravity(Gravity.CENTER_VERTICAL);
+        bar.setLayoutDirection(View.LAYOUT_DIRECTION_RTL);
+        TextView h=title(heading,27);
+        bar.addView(h,new LinearLayout.LayoutParams(0,dp(58),1));
+        Button back=smallButton("‹");
+        back.setTextSize(25);
+        back.setOnClickListener(v->showHome());
+        bar.addView(back,new LinearLayout.LayoutParams(dp(54),dp(48)));
+        root.addView(bar,new LinearLayout.LayoutParams(-1,dp(62)));
+    }
+
+    void showRankings(){
+        inGame=false; backArmed=false; currentBackground=2; base();
+        addPageHeader("رتبه‌ها 🏆");
+        addProfileCard();
+        TextView mine=text("رتبه من\n"+fa(Math.max(1, 1000-score/10))+"   •   امتیاز "+fa(score),20);
+        mine.setBackground(bg(Color.argb(230,55,28,105),Color.argb(220,18,22,70),26));
+        root.addView(mine,new LinearLayout.LayoutParams(-1,dp(100)));
+        root.addView(title("جدول امتیاز",22),new LinearLayout.LayoutParams(-1,dp(48)));
+        String[] names={"دانای برتر","استاد دانش","ذهن طلایی","دانای امروز"};
+        int[] pts={980,860,740,620};
+        for(int i=0;i<names.length;i++){
+            TextView row=text((i+1)+"   "+names[i]+"                         "+fa(pts[i])+" امتیاز",17);
+            row.setGravity(Gravity.CENTER_VERTICAL|Gravity.RIGHT);
+            row.setBackground(bg(Color.argb(220,10,48,105),Color.argb(210,6,25,65),20));
+            LinearLayout.LayoutParams rp=new LinearLayout.LayoutParams(-1,dp(54)); rp.setMargins(0,dp(5),0,dp(5)); root.addView(row,rp);
+        }
+        addBottomNavStandalone();
+    }
+
+    void showFavorites(){
+        inGame=false; backArmed=false; currentBackground=0; base();
+        addPageHeader("علاقه‌مندی‌ها ★");
+        if(favorites.isEmpty()){
+            TextView empty=text("هنوز سؤالی به علاقه‌مندی‌ها اضافه نکرده‌ای ⭐\n\nهنگام پاسخ دادن، روی ستاره کنار سؤال بزن.",19);
+            empty.setBackground(bg(Color.argb(225,15,48,95),Color.argb(215,7,24,58),26));
+            root.addView(empty,new LinearLayout.LayoutParams(-1,dp(180)));
+        }else{
+            for(String key:new ArrayList<>(favorites)){
+                Question found=null;
+                for(Question q:questions) if(q.q.equals(key)){found=q;break;}
+                if(found==null) continue;
+                TextView row=text("★  "+found.q,17);
+                row.setGravity(Gravity.RIGHT|Gravity.CENTER_VERTICAL);
+                row.setBackground(bg(Color.argb(225,55,37,105),Color.argb(215,15,24,65),22));
+                LinearLayout.LayoutParams rp=new LinearLayout.LayoutParams(-1,dp(78)); rp.setMargins(0,dp(5),0,dp(5)); root.addView(row,rp);
+                final String removeKey=key;
+                row.setOnClickListener(v->{favorites.remove(removeKey); saveFavorites(); showFavorites();});
+            }
+        }
+        addBottomNavStandalone();
+    }
+
+    void addBottomNavStandalone(){
+        Space sp=new Space(this); root.addView(sp,new LinearLayout.LayoutParams(1,dp(10)));
+        LinearLayout nav=new LinearLayout(this); nav.setOrientation(LinearLayout.HORIZONTAL); nav.setGravity(Gravity.CENTER); nav.setPadding(dp(6),dp(4),dp(6),dp(4)); nav.setBackground(bg(Color.argb(230,5,44,75),Color.argb(230,4,22,50),22));
+        String[] labels={"⌂\nخانه","🏆\nرتبه‌ها","★\nعلاقه‌مندی‌ها","👤\nپروفایل"};
+        for(String lab:labels){ TextView n=text(lab,14); n.setGravity(Gravity.CENTER); nav.addView(n,new LinearLayout.LayoutParams(0,dp(66),1)); if(lab.contains("رتبه")) n.setOnClickListener(v->showRankings()); else if(lab.contains("علاقه")) n.setOnClickListener(v->showFavorites()); else if(lab.contains("پروفایل")) n.setOnClickListener(v->showProfileEditor()); else n.setOnClickListener(v->showHome()); }
+        root.addView(nav,new LinearLayout.LayoutParams(-1,dp(78)));
+    }
+
+    boolean isFavorite(Question q){ return favorites.contains(q.q); }
+    void saveFavorites(){ prefs.edit().putStringSet("favorites",new HashSet<>(favorites)).apply(); }
+    void toggleFavorite(Question q, Button b){ if(isFavorite(q)){favorites.remove(q.q); b.setText("☆");}else{favorites.add(q.q); b.setText("★");} saveFavorites(); }
+
     void buildQuestions(){
         questions.clear();
-        ArrayList<String[]> all=new ArrayList<>(); all.addAll(Arrays.asList(facts)); all.addAll(Arrays.asList(iranFacts));
+        ArrayList<String[]> all=new ArrayList<>(); all.addAll(Arrays.asList(facts)); all.addAll(Arrays.asList(iranFacts)); all.addAll(Arrays.asList(specializedFacts));
         Random rnd=new Random(20260921L);
         // No introductory filler: the question itself is shown.
         for(String[] f:all){
@@ -448,9 +834,21 @@ public class MainActivity extends Activity {
             int correct=shuffled.indexOf(f[2]); questions.add(new Question(f[0],f[1],shuffled.toArray(new String[0]),correct));
         }
         Collections.shuffle(questions,rnd);
-        // Repeat with fresh option order to keep a large pool without changing the wording.
-        ArrayList<Question> copy=new ArrayList<>(questions);
-        for(Question q:copy){String[] opts=q.a.clone();ArrayList<String> sh=new ArrayList<>(Arrays.asList(opts));Collections.shuffle(sh,rnd);int c=sh.indexOf(q.a[q.correct]);questions.add(new Question(q.q,q.icon,sh.toArray(new String[0]),c));}
+        // Expand the playable pool to 3000 questions while reshuffling options each round.
+        ArrayList<Question> seed=new ArrayList<>(questions);
+        int round=0;
+        while(questions.size()<3000){
+            round++;
+            for(Question q:seed){
+                String[] opts=q.a.clone();
+                ArrayList<String> sh=new ArrayList<>(Arrays.asList(opts));
+                Collections.shuffle(sh,new Random(20260921L+round*997L+q.q.hashCode()));
+                int c=sh.indexOf(q.a[q.correct]);
+                questions.add(new Question(q.q,q.icon,sh.toArray(new String[0]),c));
+                if(questions.size()>=3000) break;
+            }
+        }
+        Collections.shuffle(questions,new Random(20260921L+77));
     }
 
     void startGame(){index=0;score=0;coin=50;inGame=true;Collections.shuffle(questions);showQuestion();}
@@ -473,6 +871,11 @@ public class MainActivity extends Activity {
         mid.setMargins(dp(6),0,dp(6),0);
         top.addView(progress,mid);
 
+        Button favorite=smallButton(isFavorite(q)?"★":"☆");
+        favorite.setTextSize(23);
+        favorite.setOnClickListener(v->toggleFavorite(q,favorite));
+        top.addView(favorite,new LinearLayout.LayoutParams(dp(54),dp(44)));
+
         Button back=smallButton("‹");
         back.setTextSize(25);
         back.setOnClickListener(v->{inGame=false;showHome();});
@@ -486,11 +889,31 @@ public class MainActivity extends Activity {
         pp.setMargins(dp(8),dp(8),dp(8),dp(12));
         root.addView(pb,pp);
 
-        questionText=text(q.q,23);
+        timerView=text("⏱ ۵",20);
+        timerView.setTextColor(Color.WHITE);
+        timerView.setGravity(Gravity.CENTER);
+        timerView.setBackground(bg(Color.rgb(30,80,170),Color.rgb(12,35,100),24));
+        LinearLayout.LayoutParams tp=new LinearLayout.LayoutParams(dp(100),dp(48));
+        tp.gravity=Gravity.CENTER_HORIZONTAL;
+        tp.setMargins(0,0,0,dp(8));
+        root.addView(timerView,tp);
+
+        ImageView scene=new ImageView(this);
+        scene.setImageResource(backgroundRes());
+        scene.setScaleType(ImageView.ScaleType.CENTER_CROP);
+        scene.setAlpha(0.92f);
+        GradientDrawable sceneBg=bg(Color.argb(90,8,25,70),Color.argb(45,8,25,70),24);
+        scene.setBackground(sceneBg);
+        scene.setClipToOutline(true);
+        LinearLayout.LayoutParams sceneLp=new LinearLayout.LayoutParams(-1,dp(92));
+        sceneLp.setMargins(dp(4),0,dp(4),dp(8));
+        root.addView(scene,sceneLp);
+
+        questionText=text(q.q,26);
         questionText.setTextColor(Color.rgb(25,32,75));
-        questionText.setBackground(bg(Color.rgb(255,255,255),Color.rgb(241,247,255),26));
+        questionText.setBackground(bg(Color.argb(218,255,255,255),Color.argb(190,241,247,255),26));
         questionText.setGravity(Gravity.CENTER);
-        LinearLayout.LayoutParams qp=new LinearLayout.LayoutParams(-1,dp(132));
+        LinearLayout.LayoutParams qp=new LinearLayout.LayoutParams(-1,dp(126));
         qp.setMargins(0,dp(8),0,dp(12));
         root.addView(questionText,qp);
 
@@ -499,19 +922,40 @@ public class MainActivity extends Activity {
             final int n=i;
             Button b=button(q.a[i]);
             b.setTextColor(Color.rgb(25,32,75));
-            b.setTextSize(17);
-            b.setBackground(bg(Color.rgb(255,255,255),Color.rgb(238,246,255),24));
+            b.setTextSize(19);
+            b.setBackground(bg(Color.argb(190,255,255,255),Color.argb(165,238,246,255),24));
             b.setOnClickListener(v->answer(n,b));
             answerButtons.add(b);
             root.addView(b);
         }
+        startQuestionTimer();
+    }
+
+    void startQuestionTimer(){
+        if(questionTimer!=null) questionTimer.cancel();
+        questionTimer=new CountDownTimer(5000,1000){
+            public void onTick(long left){
+                int sec=(int)Math.ceil(left/1000.0);
+                if(timerView!=null) timerView.setText("⏱  "+fa(sec));
+                try{ if(left<=2000) tone.startTone(android.media.ToneGenerator.TONE_PROP_BEEP,90); }catch(Exception ignored){}
+            }
+            public void onFinish(){
+                if(answered)return;
+                answered=true;
+                if(timerView!=null){ timerView.setText("⏱ ۰"); timerView.setBackground(bg(Color.rgb(235,78,95),Color.rgb(145,25,55),24)); }
+                try{tone.startTone(android.media.ToneGenerator.TONE_CDMA_ALERT_CALL_GUARD,260);}catch(Exception ignored){}
+                new android.os.Handler().postDelayed(()->{index++; if(index<questions.size())showQuestion(); else showResult();},700);
+            }
+        }.start();
     }
 
     void answer(int n,Button chosen){
-        if(answered)return; answered=true; Question q=questions.get(index); boolean ok=n==q.correct;
+        if(answered)return; answered=true;
+        if(questionTimer!=null){questionTimer.cancel();questionTimer=null;}
+        Question q=questions.get(index); boolean ok=n==q.correct;
         try{tone.startTone(ok?android.media.ToneGenerator.TONE_PROP_ACK:android.media.ToneGenerator.TONE_PROP_NACK,180);}catch(Exception ignored){}
-        if(ok){score+=10;coin+=5;chosen.setBackground(bg(Color.rgb(35,205,130),Color.rgb(10,125,80),25));chosen.setTextColor(Color.WHITE);chosen.setText("✓  "+chosen.getText());}
-        else{coin=Math.max(0,coin-5);chosen.setBackground(bg(Color.rgb(235,78,95),Color.rgb(145,25,55),25));chosen.setTextColor(Color.WHITE);chosen.setText("✕  "+chosen.getText()); Button correct=answerButtons.get(q.correct);correct.setBackground(bg(Color.rgb(35,205,130),Color.rgb(10,125,80),25));correct.setTextColor(Color.WHITE);correct.setText("✓  "+correct.getText());}
+        if(ok){if(timerView!=null) timerView.setBackground(bg(Color.rgb(35,170,115),Color.rgb(10,105,75),24));score+=10;coin+=5;chosen.setBackground(bg(Color.rgb(35,205,130),Color.rgb(10,125,80),25));chosen.setTextColor(Color.WHITE);chosen.setText("✓  "+chosen.getText());}
+        else{if(timerView!=null) timerView.setBackground(bg(Color.rgb(235,78,95),Color.rgb(145,25,55),24));coin=Math.max(0,coin-5);chosen.setBackground(bg(Color.rgb(235,78,95),Color.rgb(145,25,55),25));chosen.setTextColor(Color.WHITE);chosen.setText("✕  "+chosen.getText()); Button correct=answerButtons.get(q.correct);correct.setBackground(bg(Color.rgb(35,205,130),Color.rgb(10,125,80),25));correct.setTextColor(Color.WHITE);correct.setText("✓  "+correct.getText());}
         new android.os.Handler().postDelayed(()->{index++;if(index<questions.size())showQuestion();else showResult();},1800);
     }
 
