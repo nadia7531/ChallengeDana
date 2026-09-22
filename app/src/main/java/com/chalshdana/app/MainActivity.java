@@ -563,17 +563,19 @@ public class MainActivity extends Activity {
     boolean backArmed = false;
     long lastBack = 0L;
     Set<String> favorites = new HashSet<>();
+    Set<String> answeredQuestions = new HashSet<>();
 
     @Override public void onCreate(Bundle b){
         super.onCreate(b);
         getWindow().setStatusBarColor(Color.rgb(5,12,38));
         getWindow().setNavigationBarColor(Color.rgb(5,12,38));
         tone = new android.media.ToneGenerator(android.media.AudioManager.STREAM_MUSIC, 85);
-        persianFont = Typeface.create("sans-serif", Typeface.NORMAL);
+        try{ persianFont = Typeface.createFromAsset(getAssets(), "fonts/NotoSansArabic-Bold.ttf"); }catch(Exception e){ persianFont = Typeface.create("sans-serif", Typeface.NORMAL); }
         prefs = getSharedPreferences("dana_profile", MODE_PRIVATE);
         profileName = prefs.getString("name", "");
         profileImageUri = prefs.getString("image", "");
         favorites.addAll(prefs.getStringSet("favorites", new HashSet<String>()));
+        answeredQuestions.addAll(prefs.getStringSet("answered_questions", new HashSet<String>()));
         buildQuestions();
         showHome();
     }
@@ -591,12 +593,12 @@ public class MainActivity extends Activity {
 
     String fa(int n){String s=""+n; String en="0123456789"; String fa="۰۱۲۳۴۵۶۷۸۹"; StringBuilder r=new StringBuilder(); for(char c:s.toCharArray()){int i=en.indexOf(c); r.append(i>=0?fa.charAt(i):c);} return r.toString();}
     int dp(int x){return (int)(x*getResources().getDisplayMetrics().density+0.5f);}
-    TextView text(String s,float size){TextView v=new TextView(this);v.setText(s);v.setTextSize(size);v.setTextColor(Color.WHITE);v.setGravity(Gravity.CENTER);v.setTypeface(Typeface.create("sans-serif",Typeface.NORMAL));v.setIncludeFontPadding(true);v.setLineSpacing(0f,1.08f);v.setPadding(dp(10),dp(6),dp(10),dp(6));v.setLayoutDirection(View.LAYOUT_DIRECTION_RTL);v.setTextDirection(View.TEXT_DIRECTION_RTL);v.setBreakStrategy(android.text.Layout.BREAK_STRATEGY_HIGH_QUALITY);v.setHyphenationFrequency(android.text.Layout.HYPHENATION_FREQUENCY_NONE);return v;}
+    TextView text(String s,float size){TextView v=new TextView(this);v.setText(s);v.setTextSize(size);v.setTextColor(Color.WHITE);v.setGravity(Gravity.CENTER);v.setIncludeFontPadding(true);v.setLineSpacing(0,1.05f);v.setTypeface(persianFont);v.setIncludeFontPadding(true);v.setLineSpacing(0f,1.08f);v.setPadding(dp(10),dp(6),dp(10),dp(6));v.setLayoutDirection(View.LAYOUT_DIRECTION_RTL);v.setTextDirection(View.TEXT_DIRECTION_RTL);v.setBreakStrategy(android.text.Layout.BREAK_STRATEGY_HIGH_QUALITY);v.setHyphenationFrequency(android.text.Layout.HYPHENATION_FREQUENCY_NONE);return v;}
     GradientDrawable bg(int c1,int c2,float r){GradientDrawable g=new GradientDrawable(GradientDrawable.Orientation.TL_BR,new int[]{c1,c2});g.setCornerRadius(dp((int)r));g.setStroke(dp(1),Color.argb(100,255,255,255));return g;}
-    Button button(String s){Button b=new Button(this);b.setText(s);b.setTextSize(17);b.setTextColor(Color.WHITE);b.setAllCaps(false);b.setGravity(Gravity.CENTER);b.setTypeface(Typeface.create("sans-serif",Typeface.NORMAL));b.setLayoutDirection(View.LAYOUT_DIRECTION_RTL);b.setPadding(dp(12),dp(8),dp(12),dp(8));b.setSingleLine(false);b.setMaxLines(3);b.setEllipsize(null);b.setHorizontallyScrolling(false);b.setMinHeight(dp(58));b.setMinimumHeight(dp(58));b.setBackground(bg(Color.rgb(30,105,210),Color.rgb(18,45,125),24));LinearLayout.LayoutParams p=new LinearLayout.LayoutParams(-1,dp(64));p.setMargins(dp(6),dp(5),dp(6),dp(5));b.setLayoutParams(p);return b;}
+    Button button(String s){Button b=new Button(this);b.setText(s);b.setTextSize(16);b.setTextColor(Color.WHITE);b.setAllCaps(false);b.setGravity(Gravity.CENTER);b.setTypeface(persianFont);b.setLayoutDirection(View.LAYOUT_DIRECTION_RTL);b.setPadding(dp(12),dp(8),dp(12),dp(8));b.setSingleLine(false);b.setMaxLines(5);b.setEllipsize(null);b.setHorizontallyScrolling(false); b.setPadding(dp(14),dp(10),dp(14),dp(10));b.setMinHeight(dp(68));b.setMinimumHeight(dp(68));b.setBackground(bg(Color.rgb(30,105,210),Color.rgb(18,45,125),24));LinearLayout.LayoutParams p=new LinearLayout.LayoutParams(-1,dp(64));p.setMargins(dp(6),dp(5),dp(6),dp(5));b.setLayoutParams(p);return b;}
     Button smallButton(String s){Button b=button(s);b.setTextSize(16);b.setTextColor(Color.WHITE);b.setBackground(bg(Color.argb(175,12,45,100),Color.argb(175,8,25,65),20));b.setLayoutParams(new LinearLayout.LayoutParams(dp(54),dp(48)));return b;}
 
-    int backgroundRes(){int[] r={R.drawable.bg_space,R.drawable.bg_nature,R.drawable.bg_iran,R.drawable.bg_ocean};return r[currentBackground%r.length];}
+    int backgroundRes(){int[] r={R.drawable.bg_premium,R.drawable.bg_nature,R.drawable.bg_iran,R.drawable.bg_ocean,R.drawable.bg_space};return r[currentBackground%r.length];}
     void base(){
         screen=new FrameLayout(this);
         ImageView image=new ImageView(this);
@@ -628,7 +630,7 @@ public class MainActivity extends Activity {
         card.setLayoutDirection(View.LAYOUT_DIRECTION_RTL);
         card.setBackground(bg(Color.argb(235,c1>>16&255,c1>>8&255,c1&255),
                               Color.argb(235,c2>>16&255,c2>>8&255,c2&255),24));
-        LinearLayout.LayoutParams cp=new LinearLayout.LayoutParams(-1,dp(98));
+        LinearLayout.LayoutParams cp=new LinearLayout.LayoutParams(-1,dp(110));
         cp.setMargins(0,dp(6),0,dp(6));
         card.setLayoutParams(cp);
 
@@ -643,10 +645,10 @@ public class MainActivity extends Activity {
         labels.setOrientation(LinearLayout.VERTICAL);
         labels.setGravity(Gravity.CENTER_VERTICAL|Gravity.RIGHT);
         labels.setLayoutDirection(View.LAYOUT_DIRECTION_RTL);
-        TextView st=text(stage,14); st.setGravity(Gravity.RIGHT|Gravity.CENTER_VERTICAL);
-        TextView nm=text(name,18); nm.setGravity(Gravity.RIGHT|Gravity.CENTER_VERTICAL);
-        labels.addView(st,new LinearLayout.LayoutParams(-1,dp(28)));
-        labels.addView(nm,new LinearLayout.LayoutParams(-1,dp(34)));
+        TextView st=text(stage,13); st.setGravity(Gravity.RIGHT|Gravity.CENTER_VERTICAL);
+        TextView nm=text(name,16); nm.setGravity(Gravity.RIGHT|Gravity.CENTER_VERTICAL);
+        labels.addView(st,new LinearLayout.LayoutParams(-1,dp(34)));
+        labels.addView(nm,new LinearLayout.LayoutParams(-1,dp(40)));
         card.addView(labels,new LinearLayout.LayoutParams(0,-1,1));
 
         TextView play=text("▶",24);
@@ -694,66 +696,48 @@ public class MainActivity extends Activity {
         else {avatar.setImageResource(R.drawable.icon_dana); avatar.setPadding(dp(8),dp(8),dp(8),dp(8));}
         card.addView(avatar,new LinearLayout.LayoutParams(dp(68),dp(68)));
         LinearLayout info=new LinearLayout(this); info.setOrientation(LinearLayout.VERTICAL); info.setGravity(Gravity.CENTER_VERTICAL|Gravity.RIGHT); info.setPadding(dp(12),0,dp(8),0); info.setLayoutDirection(View.LAYOUT_DIRECTION_RTL);
-        TextView n=text(profileName.isEmpty()?"ساخت پروفایل":"سلام، "+profileName,17); n.setGravity(Gravity.RIGHT|Gravity.CENTER_VERTICAL); TextView sub=text(profileName.isEmpty()?"نام و عکس خودت را اضافه کن":"پروفایل من",12); sub.setTextColor(Color.rgb(220,230,255)); sub.setGravity(Gravity.RIGHT|Gravity.CENTER_VERTICAL); info.addView(n,new LinearLayout.LayoutParams(-1,dp(34))); info.addView(sub,new LinearLayout.LayoutParams(-1,dp(28))); card.addView(info,new LinearLayout.LayoutParams(0,-1,1));
+        TextView n=text(profileName.isEmpty()?"ساخت پروفایل":"درود، "+profileName,17); n.setGravity(Gravity.RIGHT|Gravity.CENTER_VERTICAL); TextView sub=text(profileName.isEmpty()?"نام و عکس خودت را اضافه کن":"پروفایل من",12); sub.setTextColor(Color.rgb(220,230,255)); sub.setGravity(Gravity.RIGHT|Gravity.CENTER_VERTICAL); info.addView(n,new LinearLayout.LayoutParams(-1,dp(34))); info.addView(sub,new LinearLayout.LayoutParams(-1,dp(28))); card.addView(info,new LinearLayout.LayoutParams(0,-1,1));
         TextView edit=text("✎",26); edit.setTextColor(Color.rgb(255,215,75)); card.addView(edit,new LinearLayout.LayoutParams(dp(48),dp(48)));
         card.setOnClickListener(v->showProfileEditor());
-        LinearLayout.LayoutParams cp=new LinearLayout.LayoutParams(-1,dp(88)); cp.setMargins(0,dp(6),0,dp(10)); root.addView(card,cp);
+        LinearLayout.LayoutParams cp=new LinearLayout.LayoutParams(-1,dp(82)); cp.setMargins(0,dp(6),0,dp(10)); root.addView(card,cp);
     }
 
     void showHome(){
         inGame=false;
-        if(questionTimer!=null){questionTimer.cancel(); questionTimer=null;} backArmed=false; currentBackground=1; base();
+        if(questionTimer!=null){questionTimer.cancel();questionTimer=null;}
+        try{tone.stopTone();}catch(Exception ignored){}
+        backArmed=false; currentBackground=0; base();
 
-        LinearLayout header=new LinearLayout(this);
-        header.setOrientation(LinearLayout.HORIZONTAL);
-        header.setGravity(Gravity.CENTER_VERTICAL);
-        header.setLayoutDirection(View.LAYOUT_DIRECTION_RTL);
-        header.setPadding(dp(8),dp(4),dp(8),dp(4));
+        // Reference-style premium home: blue glass cards, bright buttons and clear Persian typography.
+        LinearLayout header=new LinearLayout(this); header.setOrientation(LinearLayout.HORIZONTAL); header.setGravity(Gravity.CENTER_VERTICAL); header.setLayoutDirection(View.LAYOUT_DIRECTION_RTL);
+        TextView coinPill=text("🪙  "+fa(coin),16); coinPill.setTextColor(Color.rgb(255,210,70)); coinPill.setGravity(Gravity.CENTER); coinPill.setBackground(bg(Color.argb(245,20,54,115),Color.argb(235,8,25,68),22));
+        header.addView(coinPill,new LinearLayout.LayoutParams(dp(92),dp(46)));
+        Space sp=new Space(this); header.addView(sp,new LinearLayout.LayoutParams(0,dp(46),1));
+        TextView gear=text("⚙",25); gear.setGravity(Gravity.CENTER); gear.setOnClickListener(v->showProfileEditor()); header.addView(gear,new LinearLayout.LayoutParams(dp(52),dp(46)));
+        root.addView(header,new LinearLayout.LayoutParams(-1,dp(50)));
 
-        TextView coinPill=text(fa(coin)+" سکه",16);
-        coinPill.setTextColor(Color.rgb(255,232,150));
-        coinPill.setBackground(bg(Color.argb(230,55,39,8),Color.argb(230,25,20,5),22));
-        header.addView(coinPill,new LinearLayout.LayoutParams(dp(112),dp(48)));
+        LinearLayout brand=new LinearLayout(this); brand.setOrientation(LinearLayout.HORIZONTAL); brand.setGravity(Gravity.CENTER_VERTICAL); brand.setLayoutDirection(View.LAYOUT_DIRECTION_RTL);
+        ImageView logo=new ImageView(this); logo.setImageResource(R.drawable.icon_dana); logo.setScaleType(ImageView.ScaleType.FIT_CENTER); brand.addView(logo,new LinearLayout.LayoutParams(dp(92),dp(92)));
+        LinearLayout bt=new LinearLayout(this); bt.setOrientation(LinearLayout.VERTICAL); bt.setGravity(Gravity.CENTER_VERTICAL|Gravity.RIGHT); bt.setLayoutDirection(View.LAYOUT_DIRECTION_RTL);
+        TextView bt1=title("چالش دانا",25); bt1.setGravity(Gravity.RIGHT|Gravity.CENTER_VERTICAL); TextView bt2=text("بازی اطلاعات عمومی",13); bt2.setTextColor(Color.rgb(225,235,255)); bt2.setGravity(Gravity.RIGHT|Gravity.CENTER_VERTICAL);
+        bt.addView(bt1,new LinearLayout.LayoutParams(-1,dp(40))); bt.addView(bt2,new LinearLayout.LayoutParams(-1,dp(30))); brand.addView(bt,new LinearLayout.LayoutParams(0,dp(92),1)); root.addView(brand,new LinearLayout.LayoutParams(-1,dp(98)));
 
-        ImageView logo=new ImageView(this);
-        logo.setImageResource(R.drawable.icon_dana);
-        logo.setScaleType(ImageView.ScaleType.FIT_CENTER);
-        LinearLayout.LayoutParams lp=new LinearLayout.LayoutParams(dp(132),dp(132));
-        lp.gravity=Gravity.CENTER;
-        header.addView(logo,lp);
+        LinearLayout profile=new LinearLayout(this); profile.setOrientation(LinearLayout.HORIZONTAL); profile.setGravity(Gravity.CENTER_VERTICAL); profile.setLayoutDirection(View.LAYOUT_DIRECTION_RTL); profile.setPadding(dp(12),dp(6),dp(12),dp(6)); profile.setBackground(bg(Color.argb(225,20,82,155),Color.argb(220,8,38,92),24));
+        ImageView av=new ImageView(this); av.setScaleType(ImageView.ScaleType.CENTER_CROP); av.setBackground(bg(Color.rgb(230,245,255),Color.rgb(130,205,255),60)); if(!profileImageUri.isEmpty())try{av.setImageURI(Uri.parse(profileImageUri));}catch(Exception ignored){}else{av.setImageResource(R.drawable.icon_dana);av.setPadding(dp(7),dp(7),dp(7),dp(7));}
+        profile.addView(av,new LinearLayout.LayoutParams(dp(58),dp(58))); LinearLayout pi=new LinearLayout(this);pi.setOrientation(LinearLayout.VERTICAL);pi.setGravity(Gravity.CENTER_VERTICAL|Gravity.RIGHT);pi.setLayoutDirection(View.LAYOUT_DIRECTION_RTL);
+        TextView pn=text(profileName.isEmpty()?"کاربر مهمان":"درود، "+profileName,16);pn.setGravity(Gravity.RIGHT|Gravity.CENTER_VERTICAL); TextView ps=text("امتیاز کل: "+fa(score),12);ps.setTextColor(Color.rgb(225,235,255));ps.setGravity(Gravity.RIGHT|Gravity.CENTER_VERTICAL);pi.addView(pn,new LinearLayout.LayoutParams(-1,dp(32)));pi.addView(ps,new LinearLayout.LayoutParams(-1,dp(24)));profile.addView(pi,new LinearLayout.LayoutParams(0,-1,1));
+        profile.setOnClickListener(v->showProfileEditor()); root.addView(profile,new LinearLayout.LayoutParams(-1,dp(76)));
 
-        Space spacer=new Space(this);
-        header.addView(spacer,new LinearLayout.LayoutParams(0,dp(48),1));
-        root.addView(header,new LinearLayout.LayoutParams(-1,dp(142)));
+        Button start=button("▶   شروع بازی"); start.setTextSize(19); start.setTextColor(Color.rgb(40,25,0)); start.setBackground(bg(Color.rgb(255,220,75),Color.rgb(255,143,18),25)); start.setOnClickListener(v->startGame()); LinearLayout.LayoutParams sb=new LinearLayout.LayoutParams(-1,dp(68));sb.setMargins(0,dp(10),0,dp(7));root.addView(start,sb);
+        Button daily=button("📅   چالش روزانه   ✦");daily.setTextSize(17);daily.setBackground(bg(Color.rgb(120,65,230),Color.rgb(70,38,165),24));daily.setOnClickListener(v->startGame());root.addView(daily,new LinearLayout.LayoutParams(-1,dp(62)));
+        Button records=button("🏆   رکوردها");records.setTextSize(17);records.setBackground(bg(Color.rgb(40,155,245),Color.rgb(18,82,190),24));records.setOnClickListener(v->showRankings());root.addView(records,new LinearLayout.LayoutParams(-1,dp(62)));
+        Button cats=button("▦   دسته‌بندی‌ها");cats.setTextSize(17);cats.setBackground(bg(Color.rgb(35,205,115),Color.rgb(12,125,78),24));cats.setOnClickListener(v->startGame());root.addView(cats,new LinearLayout.LayoutParams(-1,dp(62)));
+        Button store=button("◎   فروشگاه");store.setTextSize(17);store.setBackground(bg(Color.rgb(235,55,135),Color.rgb(160,25,90),24));store.setOnClickListener(v->Toast.makeText(this,"فروشگاه به‌زودی فعال می‌شود",Toast.LENGTH_SHORT).show());root.addView(store,new LinearLayout.LayoutParams(-1,dp(62)));
 
-        root.addView(title("چالش دانا",34),new LinearLayout.LayoutParams(-1,dp(54)));
-        root.addView(text("دانش، کلید دنیای بهتر است",15),new LinearLayout.LayoutParams(-1,dp(36)));
-        addProfileCard();
-
-        root.addView(stageCard(R.drawable.bg_nature,"مرحله ۱","عمومی",0x18BBD6,0x0B7FBE));
-        root.addView(stageCard(R.drawable.bg_iran,"مرحله ۲","ایران 🇮🇷",0xFFB51D,0xE56A00));
-        root.addView(stageCard(R.drawable.bg_space,"مرحله ۳","علم و فناوری",0x8E45E8,0x4C21B5));
-        root.addView(stageCard(R.drawable.bg_ocean,"مرحله ۴","سرگرمی",0xEF4B9B,0xC91F6B));
-
-        LinearLayout nav=new LinearLayout(this);
-        nav.setOrientation(LinearLayout.HORIZONTAL);
-        nav.setGravity(Gravity.CENTER);
-        nav.setPadding(dp(6),dp(4),dp(6),dp(4));
-        nav.setBackground(bg(Color.argb(225,5,44,75),Color.argb(225,4,22,50),22));
-        String[] labels={"⌂\nخانه","🏆\nرتبه‌ها","★\nعلاقه‌مندی‌ها","👤\nپروفایل"};
-        for(String lab:labels){
-            TextView n=text(lab,14);
-            n.setTextColor(Color.WHITE);
-            n.setGravity(Gravity.CENTER);
-            nav.addView(n,new LinearLayout.LayoutParams(0,dp(66),1));
-            if(lab.contains("رتبه")) n.setOnClickListener(v->showRankings());
-            else if(lab.contains("علاقه")) n.setOnClickListener(v->showFavorites());
-            else if(lab.contains("پروفایل")) n.setOnClickListener(v->showProfileEditor());
-            else n.setOnClickListener(v->showHome());
-        }
-        LinearLayout.LayoutParams np=new LinearLayout.LayoutParams(-1,dp(78));
-        np.setMargins(0,dp(12),0,dp(4));
-        root.addView(nav,np);
+        LinearLayout nav=new LinearLayout(this);nav.setOrientation(LinearLayout.HORIZONTAL);nav.setGravity(Gravity.CENTER);nav.setLayoutDirection(View.LAYOUT_DIRECTION_RTL);nav.setPadding(dp(4),dp(3),dp(4),dp(3));nav.setBackground(bg(Color.argb(240,6,37,80),Color.argb(235,4,18,48),20));
+        String[][] n={{"⚙","تنظیمات"},{"▦","دسته‌ها"},{"👤","پروفایل"},{"⌂","خانه"}};
+        for(String[] a:n){TextView t=text(a[0]+"\n"+a[1],12);t.setGravity(Gravity.CENTER);nav.addView(t,new LinearLayout.LayoutParams(0,dp(64),1));if(a[1].equals("پروفایل"))t.setOnClickListener(v->showProfileEditor());else if(a[1].equals("دسته‌ها"))t.setOnClickListener(v->startGame());else if(a[1].equals("خانه"))t.setOnClickListener(v->showHome());else t.setOnClickListener(v->showProfileEditor());}
+        LinearLayout.LayoutParams np=new LinearLayout.LayoutParams(-1,dp(70));np.setMargins(0,dp(12),0,dp(2));root.addView(nav,np);
     }
 
     void addPageHeader(String heading){
@@ -824,123 +808,181 @@ public class MainActivity extends Activity {
     void saveFavorites(){ prefs.edit().putStringSet("favorites",new HashSet<>(favorites)).apply(); }
     void toggleFavorite(Question q, Button b){ if(isFavorite(q)){favorites.remove(q.q); b.setText("☆");}else{favorites.add(q.q); b.setText("★");} saveFavorites(); }
 
+    final String[][] extraSpecializedFacts = {
+        {"کدام عنصر بیشترین فراوانی را در پوسته زمین دارد؟","⚗️","اکسیژن","سیلیسیم","آلومینیوم","آهن"},
+        {"کدام عنصر دومین عنصر فراوان پوسته زمین است؟","⚗️","سیلیسیم","اکسیژن","آهن","کلسیم"},
+        {"کدام ترکیب عامل اصلی سختی آب موقت است؟","⚗️","بی‌کربنات‌های کلسیم و منیزیم","کلرید سدیم","اکسید آهن","گلوکز"},
+        {"کاتالیزگر در واکنش شیمیایی چه اثری دارد؟","⚗️","انرژی فعال‌سازی را کاهش می‌دهد","محصول را حذف می‌کند","جرم را افزایش می‌دهد","دما را همیشه بالا می‌برد"},
+        {"در واکنش اکسایش معمولاً چه اتفاقی برای الکترون رخ می‌دهد؟","⚗️","از دست داده می‌شود","گرفته می‌شود","تبدیل به پروتون می‌شود","ناپدید می‌شود"},
+        {"کدام ذره تعیین‌کننده هویت یک عنصر است؟","⚗️","تعداد پروتون‌ها","تعداد نوترون‌ها","تعداد مولکول‌ها","تعداد لایه‌ها"},
+        {"ایزوتوپ‌های یک عنصر در چه چیزی متفاوت‌اند؟","⚗️","تعداد نوترون‌ها","تعداد پروتون‌ها","عدد اتمی","نام عنصر"},
+        {"مول در شیمی واحد اندازه‌گیری چیست؟","⚗️","مقدار ماده","فشار","دما","توان"},
+        {"عدد آووگادرو تقریباً چند است؟","⚗️","۶٫۰۲×۱۰²³","۹٫۸×۱۰⁹","۳×۱۰⁸","۱٫۶×۱۰⁻¹⁹"},
+        {"کدام پیوند با اشتراک الکترون‌ها تشکیل می‌شود؟","⚗️","کووالانسی","یونی","فلزی خالص","هیدروژنی فقط"},
+        {"پیوند یونی معمولاً از چه چیزی ناشی می‌شود؟","⚗️","جاذبه یون‌های با بار مخالف","اشتراک برابر الکترون‌ها","برخورد نوترون‌ها","ذوب فلز"},
+        {"کدام ماده در آب به یون H+ کمک می‌کند؟","⚗️","اسید","باز","نمک خنثی","فلز"},
+        {"کدام کمیت نشان‌دهنده مقدار ماده حل‌شونده در محلول است؟","⚗️","غلظت","جرم حجمی","فشار","دما"},
+        {"در واکنش گرماگیر، محیط چه چیزی از دست می‌دهد؟","⚗️","گرما","جرم","الکترون همیشه","حجم همیشه"},
+        {"در واکنش گرمازا چه چیزی آزاد می‌شود؟","⚗️","گرما","جرم","نوترون","نور همیشه"},
+        {"قانون پایستگی جرم بیان می‌کند که در واکنش بسته چه چیزی ثابت می‌ماند؟","⚗️","جرم کل","دما","فشار","حجم"},
+        {"واحد مقدار فشار اتمسفر استاندارد تقریباً چند پاسکال است؟","⚛️","۱۰۱۳۲۵","۹۸۰۰","۱۰۰۰","۳۰۰۰۰۰"},
+        {"اگر نیروی خالص بر جسم صفر باشد، شتاب آن چگونه است؟","⚛️","صفر","یک","منفی یک","نامحدود"},
+        {"تکانه جسم از حاصل‌ضرب چه دو کمیتی به دست می‌آید؟","⚛️","جرم و سرعت","نیرو و زمان","توان و انرژی","فشار و حجم"},
+        {"کار مکانیکی وقتی نیرو و جابه‌جایی هم‌جهت باشند چگونه محاسبه می‌شود؟","⚛️","W=Fd","W=m/v","W=Pt²","W=F/d"},
+        {"قانون پایستگی انرژی چه می‌گوید؟","⚛️","انرژی نه خلق و نه نابود می‌شود","انرژی همیشه صفر است","جرم همیشه افزایش می‌یابد","دما ثابت است"},
+        {"فرکانس یک موج با افزایش دوره چه تغییری می‌کند؟","⚛️","کاهش می‌یابد","افزایش می‌یابد","ثابت می‌ماند","صفر می‌شود"},
+        {"طول موج و فرکانس موج در یک محیط با سرعت ثابت چه رابطه‌ای دارند؟","⚛️","معکوس‌اند","مستقیم‌اند","هیچ رابطه‌ای ندارند","همیشه برابرند"},
+        {"کدام عدسی برای همگرا کردن پرتوهای موازی استفاده می‌شود؟","⚛️","محدب","مقعر","استوانه‌ای تخت","آینه تخت"},
+        {"کدام آینه تصویر مجازی، مستقیم و هم‌اندازه ایجاد می‌کند؟","⚛️","آینه تخت","آینه مقعر همیشه","آینه محدب همیشه بزرگ","هیچ‌کدام"},
+        {"اثر فوتوالکتریک با تابش چه چیزی مرتبط است؟","⚛️","نور و آزاد شدن الکترون","صوت و تولید نوترون","گرما و تولید پروتون","فشار و یونش آب"},
+        {"کدام قانون رابطه جریان و مقاومت را در مدار بیان می‌کند؟","⚛️","قانون اهم","قانون لنز","قانون کولن","قانون گازها"},
+        {"قانون کولن درباره چه نیرویی است؟","⚛️","نیروی الکتریکی بین بارها","نیروی گرانشی فقط","نیروی اصطکاک","نیروی شناوری"},
+        {"القای الکترومغناطیسی با نام کدام دانشمند پیوند دارد؟","⚛️","فارادی","داروین","مندلیف","پاستور"},
+        {"قانون لنز جهت جریان القایی را چگونه توصیف می‌کند؟","⚛️","مخالف تغییر شار ایجادکننده است","هم‌جهت با تغییر است","همیشه صفر است","فقط به جرم بستگی دارد"},
+        {"کدام بخش DNA حامل اطلاعات وراثتی است؟","🧬","توالی نوکلئوتیدها","آب سلول","لیپید غشا","کلسیم استخوان"},
+        {"باز مکمل آدنین در DNA چیست؟","🧬","تیمین","یوراسیل","سیتوزین","گوانین"},
+        {"باز مکمل آدنین در RNA چیست؟","🧬","یوراسیل","تیمین","گوانین","سیتوزین"},
+        {"فرایند ساخت RNA از روی DNA چیست؟","🧬","رونویسی","ترجمه","همانندسازی پروتئین","تنفس"},
+        {"فرایند ساخت پروتئین از روی RNA چه نام دارد؟","🧬","ترجمه","رونویسی","تکثیر DNA","جهش"},
+        {"واحد سازنده پروتئین‌ها چیست؟","🧬","اسید آمینه","نوکلئوتید","اسید چرب","گلوکز"},
+        {"واحد سازنده DNA و RNA چیست؟","🧬","نوکلئوتید","اسید آمینه","گلیسرول","گلوکز"},
+        {"کدام فرایند تقسیم سلولی برای رشد بدن اهمیت دارد؟","🧬","میتوز","میوز فقط","لقاح","جهش"},
+        {"کدام تقسیم سلولی تعداد کروموزوم‌ها را نصف می‌کند؟","🧬","میوز","میتوز","دوبرابر شدن DNA","ترجمه"},
+        {"کدام اندامک در سلول گیاهی فتوسنتز می‌کند؟","🧬","کلروپلاست","میتوکندری","ریبوزوم","لیزوزوم"},
+        {"دیواره سلولی گیاه عمدتاً از چه ماده‌ای ساخته شده است؟","🧬","سلولز","گلیکوژن","کیتین خالص","هموگلوبین"},
+        {"کدام ماده ذخیره‌ای اصلی در گیاهان است؟","🧬","نشاسته","گلیکوژن","کراتین","هموگلوبین"},
+        {"کدام ماده ذخیره‌ای اصلی در جانوران است؟","🧬","گلیکوژن","نشاسته","سلولز","کیتین"},
+        {"کدام بخش نورون پیام را به سوی جسم سلولی می‌آورد؟","🧬","دندریت","آکسون","میلین فقط","هسته"},
+        {"کدام بخش نورون پیام را از جسم سلولی دور می‌کند؟","🧬","آکسون","دندریت","هسته","سیناپس"},
+        {"انتقال پیام بین دو نورون معمولاً در چه ناحیه‌ای رخ می‌دهد؟","🧬","سیناپس","هسته","میتوکندری","گلبول قرمز"},
+        {"کدام بخش کلیه واحد عملکردی اصلی آن است؟","🧬","نفرون","آلوئول","نورون","پرز"},
+        {"تبادل گاز در ریه بیشتر در کدام ساختار انجام می‌شود؟","🧬","آلوئول","نفرون","نایژه اصلی","حنجره"},
+        {"کدام سلول ایمنی آنتی‌بادی تولید می‌کند؟","🧬","لنفوسیت B","گلبول قرمز","پلاکت","سلول عضلانی"},
+        {"آنتی‌بادی‌ها بیشتر به کدام دستگاه دفاعی تعلق دارند؟","🧬","ایمنی تطبیقی","گوارشی","اسکلتی","تنفسی"},
+        {"کدام هورمون با تنظیم سوخت‌وساز پایه مرتبط است؟","🧬","تیروکسین","انسولین فقط","ملاتونین","آدرنالین فقط"},
+        {"کدام هورمون با چرخه خواب و بیداری مرتبط است؟","🧬","ملاتونین","انسولین","کورتیزول فقط","انسولین"},
+        {"کدام سیاره بیشترین سرعت مداری میان سیارات اصلی دارد؟","🪐","عطارد","زمین","مریخ","نپتون"},
+        {"کدام سیاره بیشترین جرم را در منظومه شمسی دارد؟","🪐","مشتری","زحل","زمین","نپتون"},
+        {"کمربند سیارکی اصلی بین کدام دو سیاره قرار دارد؟","🪐","مریخ و مشتری","زمین و مریخ","مشتری و زحل","زهره و زمین"},
+        {"کهکشان راه شیری از چه نوع کهکشانی است؟","🪐","مارپیچی میله‌ای","بیضوی کامل","نامنظم فقط","حلقوی ساده"},
+        {"سال نوری واحد اندازه‌گیری چیست؟","🪐","فاصله","زمان","جرم","دما"},
+        {"کدام تلسکوپ فضایی برای رصد مادون قرمز بسیار شناخته‌شده است؟","🪐","جیمز وب","هابل فقط در مادون قرمز","کپلر","آپولو"},
+        {"کدام ستاره نزدیک‌ترین ستاره به خورشید است؟","🪐","پروکسیما قنطورس","شباهنگ","ستاره قطبی","منظومه آلفا"},
+        {"فاز ماه وقتی تمام سطح روشن آن دیده می‌شود چیست؟","🪐","ماه کامل","ماه نو","تربیع اول","هلال"},
+        {"علت اصلی فصل‌ها در زمین چیست؟","🪐","انحراف محور زمین و گردش آن به دور خورشید","فاصله ثابت ماه","تغییر جرم زمین","بادهای خورشیدی فقط"},
+        {"کدام لایه خورشید سطح مرئی آن است؟","🪐","فوتوسفر","کروموسفر","تاج","هسته"},
+        {"واحد نجومی تقریباً فاصله میان کدام دو جرم را تعریف می‌کند؟","🪐","زمین و خورشید","زمین و ماه","خورشید و مشتری","ماه و خورشید"},
+        {"کدام پروتکل برای دریافت صفحات وب به‌کار می‌رود؟","💻","HTTP/HTTPS","SMTP","FTP فقط","DNS فقط"},
+        {"DNS چه کاری انجام می‌دهد؟","💻","نام دامنه را به نشانی IP مرتبط می‌کند","رمز عبور را ذخیره می‌کند","تصویر را فشرده می‌کند","پردازنده را خنک می‌کند"},
+        {"کدام پروتکل برای ارسال ایمیل رایج است؟","💻","SMTP","HTTP","DNS","SSH فقط"},
+        {"SSH معمولاً برای چه کاری استفاده می‌شود؟","💻","دسترسی امن از راه دور","پخش ویدئو","ویرایش عکس","مدیریت صدا"},
+        {"رمزنگاری متقارن از چه چیزی استفاده می‌کند؟","💻","یک کلید مشترک","دو کلید عمومی و خصوصی فقط","بدون کلید","کلید فیزیکی USB"},
+        {"در رمزنگاری نامتقارن چه کلیدهایی وجود دارد؟","💻","عمومی و خصوصی","دو کلید یکسان","فقط کلید عمومی","بدون کلید"},
+        {"کدام ساختار برای رابطه‌های سلسله‌مراتبی مناسب است؟","💻","Tree","Queue","Stack","Array فقط"},
+        {"پیچیدگی جست‌وجوی دودویی در حالت معمول چیست؟","💻","O(log n)","O(n²)","O(1) همیشه","O(n³)"},
+        {"کدام نوع داده برای مقدار درست یا نادرست مناسب است؟","💻","Boolean","String","Float","Array"},
+        {"کدام زبان برنامه‌نویسی برای تحلیل داده و یادگیری ماشین بسیار رایج است؟","💻","Python","HTML","CSS","XML"},
+        {"API معمولاً چه مفهومی دارد؟","💻","رابط برنامه‌نویسی کاربردی","حافظه تصویری","پروتکل برق","فایل صوتی"},
+        {"JSON بیشتر برای چه چیزی استفاده می‌شود؟","💻","تبادل داده ساختاریافته","ویرایش تصویر","فشرده‌سازی ویدئو","کنترل ولتاژ"},
+        {"کدام الگوریتم رمزنگاری برای هش یک‌طرفه شناخته‌شده است؟","💻","SHA-256","JPEG","HTTP","CSV"},
+        {"کدام مورد پایگاه داده رابطه‌ای است؟","💻","PostgreSQL","HTML","Git","PNG"},
+        {"کلید اصلی در پایگاه داده چه نقشی دارد؟","💻","شناسایی یکتای رکورد","ذخیره تصویر","رمزنگاری صفحه","تغییر فونت"},
+        {"کدام عملگر منطقی برای AND در بسیاری از زبان‌ها استفاده می‌شود؟","💻","&&","||","!","=="},
+        {"کدام عملگر برای مقایسه برابری در بسیاری از زبان‌ها استفاده می‌شود؟","💻","==","=","=>","++"},
+        {"در برنامه‌نویسی، حلقه برای چه کاری مناسب است؟","💻","تکرار یک بخش از کد","ذخیره دائمی برق","ساخت سخت‌افزار","تغییر وضوح صفحه"},
+        {"کدام حافظه معمولاً از RAM سریع‌تر و کوچک‌تر است؟","💻","Cache","HDD","DVD","فلش دیسک همیشه"},
+        {"GPU بیشتر برای چه نوع پردازشی مناسب است؟","💻","پردازش موازی گرافیکی","ذخیره فایل متنی","چاپ سند","تولید صدا فقط"},
+        {"کدام مورد یک سیستم کنترل نسخه توزیع‌شده است؟","💻","Git","FTP","DNS","HTTP"},
+        {"در احتمال، احتمال یک رویداد قطعی چند است؟","➗","۱","۰","۰٫۵","-۱"},
+        {"میانگین اعداد ۲، ۴ و ۶ چند است؟","➗","۴","۳","۵","۶"},
+        {"میانه اعداد ۱، ۳ و ۹ چند است؟","➗","۳","۱","۹","۱۳"},
+        {"اگر x+5=12 باشد، x چند است؟","➗","۷","۵","۱۷","۶"},
+        {"اگر 3x=21 باشد، x چند است؟","➗","۷","۶","۸","۹"},
+        {"مساحت دایره با شعاع r با کدام فرمول بیان می‌شود؟","➗","πr²","2πr","r²/π","π+r"},
+        {"محیط دایره با شعاع r با کدام فرمول است؟","➗","2πr","πr²","r/π","π+r²"},
+        {"شیب خط در دستگاه مختصات چه چیزی را نشان می‌دهد؟","➗","نرخ تغییر y نسبت به x","مساحت کل","محیط دایره","فقط عرض از مبدأ"},
+        {"مشتق تابع بیشتر چه مفهومی دارد؟","➗","نرخ تغییر لحظه‌ای","مساحت ثابت","میانگین ساده","تعداد ریشه‌ها"},
+        {"انتگرال معین در بسیاری از کاربردها برای محاسبه چه چیزی استفاده می‌شود؟","➗","مساحت تجمعی","فقط شیب","عدد اول","میانگین هندسی"}
+    };
+
     void buildQuestions(){
         questions.clear();
-        ArrayList<String[]> all=new ArrayList<>(); all.addAll(Arrays.asList(facts)); all.addAll(Arrays.asList(iranFacts)); all.addAll(Arrays.asList(specializedFacts));
-        Random rnd=new Random(20260921L);
-        // No introductory filler: the question itself is shown.
+        ArrayList<String[]> all=new ArrayList<>();
+        all.addAll(Arrays.asList(facts));
+        all.addAll(Arrays.asList(iranFacts));
+        all.addAll(Arrays.asList(specializedFacts));
+        all.addAll(Arrays.asList(extraSpecializedFacts));
+        Random rnd=new Random(System.nanoTime());
+        HashSet<String> seen=new HashSet<>();
         for(String[] f:all){
-            String[] opts={f[2],f[3],f[4],f[5]}; ArrayList<String> shuffled=new ArrayList<>(Arrays.asList(opts)); Collections.shuffle(shuffled,rnd);
-            int correct=shuffled.indexOf(f[2]); questions.add(new Question(f[0],f[1],shuffled.toArray(new String[0]),correct));
+            if(f.length<6 || !seen.add(f[0])) continue;
+            String[] opts={f[2],f[3],f[4],f[5]};
+            ArrayList<String> shuffled=new ArrayList<>(Arrays.asList(opts));
+            Collections.shuffle(shuffled,rnd);
+            int correct=shuffled.indexOf(f[2]);
+            questions.add(new Question(f[0],f[1],shuffled.toArray(new String[0]),correct));
         }
         Collections.shuffle(questions,rnd);
-        // Expand the playable pool to 3000 questions while reshuffling options each round.
-        ArrayList<Question> seed=new ArrayList<>(questions);
-        int round=0;
-        while(questions.size()<3000){
-            round++;
-            for(Question q:seed){
-                String[] opts=q.a.clone();
-                ArrayList<String> sh=new ArrayList<>(Arrays.asList(opts));
-                Collections.shuffle(sh,new Random(20260921L+round*997L+q.q.hashCode()));
-                int c=sh.indexOf(q.a[q.correct]);
-                questions.add(new Question(q.q,q.icon,sh.toArray(new String[0]),c));
-                if(questions.size()>=3000) break;
-            }
-        }
-        Collections.shuffle(questions,new Random(20260921L+77));
     }
 
-    void startGame(){index=0;score=0;coin=50;inGame=true;Collections.shuffle(questions);showQuestion();}
+    void startGame(){
+        index=0;score=0;coin=50;
+        ArrayList<Question> fresh=new ArrayList<>();
+        for(Question q:questions) if(!answeredQuestions.contains(q.q)) fresh.add(q);
+        if(fresh.isEmpty()){
+            Toast.makeText(this,"فعلاً سؤال جدیدی باقی نمانده است؛ سؤال‌های جدید در نسخه‌های بعدی اضافه می‌شوند.",Toast.LENGTH_LONG).show();
+            showHome();
+            return;
+        }
+        questions=new ArrayList<>(fresh);
+        Collections.shuffle(questions,new Random(System.nanoTime()));
+        inGame=true;showQuestion();
+    }
+
+    void saveAnswered(String key){
+        answeredQuestions.add(key);
+        prefs.edit().putStringSet("answered_questions",new HashSet<>(answeredQuestions)).apply();
+    }
+
 
     void showQuestion(){
-        answered=false; currentBackground=index; Question q=questions.get(index); base();
-
-        LinearLayout top=new LinearLayout(this);
-        top.setOrientation(LinearLayout.HORIZONTAL);
-        top.setGravity(Gravity.CENTER_VERTICAL);
-        top.setLayoutDirection(View.LAYOUT_DIRECTION_RTL);
-
-        TextView badge=text("🏆 "+fa(score),15);
-        badge.setBackground(bg(Color.argb(205,10,35,75),Color.argb(205,5,18,50),22));
-        top.addView(badge,new LinearLayout.LayoutParams(dp(82),dp(44)));
-
-        progress=text("مرحله "+fa((index/15)+1)+"   "+fa((index%15)+1)+"/"+fa(15),15);
-        progress.setBackground(bg(Color.argb(205,10,35,75),Color.argb(205,5,18,50),22));
-        LinearLayout.LayoutParams mid=new LinearLayout.LayoutParams(0,dp(44),1);
-        mid.setMargins(dp(6),0,dp(6),0);
-        top.addView(progress,mid);
-
-        Button favorite=smallButton(isFavorite(q)?"★":"☆");
-        favorite.setTextSize(23);
-        favorite.setOnClickListener(v->toggleFavorite(q,favorite));
-        top.addView(favorite,new LinearLayout.LayoutParams(dp(54),dp(44)));
-
-        Button back=smallButton("‹");
-        back.setTextSize(25);
-        back.setOnClickListener(v->{inGame=false; if(questionTimer!=null){questionTimer.cancel(); questionTimer=null;} showHome();});
-        top.addView(back,new LinearLayout.LayoutParams(dp(54),dp(44)));
-        root.addView(top);
-
-        ProgressBar pb=new ProgressBar(this,null,android.R.attr.progressBarStyleHorizontal);
-        pb.setMax(15); pb.setProgress((index%15)+1);
-        pb.setProgressDrawable(bg(Color.rgb(255,196,45),Color.rgb(245,120,20),20));
-        LinearLayout.LayoutParams pp=new LinearLayout.LayoutParams(-1,dp(8));
-        pp.setMargins(dp(8),dp(8),dp(8),dp(12));
-        root.addView(pb,pp);
-
-        timerView=text("⏱ ۵",20);
-        timerView.setTextColor(Color.WHITE);
-        timerView.setGravity(Gravity.CENTER);
-        timerView.setBackground(bg(Color.rgb(30,80,170),Color.rgb(12,35,100),24));
-        LinearLayout.LayoutParams tp=new LinearLayout.LayoutParams(dp(100),dp(48));
-        tp.gravity=Gravity.CENTER_HORIZONTAL;
-        tp.setMargins(0,0,0,dp(8));
-        root.addView(timerView,tp);
-
-        ImageView scene=new ImageView(this);
-        scene.setImageResource(backgroundRes());
-        scene.setScaleType(ImageView.ScaleType.CENTER_CROP);
-        scene.setAlpha(0.92f);
-        GradientDrawable sceneBg=bg(Color.argb(90,8,25,70),Color.argb(45,8,25,70),24);
-        scene.setBackground(sceneBg);
-        scene.setClipToOutline(true);
-        LinearLayout.LayoutParams sceneLp=new LinearLayout.LayoutParams(-1,dp(72));
-        sceneLp.setMargins(dp(4),0,dp(4),dp(8));
-        root.addView(scene,sceneLp);
-
-        questionText=text(q.q,20);
-        questionText.setTextColor(Color.rgb(25,32,75));
-        questionText.setBackground(bg(Color.argb(218,255,255,255),Color.argb(190,241,247,255),26));
-        questionText.setGravity(Gravity.CENTER);
-        LinearLayout.LayoutParams qp=new LinearLayout.LayoutParams(-1,dp(112));
-        qp.setMargins(0,dp(8),0,dp(12));
-        questionText.setMinHeight(dp(96)); questionText.setMaxLines(5); root.addView(questionText,qp);
-
-        answerButtons.clear();
-        for(int i=0;i<4;i++){
-            final int n=i;
-            Button b=button(q.a[i]);
-            b.setTextColor(Color.rgb(25,32,75));
-            b.setTextSize(17);
-            b.setTypeface(Typeface.create("sans-serif",Typeface.NORMAL));
-            b.setMinHeight(dp(58));
-            b.setMinimumHeight(dp(58));
-            b.setSingleLine(false);
-            b.setMaxLines(3);
-            b.setEllipsize(null);
-            b.setHorizontallyScrolling(false);
-            b.setBackground(bg(Color.argb(190,255,255,255),Color.argb(165,238,246,255),24));
-            b.setOnClickListener(v->answer(n,b));
-            answerButtons.add(b);
-            root.addView(b);
-        }
+        answered=false; currentBackground=(index%4)+1; Question q=questions.get(index); base();
+        LinearLayout top=new LinearLayout(this);top.setOrientation(LinearLayout.HORIZONTAL);top.setGravity(Gravity.CENTER_VERTICAL);top.setLayoutDirection(View.LAYOUT_DIRECTION_RTL);
+        TextView timerBadge=text("⏱ ۱۰",16);timerBadge.setVisibility(View.GONE);
+        progress=text("چالش "+fa(index+1),16);progress.setTextColor(Color.WHITE);progress.setGravity(Gravity.CENTER);progress.setBackground(bg(Color.argb(235,18,55,115),Color.argb(230,7,27,70),22));top.addView(progress,new LinearLayout.LayoutParams(0,dp(48),1));
+        timerView=text("⏱ ۱۰",17);timerView.setTextColor(Color.WHITE);timerView.setGravity(Gravity.CENTER);timerView.setBackground(bg(Color.rgb(255,193,45),Color.rgb(220,95,10),22));top.addView(timerView,new LinearLayout.LayoutParams(dp(88),dp(48)));
+        Button back=smallButton("‹");back.setTextSize(26);back.setOnClickListener(v->{inGame=false;if(questionTimer!=null){questionTimer.cancel();questionTimer=null;}try{tone.stopTone();}catch(Exception ignored){}showHome();});top.addView(back,new LinearLayout.LayoutParams(dp(52),dp(48)));root.addView(top,new LinearLayout.LayoutParams(-1,dp(54)));
+        ProgressBar pb=new ProgressBar(this,null,android.R.attr.progressBarStyleHorizontal);pb.setMax(15);pb.setProgress((index%15)+1);pb.setProgressDrawable(bg(Color.rgb(55,220,150),Color.rgb(20,130,210),20));LinearLayout.LayoutParams pp=new LinearLayout.LayoutParams(-1,dp(8));pp.setMargins(dp(8),dp(6),dp(8),dp(10));root.addView(pb,pp);
+        ImageView scene=new ImageView(this);scene.setImageResource(questionVisualRes(q.q,q.icon));scene.setScaleType(ImageView.ScaleType.CENTER_CROP);scene.setAlpha(0.98f);scene.setClipToOutline(true);scene.setBackground(bg(Color.argb(220,8,20,50),Color.argb(180,20,60,100),22));LinearLayout.LayoutParams sl=new LinearLayout.LayoutParams(-1,dp(125));sl.setMargins(dp(2),0,dp(2),dp(10));root.addView(scene,sl);
+        questionText=text(q.q,18);questionText.setTextColor(Color.rgb(18,35,75));questionText.setTypeface(persianFont);questionText.setGravity(Gravity.CENTER);questionText.setBackground(bg(Color.argb(248,255,255,255),Color.argb(242,246,249,255),24));questionText.setMaxLines(6);questionText.setMinHeight(dp(100));questionText.setPadding(dp(16),dp(14),dp(16),dp(14));LinearLayout.LayoutParams qp=new LinearLayout.LayoutParams(-1,LinearLayout.LayoutParams.WRAP_CONTENT);qp.setMargins(0,0,0,dp(10));root.addView(questionText,qp);
+        answerButtons.clear();String[] labels={"A","B","C","D"};for(int i=0;i<4;i++){final int n=i;Button b=button(labels[i]+"   "+q.a[i]);b.setTextColor(Color.rgb(20,35,75));b.setTextSize(17);b.setTypeface(persianFont);b.setGravity(Gravity.CENTER|Gravity.RIGHT);b.setMinHeight(dp(62));b.setMaxLines(3);b.setSingleLine(false);b.setEllipsize(null);b.setHorizontallyScrolling(false);b.setBackground(bg(Color.argb(245,255,255,255),Color.argb(235,238,246,255),22));b.setOnClickListener(v->answer(n,b));answerButtons.add(b);LinearLayout.LayoutParams ap=new LinearLayout.LayoutParams(-1,dp(66));ap.setMargins(dp(2),dp(4),dp(2),dp(4));root.addView(b,ap);}
         startQuestionTimer();
+    }
+
+    int questionVisualRes(String qtext,String icon){
+        if(qtext.contains("تخت جمشید") || qtext.contains("مرودشت")) return R.drawable.q_persepolis;
+        if(qtext.contains("نقش جهان") || qtext.contains("شیخ لطف‌الله") || qtext.contains("سی‌وسه‌پل") || qtext.contains("پل خواجو")) return R.drawable.q_naghshjahan;
+        if(qtext.contains("دماوند")) return R.drawable.q_damavand;
+        if(qtext.contains("لوت")) return R.drawable.q_lut;
+        if(qtext.contains("هرمز") || qtext.contains("خاک‌های رنگارنگ")) return R.drawable.q_hormoz;
+        if(qtext.contains("ارگ بم")) return R.drawable.q_bam;
+        if(qtext.contains("یزد") || qtext.contains("بادگیر")) return R.drawable.q_yazd;
+        if(qtext.contains("چغازنبیل") || qtext.contains("شوش")) return R.drawable.q_chogha;
+        if(icon==null) return R.drawable.q_science;
+        if(icon.contains("⚗") || icon.contains("⚛") || icon.contains("🧪") || icon.contains("⚡")) return R.drawable.q_science;
+        if(icon.contains("🪐") || icon.contains("☀") || icon.contains("🌌") || icon.contains("⭐") || icon.contains("🌙") || icon.contains("🛰") || icon.contains("🔭")) return R.drawable.q_space;
+        if(icon.contains("🇮🇷") || icon.contains("🏺") || icon.contains("🕌") || icon.contains("🌹") || icon.contains("🏜") || icon.contains("🧂")) return R.drawable.q_iran;
+        if(icon.contains("🌊") || icon.contains("🌍") || icon.contains("🌎") || icon.contains("🗺") || icon.contains("🧭") || icon.contains("❄")) return R.drawable.q_geography;
+        if(icon.contains("🧠") || icon.contains("❤️") || icon.contains("🫁") || icon.contains("🫘") || icon.contains("🌿") || icon.contains("🌞") || icon.contains("🦁") || icon.contains("🐆") || icon.contains("🐧") || icon.contains("🐢") || icon.contains("🦘")) return R.drawable.q_biology;
+        if(icon.contains("➕") || icon.contains("➗") || icon.contains("🔢") || icon.contains("📐") || icon.contains("🔺") || icon.contains("📅")) return R.drawable.q_math;
+        if(icon.contains("📱") || icon.contains("💻") || icon.contains("⚙") || icon.contains("🛰")) return R.drawable.q_tech;
+        if(icon.contains("🎨") || icon.contains("📜") || icon.contains("🎵") || icon.contains("🏛")) return R.drawable.q_art;
+        return R.drawable.q_science;
     }
 
     void startQuestionTimer(){
         if(questionTimer!=null) questionTimer.cancel();
-        questionTimer=new CountDownTimer(5000,1000){
+        questionTimer=new CountDownTimer(10000,1000){
             public void onTick(long left){
                 int sec=(int)Math.ceil(left/1000.0);
                 if(timerView!=null) timerView.setText("⏱  "+fa(sec));
@@ -951,7 +993,10 @@ public class MainActivity extends Activity {
                 answered=true;
                 if(timerView!=null){ timerView.setText("⏱ ۰"); timerView.setBackground(bg(Color.rgb(235,78,95),Color.rgb(145,25,55),24)); }
                 try{tone.startTone(android.media.ToneGenerator.TONE_CDMA_ALERT_CALL_GUARD,260);}catch(Exception ignored){}
-                new android.os.Handler().postDelayed(()->{if(!inGame)return; index++; if(index<questions.size())showQuestion(); else showResult();},700);
+                Question q=questions.get(index);
+                saveAnswered(q.q);
+                if(answerButtons.size()>q.correct){ Button correct=answerButtons.get(q.correct); correct.setBackground(bg(Color.rgb(35,205,130),Color.rgb(10,125,80),25)); correct.setTextColor(Color.WHITE); correct.setText("✓  "+correct.getText()); }
+                new android.os.Handler().postDelayed(()->{if(!inGame)return; index++; if(index<questions.size())showQuestion(); else showResult();},1800);
             }
         }.start();
     }
@@ -959,7 +1004,7 @@ public class MainActivity extends Activity {
     void answer(int n,Button chosen){
         if(answered)return; answered=true;
         if(questionTimer!=null){questionTimer.cancel();questionTimer=null;}
-        Question q=questions.get(index); boolean ok=n==q.correct;
+        Question q=questions.get(index); saveAnswered(q.q); boolean ok=n==q.correct;
         try{tone.startTone(ok?android.media.ToneGenerator.TONE_PROP_ACK:android.media.ToneGenerator.TONE_PROP_NACK,180);}catch(Exception ignored){}
         if(ok){if(timerView!=null) timerView.setBackground(bg(Color.rgb(35,170,115),Color.rgb(10,105,75),24));score+=10;coin+=5;chosen.setBackground(bg(Color.rgb(35,205,130),Color.rgb(10,125,80),25));chosen.setTextColor(Color.WHITE);chosen.setText("✓  "+chosen.getText());}
         else{if(timerView!=null) timerView.setBackground(bg(Color.rgb(235,78,95),Color.rgb(145,25,55),24));coin=Math.max(0,coin-5);chosen.setBackground(bg(Color.rgb(235,78,95),Color.rgb(145,25,55),25));chosen.setTextColor(Color.WHITE);chosen.setText("✕  "+chosen.getText()); Button correct=answerButtons.get(q.correct);correct.setBackground(bg(Color.rgb(35,205,130),Color.rgb(10,125,80),25));correct.setTextColor(Color.WHITE);correct.setText("✓  "+correct.getText());}
