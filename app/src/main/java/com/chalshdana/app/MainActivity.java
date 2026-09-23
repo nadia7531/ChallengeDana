@@ -1148,7 +1148,6 @@ public class MainActivity extends Activity {
             b.setOnClickListener(v->answer(n,b));
             answerButtons.add(b);
             LinearLayout.LayoutParams ap=new LinearLayout.LayoutParams(-1,LinearLayout.LayoutParams.WRAP_CONTENT);
-            ap.setMinimumHeight(dp(64));
             ap.setMargins(0,dp(5),0,dp(5));
             root.addView(b,ap);
         }
