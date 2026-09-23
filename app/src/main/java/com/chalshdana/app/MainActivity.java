@@ -733,7 +733,7 @@ public class MainActivity extends Activity {
         centerLogo.setImageResource(R.drawable.icon_dana);
         centerLogo.setScaleType(ImageView.ScaleType.FIT_CENTER);
         centerLogo.setAdjustViewBounds(true);
-        LinearLayout.LayoutParams lp=new LinearLayout.LayoutParams(dp(122),dp(122));
+        LinearLayout.LayoutParams lp=new LinearLayout.LayoutParams(dp(108),dp(108));
         lp.setMargins(0,dp(4),0,dp(0));
         root.addView(centerLogo,lp);
 
@@ -759,7 +759,7 @@ public class MainActivity extends Activity {
         if(!profileImageUri.isEmpty()) try{av.setImageURI(Uri.parse(profileImageUri));}
         catch(Exception ignored){}
         else {av.setImageResource(R.drawable.icon_dana);av.setPadding(dp(7),dp(7),dp(7),dp(7));}
-        profile.addView(av,new LinearLayout.LayoutParams(dp(60),dp(60)));
+        profile.addView(av,new LinearLayout.LayoutParams(dp(52),dp(52)));
 
         LinearLayout pi=new LinearLayout(this);
         pi.setOrientation(LinearLayout.VERTICAL);
