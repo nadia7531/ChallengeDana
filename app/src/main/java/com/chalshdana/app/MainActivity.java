@@ -593,19 +593,20 @@ public class MainActivity extends Activity {
 
     String fa(int n){String s=""+n; String en="0123456789"; String fa="۰۱۲۳۴۵۶۷۸۹"; StringBuilder r=new StringBuilder(); for(char c:s.toCharArray()){int i=en.indexOf(c); r.append(i>=0?fa.charAt(i):c);} return r.toString();}
     int dp(int x){return (int)(x*getResources().getDisplayMetrics().density+0.5f);}
-    TextView text(String s,float size){TextView v=new TextView(this);v.setText(s);v.setTextSize(size);v.setTextColor(Color.WHITE);v.setGravity(Gravity.CENTER);v.setIncludeFontPadding(false);v.setLineSpacing(0,1.02f);v.setTypeface(persianFont);v.setIncludeFontPadding(false);v.setLineSpacing(0f,1.04f);v.setPadding(dp(8),dp(3),dp(8),dp(3));v.setLayoutDirection(View.LAYOUT_DIRECTION_RTL);v.setTextDirection(View.TEXT_DIRECTION_RTL);v.setBreakStrategy(android.text.Layout.BREAK_STRATEGY_HIGH_QUALITY);v.setHyphenationFrequency(android.text.Layout.HYPHENATION_FREQUENCY_NONE);return v;}
+    float responsiveTextSize(float size){ float density=getResources().getDisplayMetrics().density; float widthDp=getResources().getDisplayMetrics().widthPixels/density; float scale=Math.max(0.90f, Math.min(1.0f, widthDp/420f)); return size*scale; }
+    TextView text(String s,float size){TextView v=new TextView(this);v.setText(s);v.setTextSize(responsiveTextSize(size));v.setTextColor(Color.WHITE);v.setGravity(Gravity.CENTER);v.setIncludeFontPadding(false);v.setLineSpacing(0,1.02f);v.setTypeface(persianFont);v.setIncludeFontPadding(false);v.setLineSpacing(0f,1.04f);v.setPadding(dp(8),dp(3),dp(8),dp(3));v.setLayoutDirection(View.LAYOUT_DIRECTION_RTL);v.setTextDirection(View.TEXT_DIRECTION_RTL);v.setBreakStrategy(android.text.Layout.BREAK_STRATEGY_HIGH_QUALITY);v.setHyphenationFrequency(android.text.Layout.HYPHENATION_FREQUENCY_NONE);return v;}
     GradientDrawable bg(int c1,int c2,float r){GradientDrawable g=new GradientDrawable(GradientDrawable.Orientation.TL_BR,new int[]{c1,c2});g.setCornerRadius(dp((int)r));g.setStroke(dp(1),Color.argb(100,255,255,255));return g;}
-    Button button(String s){Button b=new Button(this);b.setText(s);b.setTextSize(16);b.setTextColor(Color.WHITE);b.setAllCaps(false);b.setGravity(Gravity.CENTER);b.setTypeface(persianFont);b.setLayoutDirection(View.LAYOUT_DIRECTION_RTL);b.setPadding(dp(12),dp(8),dp(12),dp(8));b.setSingleLine(false);b.setMaxLines(5);b.setEllipsize(null);b.setHorizontallyScrolling(false); b.setPadding(dp(14),dp(10),dp(14),dp(10));b.setMinHeight(dp(68));b.setMinimumHeight(dp(68));b.setBackground(bg(Color.rgb(30,105,210),Color.rgb(18,45,125),24));LinearLayout.LayoutParams p=new LinearLayout.LayoutParams(-1,dp(64));p.setMargins(dp(6),dp(5),dp(6),dp(5));b.setLayoutParams(p);return b;}
+    Button button(String s){Button b=new Button(this);b.setText(s);b.setTextSize(responsiveTextSize(16));b.setTextColor(Color.WHITE);b.setAllCaps(false);b.setGravity(Gravity.CENTER);b.setTypeface(persianFont);b.setLayoutDirection(View.LAYOUT_DIRECTION_RTL);b.setPadding(dp(12),dp(8),dp(12),dp(8));b.setSingleLine(false);b.setMaxLines(5);b.setEllipsize(null);b.setHorizontallyScrolling(false); b.setPadding(dp(14),dp(10),dp(14),dp(10));b.setMinHeight(dp(68));b.setMinimumHeight(dp(68));b.setBackground(bg(Color.rgb(30,105,210),Color.rgb(18,45,125),24));LinearLayout.LayoutParams p=new LinearLayout.LayoutParams(-1,dp(64));p.setMargins(dp(6),dp(5),dp(6),dp(5));b.setLayoutParams(p);return b;}
     Button smallButton(String s){Button b=button(s);b.setTextSize(16);b.setTextColor(Color.WHITE);b.setBackground(bg(Color.argb(175,12,45,100),Color.argb(175,8,25,65),20));b.setLayoutParams(new LinearLayout.LayoutParams(dp(54),dp(48)));return b;}
 
-    int backgroundRes(){int[] r={R.drawable.bg_premium,R.drawable.bg_nature,R.drawable.bg_iran,R.drawable.bg_ocean,R.drawable.bg_space};return r[currentBackground%r.length];}
+    int backgroundRes(){int[] r={R.drawable.bg_home};return r[0];}
     void base(){
         screen=new FrameLayout(this);
         ImageView image=new ImageView(this);
         image.setImageResource(backgroundRes());
         image.setScaleType(ImageView.ScaleType.CENTER_CROP);
         screen.addView(image,new FrameLayout.LayoutParams(-1,-1));
-        View shade=new View(this); shade.setBackgroundColor(Color.argb(28,2,10,35));
+        View shade=new View(this); shade.setBackgroundColor(Color.argb(48,2,10,35));
         screen.addView(shade,new FrameLayout.LayoutParams(-1,-1));
         ScrollView scroll=new ScrollView(this); scroll.setFillViewport(true); scroll.setClipToPadding(false);
         root=new LinearLayout(this); root.setOrientation(LinearLayout.VERTICAL); root.setGravity(Gravity.CENTER_HORIZONTAL); root.setPadding(dp(14),dp(10),dp(14),dp(20)); root.setLayoutDirection(View.LAYOUT_DIRECTION_RTL);
@@ -733,15 +734,15 @@ public class MainActivity extends Activity {
         centerLogo.setImageResource(R.drawable.icon_dana);
         centerLogo.setScaleType(ImageView.ScaleType.FIT_CENTER);
         centerLogo.setAdjustViewBounds(true);
-        LinearLayout.LayoutParams lp=new LinearLayout.LayoutParams(dp(108),dp(108));
-        lp.setMargins(0,dp(4),0,dp(0));
+        LinearLayout.LayoutParams lp=new LinearLayout.LayoutParams(dp(74),dp(74));
+        lp.setMargins(0,dp(14),0,dp(0));
         root.addView(centerLogo,lp);
 
-        TextView appName=title("چالش دانا",23);
+        TextView appName=title("چالش دانا",21);
         appName.setGravity(Gravity.CENTER);
         root.addView(appName,new LinearLayout.LayoutParams(-1,dp(42)));
 
-        TextView tagline=text("دانش، سرعت و هیجان",13);
+        TextView tagline=text("دانش، سرعت و هیجان",12);
         tagline.setTextColor(Color.rgb(220,235,255));
         root.addView(tagline,new LinearLayout.LayoutParams(-1,dp(32)));
 
@@ -767,11 +768,11 @@ public class MainActivity extends Activity {
         pi.setLayoutDirection(View.LAYOUT_DIRECTION_RTL);
         pi.setPadding(dp(14),0,dp(6),0);
 
-        TextView pn=text(profileName.isEmpty()?"کاربر مهمان":"درود، "+profileName,16);
+        TextView pn=text(profileName.isEmpty()?"کاربر مهمان":"درود، "+profileName,15);
         pn.setGravity(Gravity.RIGHT|Gravity.CENTER_VERTICAL);
         pn.setTextColor(Color.WHITE);
         pn.setMaxLines(1);
-        TextView ps=text("امتیاز  "+fa(score)+"   •   جان  "+fa(lives),12);
+        TextView ps=text("امتیاز  "+fa(score)+"   •   جان  "+fa(lives),11);
         ps.setTextColor(Color.rgb(225,235,255));
         ps.setGravity(Gravity.RIGHT|Gravity.CENTER_VERTICAL);
         pi.addView(pn,new LinearLayout.LayoutParams(-1,dp(34)));
@@ -783,7 +784,7 @@ public class MainActivity extends Activity {
         cp.setMargins(0,dp(10),0,dp(12));
         root.addView(profile,cp);
 
-        Button start=button("▶   شروع چالش");
+        Button start=button("✦   شروع چالش   ›");
         start.setTextSize(18);
         start.setTextColor(Color.rgb(45,25,0));
         start.setBackground(bg(Color.rgb(255,220,75),Color.rgb(255,143,18),25));
@@ -799,12 +800,12 @@ public class MainActivity extends Activity {
         quick.setLayoutDirection(View.LAYOUT_DIRECTION_RTL);
 
         Button records=button("🏆  رکوردها");
-        records.setTextSize(14);
+        records.setTextSize(responsiveTextSize(14));
         records.setBackground(bg(Color.rgb(40,155,245),Color.rgb(18,82,190),22));
         records.setOnClickListener(v->showRankings());
 
         Button profileBtn=button("👤  پروفایل");
-        profileBtn.setTextSize(14);
+        profileBtn.setTextSize(responsiveTextSize(14));
         profileBtn.setBackground(bg(Color.rgb(120,65,230),Color.rgb(70,38,165),22));
         profileBtn.setOnClickListener(v->showProfileEditor());
 
