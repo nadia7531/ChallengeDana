@@ -567,8 +567,9 @@ public class MainActivity extends Activity {
 
     @Override public void onCreate(Bundle b){
         super.onCreate(b);
-        getWindow().setStatusBarColor(Color.rgb(5,12,38));
+        getWindow().setStatusBarColor(Color.TRANSPARENT);
         getWindow().setNavigationBarColor(Color.rgb(5,12,38));
+        getWindow().setFlags(android.view.WindowManager.LayoutParams.FLAG_FULLSCREEN, android.view.WindowManager.LayoutParams.FLAG_FULLSCREEN);
         tone = new android.media.ToneGenerator(android.media.AudioManager.STREAM_MUSIC, 85);
         try{ persianFont = Typeface.createFromAsset(getAssets(), "fonts/NotoSansArabic-Bold.ttf"); }catch(Exception e){ persianFont = Typeface.create("sans-serif", Typeface.NORMAL); }
         prefs = getSharedPreferences("dana_profile", MODE_PRIVATE);
@@ -599,7 +600,7 @@ public class MainActivity extends Activity {
     Button button(String s){Button b=new Button(this);b.setText(s);b.setTextSize(responsiveTextSize(16));b.setTextColor(Color.WHITE);b.setAllCaps(false);b.setGravity(Gravity.CENTER);b.setTypeface(persianFont);b.setLayoutDirection(View.LAYOUT_DIRECTION_RTL);b.setPadding(dp(12),dp(8),dp(12),dp(8));b.setSingleLine(false);b.setMaxLines(5);b.setEllipsize(null);b.setHorizontallyScrolling(false); b.setPadding(dp(14),dp(10),dp(14),dp(10));b.setMinHeight(dp(60));b.setMinimumHeight(dp(60));b.setBackground(bg(Color.rgb(30,105,210),Color.rgb(18,45,125),24));LinearLayout.LayoutParams p=new LinearLayout.LayoutParams(-1,dp(60));p.setMargins(dp(6),dp(4),dp(6),dp(4));b.setLayoutParams(p);return b;}
     Button smallButton(String s){Button b=button(s);b.setTextSize(16);b.setTextColor(Color.WHITE);b.setBackground(bg(Color.argb(175,12,45,100),Color.argb(175,8,25,65),20));b.setLayoutParams(new LinearLayout.LayoutParams(dp(54),dp(48)));return b;}
 
-    int backgroundRes(){int[] r={R.drawable.bg_home};return r[0];}
+    int backgroundRes(){return R.drawable.bg_home_persepolis;}
     void base(){
         screen=new FrameLayout(this);
         ImageView image=new ImageView(this);
@@ -709,116 +710,55 @@ public class MainActivity extends Activity {
         try{tone.stopTone();}catch(Exception ignored){}
         backArmed=false; currentBackground=0; base();
 
+        // Top-right profile circle only. Name is optional and edited by tapping this circle.
         LinearLayout top=new LinearLayout(this);
         top.setOrientation(LinearLayout.HORIZONTAL);
         top.setGravity(Gravity.CENTER_VERTICAL);
         top.setLayoutDirection(View.LAYOUT_DIRECTION_RTL);
+        Space left=new Space(this);
+        top.addView(left,new LinearLayout.LayoutParams(0,dp(42),1));
+        TextView profileCircle=text("👤",18);
+        profileCircle.setGravity(Gravity.CENTER);
+        profileCircle.setTextColor(Color.WHITE);
+        profileCircle.setBackground(bg(Color.argb(215,20,100,190),Color.argb(215,5,35,90),50));
+        profileCircle.setOnClickListener(v->showProfileEditor());
+        top.addView(profileCircle,new LinearLayout.LayoutParams(dp(44),dp(44)));
+        LinearLayout.LayoutParams tp=new LinearLayout.LayoutParams(-1,dp(46));
+        tp.setMargins(0,dp(4),0,0);
+        root.addView(top,tp);
 
-        TextView coinPill=text("🪙  "+fa(coin),15);
-        coinPill.setTextColor(Color.rgb(255,220,85));
-        coinPill.setGravity(Gravity.CENTER);
-        coinPill.setBackground(bg(Color.argb(235,15,43,95),Color.argb(225,7,22,58),22));
-        top.addView(coinPill,new LinearLayout.LayoutParams(dp(88),dp(44)));
-
-        Space topSpace=new Space(this);
-        top.addView(topSpace,new LinearLayout.LayoutParams(0,dp(44),1));
-
-        TextView gear=text("👤",19);
-        gear.setGravity(Gravity.CENTER);
-        gear.setTextColor(Color.WHITE);
-        gear.setBackground(bg(Color.argb(210,25,78,150),Color.argb(210,8,30,78),50));
-        gear.setOnClickListener(v->showProfileEditor());
-        top.addView(gear,new LinearLayout.LayoutParams(dp(46),dp(46)));
-        root.addView(top,new LinearLayout.LayoutParams(-1,dp(48)));
-
-        // Centered logo: the main visual identity of the app.
+        // Compact centered branding: smaller icon and title so every phone size stays readable.
         ImageView centerLogo=new ImageView(this);
         centerLogo.setImageResource(R.drawable.icon_dana);
         centerLogo.setScaleType(ImageView.ScaleType.FIT_CENTER);
         centerLogo.setAdjustViewBounds(true);
-        LinearLayout.LayoutParams lp=new LinearLayout.LayoutParams(dp(66),dp(66));
-        lp.setMargins(0,dp(10),0,dp(0));
+        centerLogo.setPadding(dp(4),dp(4),dp(4),dp(4));
+        LinearLayout.LayoutParams lp=new LinearLayout.LayoutParams(dp(58),dp(58));
+        lp.setGravity(Gravity.CENTER_HORIZONTAL);
+        lp.setMargins(0,dp(8),0,0);
         root.addView(centerLogo,lp);
 
-        TextView appName=title("چالش دانا",21);
+        TextView appName=title("چالش دانا",18);
         appName.setGravity(Gravity.CENTER);
-        root.addView(appName,new LinearLayout.LayoutParams(-1,dp(38)));
+        LinearLayout.LayoutParams np=new LinearLayout.LayoutParams(-1,dp(32));
+        np.setMargins(0,dp(2),0,0);
+        root.addView(appName,np);
 
-        TextView tagline=text("دانش، سرعت و هیجان",12);
-        tagline.setTextColor(Color.rgb(220,235,255));
-        root.addView(tagline,new LinearLayout.LayoutParams(-1,dp(28)));
+        TextView tagline=text("دانش، سرعت و هیجان",11);
+        tagline.setTextColor(Color.rgb(230,240,255));
+        root.addView(tagline,new LinearLayout.LayoutParams(-1,dp(25)));
 
-        // Profile card with generous spacing so the name is always readable.
-        LinearLayout profile=new LinearLayout(this);
-        profile.setOrientation(LinearLayout.HORIZONTAL);
-        profile.setGravity(Gravity.CENTER_VERTICAL);
-        profile.setLayoutDirection(View.LAYOUT_DIRECTION_RTL);
-        profile.setPadding(dp(14),dp(10),dp(14),dp(10));
-        profile.setBackground(bg(Color.argb(235,18,63,125),Color.argb(225,7,25,66),24));
-
-        ImageView av=new ImageView(this);
-        av.setScaleType(ImageView.ScaleType.CENTER_CROP);
-        av.setBackground(bg(Color.rgb(230,245,255),Color.rgb(130,205,255),60));
-        if(!profileImageUri.isEmpty()) try{av.setImageURI(Uri.parse(profileImageUri));}
-        catch(Exception ignored){}
-        else {av.setImageResource(R.drawable.icon_dana);av.setPadding(dp(7),dp(7),dp(7),dp(7));}
-        profile.addView(av,new LinearLayout.LayoutParams(dp(46),dp(46)));
-
-        LinearLayout pi=new LinearLayout(this);
-        pi.setOrientation(LinearLayout.VERTICAL);
-        pi.setGravity(Gravity.CENTER_VERTICAL|Gravity.RIGHT);
-        pi.setLayoutDirection(View.LAYOUT_DIRECTION_RTL);
-        pi.setPadding(dp(14),0,dp(6),0);
-
-        TextView pn=text(profileName.isEmpty()?"":"درود، "+profileName,15);
-        pn.setGravity(Gravity.RIGHT|Gravity.CENTER_VERTICAL);
-        pn.setTextColor(Color.WHITE);
-        pn.setMaxLines(1);
-        TextView ps=text("امتیاز  "+fa(score)+"   •   جان  "+fa(lives),11);
-        ps.setTextColor(Color.rgb(225,235,255));
-        ps.setGravity(Gravity.RIGHT|Gravity.CENTER_VERTICAL);
-        pi.addView(pn,new LinearLayout.LayoutParams(-1,dp(34)));
-        pi.addView(ps,new LinearLayout.LayoutParams(-1,dp(30)));
-        profile.addView(pi,new LinearLayout.LayoutParams(0,dp(62),1));
-        profile.setOnClickListener(v->showProfileEditor());
-
-        LinearLayout.LayoutParams cp=new LinearLayout.LayoutParams(-1,dp(84));
-        cp.setMargins(0,dp(10),0,dp(12));
-        root.addView(profile,cp);
-
+        // The home screen intentionally contains only the main action.
         Button start=button("✦   شروع چالش   ›");
-        start.setTextSize(18);
+        start.setTextSize(responsiveTextSize(18));
         start.setTextColor(Color.rgb(45,25,0));
         start.setBackground(bg(Color.rgb(255,220,75),Color.rgb(255,143,18),25));
         start.setOnClickListener(v->startGame());
         LinearLayout.LayoutParams sb=new LinearLayout.LayoutParams(-1,dp(68));
-        sb.setMargins(0,dp(2),0,dp(16));
+        sb.setMargins(dp(4),dp(26),dp(4),dp(22));
         root.addView(start,sb);
 
-        // Only essential shortcuts remain; no store or oversized stacked buttons.
-        LinearLayout quick=new LinearLayout(this);
-        quick.setOrientation(LinearLayout.HORIZONTAL);
-        quick.setGravity(Gravity.CENTER);
-        quick.setLayoutDirection(View.LAYOUT_DIRECTION_RTL);
-
-        Button records=button("🏆  رکوردها");
-        records.setTextSize(responsiveTextSize(14));
-        records.setBackground(bg(Color.rgb(40,155,245),Color.rgb(18,82,190),22));
-        records.setOnClickListener(v->showRankings());
-
-        Button profileBtn=button("👤  پروفایل");
-        profileBtn.setTextSize(responsiveTextSize(14));
-        profileBtn.setBackground(bg(Color.rgb(120,65,230),Color.rgb(70,38,165),22));
-        profileBtn.setOnClickListener(v->showProfileEditor());
-
-        LinearLayout.LayoutParams qp1=new LinearLayout.LayoutParams(0,dp(60),1);
-        qp1.setMargins(dp(4),0,dp(4),0);
-        quick.addView(records,qp1);
-        LinearLayout.LayoutParams qp2=new LinearLayout.LayoutParams(0,dp(60),1);
-        qp2.setMargins(dp(4),0,dp(4),0);
-        quick.addView(profileBtn,qp2);
-        root.addView(quick,new LinearLayout.LayoutParams(-1,dp(68)));
-
+        // Bottom navigation: only navigation items, no guest/score/lives card.
         addBottomNavStandalone();
     }
 
@@ -882,8 +822,8 @@ public class MainActivity extends Activity {
         Space sp=new Space(this); root.addView(sp,new LinearLayout.LayoutParams(1,dp(10)));
         LinearLayout nav=new LinearLayout(this); nav.setOrientation(LinearLayout.HORIZONTAL); nav.setGravity(Gravity.CENTER); nav.setPadding(dp(6),dp(4),dp(6),dp(4)); nav.setBackground(bg(Color.argb(230,5,44,75),Color.argb(230,4,22,50),22));
         String[] labels={"⌂\nخانه","🏆\nرتبه‌ها","★\nعلاقه‌مندی‌ها","👤\nپروفایل"};
-        for(String lab:labels){ TextView n=text(lab,12); n.setGravity(Gravity.CENTER); nav.addView(n,new LinearLayout.LayoutParams(0,dp(64),1)); if(lab.contains("رتبه")) n.setOnClickListener(v->showRankings()); else if(lab.contains("علاقه")) n.setOnClickListener(v->showFavorites()); else if(lab.contains("پروفایل")) n.setOnClickListener(v->showProfileEditor()); else n.setOnClickListener(v->showHome()); }
-        root.addView(nav,new LinearLayout.LayoutParams(-1,dp(76)));
+        for(String lab:labels){ TextView n=text(lab,11); n.setGravity(Gravity.CENTER); nav.addView(n,new LinearLayout.LayoutParams(0,dp(62),1)); if(lab.contains("رتبه")) n.setOnClickListener(v->showRankings()); else if(lab.contains("علاقه")) n.setOnClickListener(v->showFavorites()); else if(lab.contains("پروفایل")) n.setOnClickListener(v->showProfileEditor()); else n.setOnClickListener(v->showHome()); }
+        root.addView(nav,new LinearLayout.LayoutParams(-1,dp(72)));
     }
 
     boolean isFavorite(Question q){ return favorites.contains(q.q); }
@@ -1032,6 +972,70 @@ public class MainActivity extends Activity {
         {"کدام شهر ایران به تولید زعفران و زرشک در خراسان جنوبی شناخته می‌شود؟","🌱","قائنات","بندر انزلی","کاشان","کرمانشاه"}
     };
 
+    final String[][] englishFacts = {
+        {"کلمه Apple به چه معناست؟","🇬🇧","سیب","پرتقال","کتاب","خانه"},
+        {"کلمه Book به چه معناست؟","🇬🇧","کتاب","مدرسه","قلم","میز"},
+        {"کلمه Beautiful به چه معناست؟","🇬🇧","زیبا","سریع","بزرگ","سرد"},
+        {"کلمه Fast به چه معناست؟","🇬🇧","سریع","آرام","سنگین","دور"},
+        {"کلمه Happy به چه معناست؟","🇬🇧","خوشحال","خسته","عصبانی","گرسنه"},
+        {"کلمه Strong به چه معناست؟","🇬🇧","قوی","ضعیف","کوتاه","خیس"},
+        {"کلمه Mountain به چه معناست؟","🇬🇧","کوه","دریا","جنگل","رود"},
+        {"کلمه River به چه معناست؟","🇬🇧","رودخانه","جزیره","بیابان","پل"},
+        {"کلمه Ancient به چه معناست؟","🇬🇧","باستانی","مدرن","کوچک","روشن"},
+        {"کلمه Journey به چه معناست؟","🇬🇧","سفر","بازی","غذا","درس"},
+        {"کلمه Knowledge به چه معناست؟","🇬🇧","دانش","سرعت","قدرت","شانس"},
+        {"کلمه Challenge به چه معناست؟","🇬🇧","چالش","پاسخ","سؤال","جایزه"},
+        {"کلمه Answer به چه معناست؟","🇬🇧","پاسخ","سؤال","اشتباه","درس"},
+        {"کلمه Question به چه معناست؟","🇬🇧","سؤال","پاسخ","امتیاز","مرحله"},
+        {"کلمه History به چه معناست؟","🇬🇧","تاریخ","جغرافیا","فیزیک","هنر"},
+        {"کلمه Science به چه معناست؟","🇬🇧","علم","ورزش","موسیقی","سفر"},
+        {"کلمه Nature به چه معناست؟","🇬🇧","طبیعت","شهر","خانه","بازار"},
+        {"کلمه Country به چه معناست؟","🇬🇧","کشور","شهر","روستا","قاره"},
+        {"کلمه City به چه معناست؟","🇬🇧","شهر","کشور","رود","کوه"},
+        {"کلمه Friend به چه معناست؟","🇬🇧","دوست","همسایه","معلم","پزشک"},
+        {"کدام گزینه معنی درستِ 'Water' است؟","🇬🇧","آب","هوا","آتش","خاک"},
+        {"کدام گزینه معنی درستِ 'Fire' است؟","🇬🇧","آتش","آب","باد","برف"},
+        {"کدام گزینه معنی درستِ 'Sky' است؟","🇬🇧","آسمان","زمین","دریا","جاده"},
+        {"کدام گزینه معنی درستِ 'Flower' است؟","🇬🇧","گل","درخت","سنگ","ابر"},
+        {"کدام گزینه معنی درستِ 'Knowledge' است؟","🇬🇧","دانش","دانشگاه","کتابخانه","آزمایشگاه"},
+        {"کدام جمله یعنی «من یک کتاب دارم»؟","🇬🇧","I have a book.","I am a book.","I read a house.","I have a pen."},
+        {"کدام جمله یعنی «او دانش‌آموز است»؟","🇬🇧","He is a student.","He has a school.","He is a teacher.","He reads a student."},
+        {"کدام جمله یعنی «من انگلیسی صحبت می‌کنم»؟","🇬🇧","I speak English.","I write England.","I am English book.","I speak Persian only."},
+        {"کدام جمله یعنی «هوا امروز سرد است»؟","🇬🇧","The weather is cold today.","The weather is hot tomorrow.","Today is a book.","The sky is a city."},
+        {"کدام جمله از نظر گرامری درست است؟","🇬🇧","She likes music.","She like music.","She liking music.","She are music."},
+        {"کدام جمله از نظر گرامری درست است؟","🇬🇧","They are happy.","They is happy.","They am happy.","They be happy."},
+        {"جای خالی را کامل کن: I ___ a student.","🇬🇧","am","is","are","be"},
+        {"جای خالی را کامل کن: She ___ a doctor.","🇬🇧","is","am","are","be"},
+        {"جای خالی را کامل کن: They ___ friends.","🇬🇧","are","is","am","be"},
+        {"جای خالی را کامل کن: He ___ English every day.","🇬🇧","studies","study","studying","studied"},
+        {"جای خالی را کامل کن: We ___ to school every morning.","🇬🇧","go","goes","going","gone"},
+        {"کدام گزینه جمع درستِ 'child' است؟","🇬🇧","children","childs","childes","childrens"},
+        {"کدام گزینه جمع درستِ 'woman' است؟","🇬🇧","women","womans","womanes","womens"},
+        {"کدام گزینه متضادِ 'hot' است؟","🇬🇧","cold","fast","bright","strong"},
+        {"کدام گزینه متضادِ 'easy' است؟","🇬🇧","difficult","small","young","early"},
+        {"کدام گزینه متضادِ 'early' است؟","🇬🇧","late","fast","near","short"},
+        {"کدام گزینه مترادفِ 'big' است؟","🇬🇧","large","small","thin","short"},
+        {"کدام گزینه مترادفِ 'quick' است؟","🇬🇧","fast","slow","weak","late"},
+        {"کدام گزینه برای پرسیدن سن استفاده می‌شود؟","🇬🇧","How old are you?","How tall is it?","Where are you?","What is your name?"},
+        {"کدام گزینه برای پرسیدن مکان استفاده می‌شود؟","🇬🇧","Where are you?","How old are you?","What time is it?","Who are you?"},
+        {"کدام گزینه برای پرسیدن ساعت استفاده می‌شود؟","🇬🇧","What time is it?","Where is it?","How old is he?","What is it?"},
+        {"کدام گزینه یعنی «اسم تو چیست؟»؟","🇬🇧","What is your name?","Where is your name?","How is your name?","Who name you?"},
+        {"کدام گزینه برای گذشته ساده درست است؟","🇬🇧","I visited Shiraz yesterday.","I visit Shiraz yesterday.","I am visit Shiraz yesterday.","I visiting Shiraz yesterday."},
+        {"کدام گزینه آینده را درست بیان می‌کند؟","🇬🇧","I will travel tomorrow.","I traveled tomorrow.","I travel yesterday.","I am traveled tomorrow."},
+        {"کدام گزینه پرسش درست برای «آیا انگلیسی صحبت می‌کنی؟» است؟","🇬🇧","Do you speak English?","Are you speak English?","Does you speak English?","You do speak English?"},
+        {"کدام گزینه پاسخ مناسب به 'Thank you' است؟","🇬🇧","You're welcome.","Good night.","See you yesterday.","I am fine."},
+        {"کدام گزینه پاسخ مناسب به 'How are you?' است؟","🇬🇧","I'm fine, thank you.","My name is Ali.","I am twenty meters.","It is Monday."},
+        {"کدام کلمه به معنی «پنجره» است؟","🇬🇧","window","door","wall","floor"},
+        {"کدام کلمه به معنی «کتابخانه» است؟","🇬🇧","library","laboratory","restaurant","station"},
+        {"کدام کلمه به معنی «دانشگاه» است؟","🇬🇧","university","hospital","museum","airport"},
+        {"کدام کلمه به معنی «موزه» است؟","🇬🇧","museum","market","school","bridge"},
+        {"کدام کلمه به معنی «فرودگاه» است؟","🇬🇧","airport","station","harbor","garden"},
+        {"کدام گزینه معنی 'environment' است؟","🇬🇧","محیط زیست","اقتصاد","مهندسی","کشاورزی"},
+        {"کدام گزینه معنی 'research' است؟","🇬🇧","پژوهش","مسابقه","سفر","خرید"},
+        {"کدام گزینه معنی 'discover' است؟","🇬🇧","کشف کردن","فراموش کردن","بستن","خوابیدن"},
+        {"کدام گزینه معنی 'improve' است؟","🇬🇧","بهبود دادن","کاهش دادن","پنهان کردن","شکستن"}
+    };
+
     void buildQuestions(){
         questions.clear();
         ArrayList<String[]> all=new ArrayList<>();
@@ -1040,6 +1044,7 @@ public class MainActivity extends Activity {
         all.addAll(Arrays.asList(specializedFacts));
         all.addAll(Arrays.asList(extraSpecializedFacts));
         all.addAll(Arrays.asList(iranAdvancedFacts));
+        all.addAll(Arrays.asList(englishFacts));
         Random rnd=new Random(System.nanoTime());
         HashSet<String> seen=new HashSet<>();
         for(String[] f:all){
