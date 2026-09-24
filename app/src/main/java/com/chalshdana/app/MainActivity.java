@@ -723,10 +723,12 @@ public class MainActivity extends Activity {
         Space topSpace=new Space(this);
         top.addView(topSpace,new LinearLayout.LayoutParams(0,dp(44),1));
 
-        TextView gear=text("⚙",23);
+        TextView gear=text("👤",19);
         gear.setGravity(Gravity.CENTER);
+        gear.setTextColor(Color.WHITE);
+        gear.setBackground(bg(Color.argb(210,25,78,150),Color.argb(210,8,30,78),50));
         gear.setOnClickListener(v->showProfileEditor());
-        top.addView(gear,new LinearLayout.LayoutParams(dp(48),dp(44)));
+        top.addView(gear,new LinearLayout.LayoutParams(dp(46),dp(46)));
         root.addView(top,new LinearLayout.LayoutParams(-1,dp(48)));
 
         // Centered logo: the main visual identity of the app.
@@ -768,7 +770,7 @@ public class MainActivity extends Activity {
         pi.setLayoutDirection(View.LAYOUT_DIRECTION_RTL);
         pi.setPadding(dp(14),0,dp(6),0);
 
-        TextView pn=text(profileName.isEmpty()?"کاربر مهمان":"درود، "+profileName,15);
+        TextView pn=text(profileName.isEmpty()?"":"درود، "+profileName,15);
         pn.setGravity(Gravity.RIGHT|Gravity.CENTER_VERTICAL);
         pn.setTextColor(Color.WHITE);
         pn.setMaxLines(1);
