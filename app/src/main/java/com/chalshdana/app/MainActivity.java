@@ -107,6 +107,35 @@ public class MainActivity extends Activity {
         {"کدام اختراع امکان تماس بی‌سیم با اینترنت را فراهم می‌کند؟","📱","وای‌فای","چراغ قوه","بلندگو","چاپگر"}
     };
 
+    final String[][] englishFacts = {
+        {"What does \"book\" mean in Persian?","🇬🇧","کتاب","مدرسه","قلم","دفتر"},
+        {"What does \"water\" mean in Persian?","🇬🇧","آب","هوا","آتش","خاک"},
+        {"What does \"apple\" mean in Persian?","🇬🇧","سیب","پرتقال","موز","انگور"},
+        {"What does \"house\" mean in Persian?","🇬🇧","خانه","ماشین","خیابان","باغ"},
+        {"What does \"friend\" mean in Persian?","🇬🇧","دوست","معلم","همسایه","برادر"},
+        {"What does \"beautiful\" mean in Persian?","🇬🇧","زیبا","سریع","بزرگ","قدیمی"},
+        {"What does \"happy\" mean in Persian?","🇬🇧","خوشحال","خسته","گرسنه","عصبانی"},
+        {"What does \"fast\" mean in Persian?","🇬🇧","سریع","آرام","سرد","سنگین"},
+        {"What does \"morning\" mean in Persian?","🇬🇧","صبح","شب","ظهر","عصر"},
+        {"What does \"school\" mean in Persian?","🇬🇧","مدرسه","کتابخانه","بیمارستان","فروشگاه"},
+        {"Which word means \"کتاب\" in English?","🇬🇧","book","chair","door","window"},
+        {"Which word means \"آب\" in English?","🇬🇧","water","bread","milk","juice"},
+        {"Which word means \"دوست\" in English?","🇬🇧","friend","family","teacher","student"},
+        {"Which word means \"خانه\" in English?","🇬🇧","house","garden","street","school"},
+        {"Which word means \"سریع\" in English?","🇬🇧","fast","slow","small","quiet"},
+        {"Choose the correct plural of \"book\".","🇬🇧","books","bookes","bookies","book"},
+        {"Choose the correct plural of \"child\".","🇬🇧","children","childs","childes","childrens"},
+        {"What is the opposite of \"hot\"?","🇬🇧","cold","big","fast","young"},
+        {"What is the opposite of \"big\"?","🇬🇧","small","tall","long","wide"},
+        {"What is the opposite of \"happy\"?","🇬🇧","sad","kind","easy","bright"},
+        {"Which word is a color?","🇬🇧","blue","table","river","teacher"},
+        {"Which word is an animal?","🇬🇧","tiger","window","school","orange"},
+        {"Which word is a job?","🇬🇧","teacher","garden","yellow","water"},
+        {"Complete: I ___ a student.","🇬🇧","am","is","are","be"},
+        {"Complete: She ___ happy.","🇬🇧","is","am","are","be"},
+        {"Complete: They ___ friends.","🇬🇧","are","is","am","be"}
+    };
+
     final String[][] specializedFacts = {
         {"نماد شیمیایی اکسیژن چیست؟","⚗️","O","H","N","C"},
         {"نماد شیمیایی کربن چیست؟","⚗️","C","Ca","Co","Cr"},
@@ -599,26 +628,16 @@ public class MainActivity extends Activity {
     Button button(String s){Button b=new Button(this);b.setText(s);b.setTextSize(responsiveTextSize(16));b.setTextColor(Color.WHITE);b.setAllCaps(false);b.setGravity(Gravity.CENTER);b.setTypeface(persianFont);b.setLayoutDirection(View.LAYOUT_DIRECTION_RTL);b.setPadding(dp(12),dp(8),dp(12),dp(8));b.setSingleLine(false);b.setMaxLines(5);b.setEllipsize(null);b.setHorizontallyScrolling(false); b.setPadding(dp(14),dp(10),dp(14),dp(10));b.setMinHeight(dp(60));b.setMinimumHeight(dp(60));b.setBackground(bg(Color.rgb(30,105,210),Color.rgb(18,45,125),24));LinearLayout.LayoutParams p=new LinearLayout.LayoutParams(-1,dp(60));p.setMargins(dp(6),dp(4),dp(6),dp(4));b.setLayoutParams(p);return b;}
     Button smallButton(String s){Button b=button(s);b.setTextSize(16);b.setTextColor(Color.WHITE);b.setBackground(bg(Color.argb(175,12,45,100),Color.argb(175,8,25,65),20));b.setLayoutParams(new LinearLayout.LayoutParams(dp(54),dp(48)));return b;}
 
-    int backgroundRes(){int[] r={R.drawable.bg_home_clear};return r[0];}
+    int backgroundRes(){return R.drawable.bg_home_new;}
     void base(){
         screen=new FrameLayout(this);
         ImageView image=new ImageView(this);
         image.setImageResource(backgroundRes());
         image.setScaleType(ImageView.ScaleType.CENTER_CROP);
         screen.addView(image,new FrameLayout.LayoutParams(-1,-1));
-        // Keep the historical background fully visible; do not blur or darken it.
-        ScrollView scroll=new ScrollView(this);
-        scroll.setFillViewport(true);
-        scroll.setClipToPadding(false);
-        root=new LinearLayout(this);
-        root.setOrientation(LinearLayout.VERTICAL);
-        root.setGravity(Gravity.CENTER_HORIZONTAL);
-        root.setPadding(dp(14),dp(10),dp(14),dp(96));
-        root.setLayoutDirection(View.LAYOUT_DIRECTION_RTL);
-        scroll.addView(root);
-        FrameLayout.LayoutParams sp=new FrameLayout.LayoutParams(-1,-1);
-        screen.addView(scroll,sp);
-        setContentView(screen);
+        ScrollView scroll=new ScrollView(this); scroll.setFillViewport(true); scroll.setClipToPadding(false);
+        root=new LinearLayout(this); root.setOrientation(LinearLayout.VERTICAL); root.setGravity(Gravity.CENTER_HORIZONTAL); root.setPadding(dp(14),dp(10),dp(14),dp(20)); root.setLayoutDirection(View.LAYOUT_DIRECTION_RTL);
+        scroll.addView(root); FrameLayout.LayoutParams sp=new FrameLayout.LayoutParams(-1,-1); screen.addView(scroll,sp); setContentView(screen);
     }
 
     ImageView imageView(int res,int h){ImageView v=new ImageView(this);v.setImageResource(res);v.setScaleType(ImageView.ScaleType.CENTER_CROP);v.setBackground(bg(Color.argb(120,0,0,0),Color.argb(80,0,0,0),28));v.setPadding(dp(3),dp(3),dp(3),dp(3));root.addView(v,new LinearLayout.LayoutParams(-1,dp(h)));return v;}
@@ -689,7 +708,7 @@ public class MainActivity extends Activity {
         final ImageView avatar=new ImageView(this); avatar.setScaleType(ImageView.ScaleType.CENTER_CROP); avatar.setBackground(bg(Color.rgb(25,75,145),Color.rgb(8,30,75),80));
         LinearLayout.LayoutParams ap=new LinearLayout.LayoutParams(dp(112),dp(112)); ap.setMargins(0,0,0,dp(12)); box.addView(avatar,ap);
         if(!profileImageUri.isEmpty()) try{avatar.setImageURI(Uri.parse(profileImageUri));}catch(Exception ignored){}
-        else {avatar.setImageResource(R.drawable.icon_dana_neat); avatar.setPadding(dp(12),dp(12),dp(12),dp(12));}
+        else {avatar.setImageResource(R.drawable.icon_dana); avatar.setPadding(dp(12),dp(12),dp(12),dp(12));}
         avatar.setOnClickListener(v->openProfilePicker());
         TextView hint=text("برای انتخاب عکس روی تصویر بزن",13); hint.setTextColor(Color.LTGRAY); box.addView(hint,new LinearLayout.LayoutParams(-1,dp(32)));
         EditText name=new EditText(this); name.setText(profileName); name.setHint("نام شما"); name.setTextSize(18); name.setGravity(Gravity.RIGHT|Gravity.CENTER_VERTICAL); name.setSingleLine(true); name.setTextColor(Color.WHITE); name.setHintTextColor(Color.LTGRAY); name.setPadding(dp(14),0,dp(14),0); name.setBackground(bg(Color.rgb(25,65,120),Color.rgb(10,30,70),18)); box.addView(name,new LinearLayout.LayoutParams(-1,dp(54)));
@@ -702,7 +721,7 @@ public class MainActivity extends Activity {
         LinearLayout card=new LinearLayout(this); card.setOrientation(LinearLayout.HORIZONTAL); card.setGravity(Gravity.CENTER_VERTICAL); card.setPadding(dp(12),dp(10),dp(12),dp(10)); card.setLayoutDirection(View.LAYOUT_DIRECTION_RTL); card.setBackground(bg(Color.argb(225,20,53,105),Color.argb(225,7,22,60),26));
         ImageView avatar=new ImageView(this); avatar.setScaleType(ImageView.ScaleType.CENTER_CROP); avatar.setBackground(bg(Color.rgb(255,197,55),Color.rgb(180,105,12),80));
         if(!profileImageUri.isEmpty()) try{avatar.setImageURI(Uri.parse(profileImageUri));}catch(Exception ignored){}
-        else {avatar.setImageResource(R.drawable.icon_dana_neat); avatar.setPadding(dp(8),dp(8),dp(8),dp(8));}
+        else {avatar.setImageResource(R.drawable.icon_dana); avatar.setPadding(dp(8),dp(8),dp(8),dp(8));}
         card.addView(avatar,new LinearLayout.LayoutParams(dp(68),dp(68)));
         LinearLayout info=new LinearLayout(this); info.setOrientation(LinearLayout.VERTICAL); info.setGravity(Gravity.CENTER_VERTICAL|Gravity.RIGHT); info.setPadding(dp(12),0,dp(8),0); info.setLayoutDirection(View.LAYOUT_DIRECTION_RTL);
         TextView n=text(profileName.isEmpty()?"ساخت پروفایل":"درود، "+profileName,17); n.setGravity(Gravity.RIGHT|Gravity.CENTER_VERTICAL); TextView sub=text(profileName.isEmpty()?"نام و عکس خودت را اضافه کن":"پروفایل من",12); sub.setTextColor(Color.rgb(220,230,255)); sub.setGravity(Gravity.RIGHT|Gravity.CENTER_VERTICAL); info.addView(n,new LinearLayout.LayoutParams(-1,dp(34))); info.addView(sub,new LinearLayout.LayoutParams(-1,dp(28))); card.addView(info,new LinearLayout.LayoutParams(0,-1,1));
@@ -717,66 +736,62 @@ public class MainActivity extends Activity {
         try{tone.stopTone();}catch(Exception ignored){}
         backArmed=false; currentBackground=0; base();
 
-        // Clean top bar: settings on the left, profile circle on the right, and only the coin count.
+        // Clean top bar: coins on the left, profile + settings on the right.
         LinearLayout top=new LinearLayout(this);
         top.setOrientation(LinearLayout.HORIZONTAL);
         top.setGravity(Gravity.CENTER_VERTICAL);
         top.setLayoutDirection(View.LAYOUT_DIRECTION_LTR);
 
-        TextView settings=text("⚙",25);
-        settings.setGravity(Gravity.CENTER);
-        settings.setTextColor(Color.WHITE);
-        settings.setBackground(bg(Color.argb(190,12,48,100),Color.argb(190,7,28,65),50));
-        settings.setOnClickListener(v->showSettingsDialog());
-        top.addView(settings,new LinearLayout.LayoutParams(dp(48),dp(48)));
+        TextView coinPill=text("🪙  "+fa(coin)+" سکه",14);
+        coinPill.setTextColor(Color.rgb(255,220,85));
+        coinPill.setGravity(Gravity.CENTER);
+        coinPill.setSingleLine(true);
+        coinPill.setBackground(bg(Color.argb(210,15,43,95),Color.argb(200,7,22,58),22));
+        top.addView(coinPill,new LinearLayout.LayoutParams(dp(112),dp(44)));
 
-        Space gap=new Space(this);
-        top.addView(gap,new LinearLayout.LayoutParams(0,dp(48),1));
-
-        TextView coinText=text("🪙  "+fa(coin)+" سکه",14);
-        coinText.setTextColor(Color.rgb(255,225,90));
-        coinText.setGravity(Gravity.CENTER);
-        coinText.setBackground(bg(Color.argb(185,12,43,90),Color.argb(185,7,25,60),22));
-        LinearLayout.LayoutParams coinLp=new LinearLayout.LayoutParams(dp(104),dp(44));
-        coinLp.setMargins(0,0,dp(8),0);
-        top.addView(coinText,coinLp);
+        Space topSpace=new Space(this);
+        top.addView(topSpace,new LinearLayout.LayoutParams(0,dp(44),1));
 
         ImageView profileIcon=new ImageView(this);
         profileIcon.setScaleType(ImageView.ScaleType.CENTER_CROP);
-        profileIcon.setBackground(bg(Color.argb(205,25,78,150),Color.argb(205,8,30,78),50));
+        profileIcon.setBackground(bg(Color.argb(210,18,75,145),Color.argb(210,7,30,78),50));
         if(!profileImageUri.isEmpty()){
-            try{profileIcon.setImageURI(Uri.parse(profileImageUri));}catch(Exception ignored){}
+            try{profileIcon.setImageURI(Uri.parse(profileImageUri));}catch(Exception ignored){profileIcon.setImageResource(R.drawable.icon_dana);}
         }else{
             profileIcon.setImageResource(android.R.drawable.ic_menu_myplaces);
             profileIcon.setColorFilter(Color.WHITE);
-            profileIcon.setPadding(dp(8),dp(8),dp(8),dp(8));
         }
+        profileIcon.setPadding(dp(9),dp(9),dp(9),dp(9));
         profileIcon.setOnClickListener(v->showProfileEditor());
-        top.addView(profileIcon,new LinearLayout.LayoutParams(dp(48),dp(48)));
-        root.addView(top,new LinearLayout.LayoutParams(-1,dp(50)));
+        top.addView(profileIcon,new LinearLayout.LayoutParams(dp(46),dp(46)));
 
-        // No app logo, title, greeting card, score/lives card, or extra shortcut buttons on the home screen.
-        Space heroGap=new Space(this);
-        root.addView(heroGap,new LinearLayout.LayoutParams(1,0,1));
+        TextView gear=text("⚙",22);
+        gear.setGravity(Gravity.CENTER);
+        gear.setTextColor(Color.WHITE);
+        gear.setBackground(bg(Color.argb(210,18,75,145),Color.argb(210,7,30,78),50));
+        gear.setOnClickListener(v->showProfileEditor());
+        LinearLayout.LayoutParams gp=new LinearLayout.LayoutParams(dp(46),dp(46));
+        gp.setMargins(dp(7),0,0,0);
+        top.addView(gear,gp);
+        root.addView(top,new LinearLayout.LayoutParams(-1,dp(48)));
+
+        Space upper=new Space(this);
+        root.addView(upper,new LinearLayout.LayoutParams(1,dp(95)));
 
         Button start=button("✦   شروع چالش   ›");
-        start.setTextSize(18);
+        start.setTextSize(responsiveTextSize(18));
         start.setTextColor(Color.rgb(45,25,0));
         start.setBackground(bg(Color.rgb(255,220,75),Color.rgb(255,143,18),25));
         start.setOnClickListener(v->startGame());
-        LinearLayout.LayoutParams sb=new LinearLayout.LayoutParams(-1,dp(68));
-        sb.setMargins(0,0,0,dp(18));
+        LinearLayout.LayoutParams sb=new LinearLayout.LayoutParams(-1,dp(70));
+        sb.setMargins(0,0,0,dp(8));
         root.addView(start,sb);
 
+        // Keep the lower navigation at the bottom without adding extra home cards.
+        int heightDp=(int)(getResources().getDisplayMetrics().heightPixels/getResources().getDisplayMetrics().density);
+        int spacerDp=Math.max(100,heightDp-390);
+        root.addView(new Space(this),new LinearLayout.LayoutParams(1,dp(spacerDp)));
         addBottomNavStandalone();
-    }
-
-    void showSettingsDialog(){
-        AlertDialog d=new AlertDialog.Builder(this)
-                .setTitle("تنظیمات")
-                .setMessage("تنظیمات برنامه آماده است.")
-                .setPositiveButton("باشه",null).create();
-        d.show();
     }
 
     void addPageHeader(String heading){
@@ -836,25 +851,11 @@ public class MainActivity extends Activity {
     }
 
     void addBottomNavStandalone(){
-        LinearLayout nav=new LinearLayout(this);
-        nav.setOrientation(LinearLayout.HORIZONTAL);
-        nav.setGravity(Gravity.CENTER);
-        nav.setPadding(dp(6),dp(4),dp(6),dp(4));
-        nav.setBackground(bg(Color.argb(235,5,44,75),Color.argb(235,4,22,50),22));
-        nav.setLayoutDirection(View.LAYOUT_DIRECTION_RTL);
+        Space sp=new Space(this); root.addView(sp,new LinearLayout.LayoutParams(1,dp(10)));
+        LinearLayout nav=new LinearLayout(this); nav.setOrientation(LinearLayout.HORIZONTAL); nav.setGravity(Gravity.CENTER); nav.setPadding(dp(6),dp(4),dp(6),dp(4)); nav.setBackground(bg(Color.argb(230,5,44,75),Color.argb(230,4,22,50),22));
         String[] labels={"⌂\nخانه","🏆\nرتبه‌ها","★\nعلاقه‌مندی‌ها","👤\nپروفایل"};
-        for(String lab:labels){
-            TextView n=text(lab,12);
-            n.setGravity(Gravity.CENTER);
-            nav.addView(n,new LinearLayout.LayoutParams(0,dp(64),1));
-            if(lab.contains("رتبه")) n.setOnClickListener(v->showRankings());
-            else if(lab.contains("علاقه")) n.setOnClickListener(v->showFavorites());
-            else if(lab.contains("پروفایل")) n.setOnClickListener(v->showProfileEditor());
-            else n.setOnClickListener(v->showHome());
-        }
-        FrameLayout.LayoutParams np=new FrameLayout.LayoutParams(-1,dp(76),Gravity.BOTTOM);
-        np.setMargins(dp(10),0,dp(10),dp(8));
-        screen.addView(nav,np);
+        for(String lab:labels){ TextView n=text(lab,12); n.setGravity(Gravity.CENTER); nav.addView(n,new LinearLayout.LayoutParams(0,dp(64),1)); if(lab.contains("رتبه")) n.setOnClickListener(v->showRankings()); else if(lab.contains("علاقه")) n.setOnClickListener(v->showFavorites()); else if(lab.contains("پروفایل")) n.setOnClickListener(v->showProfileEditor()); else n.setOnClickListener(v->showHome()); }
+        root.addView(nav,new LinearLayout.LayoutParams(-1,dp(76)));
     }
 
     boolean isFavorite(Question q){ return favorites.contains(q.q); }
@@ -1003,48 +1004,15 @@ public class MainActivity extends Activity {
         {"کدام شهر ایران به تولید زعفران و زرشک در خراسان جنوبی شناخته می‌شود؟","🌱","قائنات","بندر انزلی","کاشان","کرمانشاه"}
     };
 
-    final String[][] englishFacts = {
-        {"معنی کلمه "apple" چیست؟","🔤","سیب","کتاب","خانه","آب"},
-        {"معنی کلمه "book" چیست؟","🔤","کتاب","مدرسه","دوست","درخت"},
-        {"معنی کلمه "water" چیست؟","🔤","آب","نان","هوا","آتش"},
-        {"معنی کلمه "house" چیست؟","🔤","خانه","ماشین","باغ","مدرسه"},
-        {"معنی کلمه "friend" چیست؟","🔤","دوست","برادر","معلم","همسایه"},
-        {"معنی کلمه "school" چیست؟","🔤","مدرسه","بیمارستان","فروشگاه","پارک"},
-        {"معنی کلمه "book" چیست؟","🔤","کتاب","قلم","کیف","میز"},
-        {"معنی کلمه "sun" چیست؟","🔤","خورشید","ماه","ستاره","ابر"},
-        {"معنی کلمه "moon" چیست؟","🔤","ماه","خورشید","زمین","دریا"},
-        {"معنی کلمه "star" چیست؟","🔤","ستاره","ابر","باد","باران"},
-        {"معنی کلمه "beautiful" چیست؟","🔤","زیبا","سریع","بزرگ","سرد"},
-        {"معنی کلمه "happy" چیست؟","🔤","خوشحال","خسته","عصبانی","گرسنه"},
-        {"معنی کلمه "strong" چیست؟","🔤","قوی","ضعیف","کوچک","آرام"},
-        {"معنی کلمه "fast" چیست؟","🔤","سریع","آرام","بلند","کوتاه"},
-        {"معنی کلمه "small" چیست؟","🔤","کوچک","بزرگ","سنگین","بلند"},
-        {"معنی کلمه "teacher" چیست؟","🔤","معلم","دانش‌آموز","پزشک","مهندس"},
-        {"معنی کلمه "doctor" چیست؟","🔤","پزشک","معلم","راننده","کشاورز"},
-        {"معنی کلمه "watermelon" چیست؟","🔤","هندوانه","سیب","پرتقال","موز"},
-        {"معنی کلمه "morning" چیست؟","🔤","صبح","شب","ظهر","عصر"},
-        {"معنی کلمه "night" چیست؟","🔤","شب","صبح","ظهر","عصر"},
-        {"معنی کلمه "red" چیست؟","🔤","قرمز","آبی","سبز","زرد"},
-        {"معنی کلمه "green" چیست؟","🔤","سبز","قرمز","بنفش","سفید"},
-        {"معنی کلمه "blue" چیست؟","🔤","آبی","زرد","مشکی","نارنجی"},
-        {"معنی کلمه "one" چیست؟","🔤","یک","دو","سه","چهار"},
-        {"معنی کلمه "five" چیست؟","🔤","پنج","چهار","شش","هفت"},
-        {"معنی کلمه "ten" چیست؟","🔤","ده","هشت","نه","دوازده"},
-        {"معنی کلمه "car" چیست؟","🔤","ماشین","قطار","دوچرخه","هواپیما"},
-        {"معنی کلمه "book" چیست؟","🔤","کتاب","خانه","باغ","کلاس"},
-        {"معنی کلمه "family" چیست؟","🔤","خانواده","دوستان","مدرسه","کشور"},
-        {"معنی کلمه "country" چیست؟","🔤","کشور","شهر","خانه","خیابان"}
-    };
-
     void buildQuestions(){
         questions.clear();
         ArrayList<String[]> all=new ArrayList<>();
         all.addAll(Arrays.asList(facts));
+        all.addAll(Arrays.asList(englishFacts));
         all.addAll(Arrays.asList(iranFacts));
         all.addAll(Arrays.asList(specializedFacts));
         all.addAll(Arrays.asList(extraSpecializedFacts));
         all.addAll(Arrays.asList(iranAdvancedFacts));
-        all.addAll(Arrays.asList(englishFacts));
         Random rnd=new Random(System.nanoTime());
         HashSet<String> seen=new HashSet<>();
         for(String[] f:all){
@@ -1237,7 +1205,7 @@ public class MainActivity extends Activity {
         if(questionTimer!=null){questionTimer.cancel(); questionTimer=null;} currentBackground=2; base();
 
         ImageView trophy=new ImageView(this);
-        trophy.setImageResource(R.drawable.icon_dana_neat);
+        trophy.setImageResource(R.drawable.icon_dana);
         trophy.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
         root.addView(trophy,new LinearLayout.LayoutParams(-1,dp(170)));
 
