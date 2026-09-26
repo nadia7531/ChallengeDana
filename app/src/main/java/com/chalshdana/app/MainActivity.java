@@ -748,8 +748,77 @@ public class MainActivity extends Activity {
         tagline.setTextColor(Color.rgb(220,235,255));
         root.addView(tagline,new LinearLayout.LayoutParams(-1,dp(28)));
 
-        // صفحه اصلی خلوت و خوانا: فقط دکمه شروع چالش و منوی پایین نمایش داده می‌شوند.
-        // کارت درود، امتیاز، جان و دکمه‌های اضافی از صفحه اصلی حذف شده‌اند.
+        // Profile card with generous spacing so the name is always readable.
+        LinearLayout profile=new LinearLayout(this);
+        profile.setOrientation(LinearLayout.HORIZONTAL);
+        profile.setGravity(Gravity.CENTER_VERTICAL);
+        profile.setLayoutDirection(View.LAYOUT_DIRECTION_RTL);
+        profile.setPadding(dp(14),dp(10),dp(14),dp(10));
+        profile.setBackground(bg(Color.argb(235,18,63,125),Color.argb(225,7,25,66),24));
+
+        ImageView av=new ImageView(this);
+        av.setScaleType(ImageView.ScaleType.CENTER_CROP);
+        av.setBackground(bg(Color.rgb(230,245,255),Color.rgb(130,205,255),60));
+        if(!profileImageUri.isEmpty()) try{av.setImageURI(Uri.parse(profileImageUri));}
+        catch(Exception ignored){}
+        else {av.setImageResource(R.drawable.icon_dana);av.setPadding(dp(7),dp(7),dp(7),dp(7));}
+        profile.addView(av,new LinearLayout.LayoutParams(dp(46),dp(46)));
+
+        LinearLayout pi=new LinearLayout(this);
+        pi.setOrientation(LinearLayout.VERTICAL);
+        pi.setGravity(Gravity.CENTER_VERTICAL|Gravity.RIGHT);
+        pi.setLayoutDirection(View.LAYOUT_DIRECTION_RTL);
+        pi.setPadding(dp(14),0,dp(6),0);
+
+        TextView pn=text(profileName.isEmpty()?"":"درود، "+profileName,15);
+        pn.setGravity(Gravity.RIGHT|Gravity.CENTER_VERTICAL);
+        pn.setTextColor(Color.WHITE);
+        pn.setMaxLines(1);
+        TextView ps=text("امتیاز  "+fa(score)+"   •   جان  "+fa(lives),11);
+        ps.setTextColor(Color.rgb(225,235,255));
+        ps.setGravity(Gravity.RIGHT|Gravity.CENTER_VERTICAL);
+        pi.addView(pn,new LinearLayout.LayoutParams(-1,dp(34)));
+        pi.addView(ps,new LinearLayout.LayoutParams(-1,dp(30)));
+        profile.addView(pi,new LinearLayout.LayoutParams(0,dp(62),1));
+        profile.setOnClickListener(v->showProfileEditor());
+
+        LinearLayout.LayoutParams cp=new LinearLayout.LayoutParams(-1,dp(84));
+        cp.setMargins(0,dp(10),0,dp(12));
+        root.addView(profile,cp);
+
+        Button start=button("✦   شروع چالش   ›");
+        start.setTextSize(18);
+        start.setTextColor(Color.rgb(45,25,0));
+        start.setBackground(bg(Color.rgb(255,220,75),Color.rgb(255,143,18),25));
+        start.setOnClickListener(v->startGame());
+        LinearLayout.LayoutParams sb=new LinearLayout.LayoutParams(-1,dp(68));
+        sb.setMargins(0,dp(2),0,dp(16));
+        root.addView(start,sb);
+
+        // Only essential shortcuts remain; no store or oversized stacked buttons.
+        LinearLayout quick=new LinearLayout(this);
+        quick.setOrientation(LinearLayout.HORIZONTAL);
+        quick.setGravity(Gravity.CENTER);
+        quick.setLayoutDirection(View.LAYOUT_DIRECTION_RTL);
+
+        Button records=button("🏆  رکوردها");
+        records.setTextSize(responsiveTextSize(14));
+        records.setBackground(bg(Color.rgb(40,155,245),Color.rgb(18,82,190),22));
+        records.setOnClickListener(v->showRankings());
+
+        Button profileBtn=button("👤  پروفایل");
+        profileBtn.setTextSize(responsiveTextSize(14));
+        profileBtn.setBackground(bg(Color.rgb(120,65,230),Color.rgb(70,38,165),22));
+        profileBtn.setOnClickListener(v->showProfileEditor());
+
+        LinearLayout.LayoutParams qp1=new LinearLayout.LayoutParams(0,dp(60),1);
+        qp1.setMargins(dp(4),0,dp(4),0);
+        quick.addView(records,qp1);
+        LinearLayout.LayoutParams qp2=new LinearLayout.LayoutParams(0,dp(60),1);
+        qp2.setMargins(dp(4),0,dp(4),0);
+        quick.addView(profileBtn,qp2);
+        root.addView(quick,new LinearLayout.LayoutParams(-1,dp(68)));
+
         addBottomNavStandalone();
     }
 
@@ -820,29 +889,6 @@ public class MainActivity extends Activity {
     boolean isFavorite(Question q){ return favorites.contains(q.q); }
     void saveFavorites(){ prefs.edit().putStringSet("favorites",new HashSet<>(favorites)).apply(); }
     void toggleFavorite(Question q, Button b){ if(isFavorite(q)){favorites.remove(q.q); b.setText("☆");}else{favorites.add(q.q); b.setText("★");} saveFavorites(); }
-
-    final String[][] englishFacts = {
-        {"کلمه "brave" به فارسی چه معنی می‌دهد؟","🇬🇧","شجاع","آرام","خجالتی","خسته"},
-        {"کلمه "ancient" به فارسی چه معنی می‌دهد؟","🇬🇧","باستانی","مدرن","سریع","روشن"},
-        {"کلمه "journey" به فارسی چه معنی می‌دهد؟","🇬🇧","سفر","دوست","پنجره","کتاب"},
-        {"کلمه "beautiful" به فارسی چه معنی می‌دهد؟","🇬🇧","زیبا","بلند","سرد","سنگین"},
-        {"کلمه "knowledge" به فارسی چه معنی می‌دهد؟","🇬🇧","دانش","سرعت","قدرت","شانس"},
-        {"کلمه "mountain" به فارسی چه معنی می‌دهد؟","🇬🇧","کوه","رودخانه","جنگل","دریا"},
-        {"کلمه "ancient city" به فارسی چه معنی می‌دهد؟","🇬🇧","شهر باستانی","شهر مدرن","روستای کوچک","پایتخت جدید"},
-        {"کدام گزینه معنی انگلیسی «دوست» است؟","🇬🇧","friend","family","teacher","student"},
-        {"کدام گزینه معنی انگلیسی «کتاب» است؟","🇬🇧","book","chair","table","window"},
-        {"کدام گزینه معنی انگلیسی «آب» است؟","🇬🇧","water","fire","earth","air"},
-        {"کدام گزینه معنی انگلیسی «خورشید» است؟","🇬🇧","sun","moon","star","cloud"},
-        {"کدام گزینه معنی انگلیسی «سریع» است؟","🇬🇧","fast","slow","weak","late"},
-        {"کدام گزینه معنی انگلیسی «زیبا» است؟","🇬🇧","beautiful","difficult","dangerous","empty"},
-        {"جمله "I am happy" چه معنی می‌دهد؟","🇬🇧","من خوشحالم","من گرسنه‌ام","من خسته‌ام","من دیر کرده‌ام"},
-        {"جمله "Where are you from?" چه معنی می‌دهد؟","🇬🇧","اهل کجا هستی؟","کجا زندگی می‌کنی؟","چه کاری انجام می‌دهی؟","چند سالت است؟"},
-        {"جمله "I like music" چه معنی می‌دهد؟","🇬🇧","من موسیقی دوست دارم","من موسیقی می‌سازم","من موسیقی نمی‌شنوم","من موسیقی می‌فروشم"},
-        {"کدام گزینه شکل درست جمع "child" است؟","🇬🇧","children","childs","childes","childrens"},
-        {"کدام گزینه گذشته فعل "go" است؟","🇬🇧","went","goed","gone","going"},
-        {"کدام گزینه برای گفتن «صبح بخیر» استفاده می‌شود؟","🇬🇧","Good morning","Good night","Goodbye","Good luck"},
-        {"کدام گزینه برای پرسیدن «چند سالت است؟» درست است؟","🇬🇧","How old are you?","Where are you?","What is your name?","How are you?"}
-    };
 
     final String[][] extraSpecializedFacts = {
         {"کدام عنصر بیشترین فراوانی را در پوسته زمین دارد؟","⚗️","اکسیژن","سیلیسیم","آلومینیوم","آهن"},
@@ -990,7 +1036,6 @@ public class MainActivity extends Activity {
         questions.clear();
         ArrayList<String[]> all=new ArrayList<>();
         all.addAll(Arrays.asList(facts));
-        all.addAll(Arrays.asList(englishFacts));
         all.addAll(Arrays.asList(iranFacts));
         all.addAll(Arrays.asList(specializedFacts));
         all.addAll(Arrays.asList(extraSpecializedFacts));
