@@ -564,7 +564,6 @@ public class MainActivity extends Activity {
     long lastBack = 0L;
     Set<String> favorites = new HashSet<>();
     Set<String> answeredQuestions = new HashSet<>();
-    Set<String> englishQuestionTexts = new HashSet<>();
 
     @Override public void onCreate(Bundle b){
         super.onCreate(b);
@@ -600,18 +599,26 @@ public class MainActivity extends Activity {
     Button button(String s){Button b=new Button(this);b.setText(s);b.setTextSize(responsiveTextSize(16));b.setTextColor(Color.WHITE);b.setAllCaps(false);b.setGravity(Gravity.CENTER);b.setTypeface(persianFont);b.setLayoutDirection(View.LAYOUT_DIRECTION_RTL);b.setPadding(dp(12),dp(8),dp(12),dp(8));b.setSingleLine(false);b.setMaxLines(5);b.setEllipsize(null);b.setHorizontallyScrolling(false); b.setPadding(dp(14),dp(10),dp(14),dp(10));b.setMinHeight(dp(60));b.setMinimumHeight(dp(60));b.setBackground(bg(Color.rgb(30,105,210),Color.rgb(18,45,125),24));LinearLayout.LayoutParams p=new LinearLayout.LayoutParams(-1,dp(60));p.setMargins(dp(6),dp(4),dp(6),dp(4));b.setLayoutParams(p);return b;}
     Button smallButton(String s){Button b=button(s);b.setTextSize(16);b.setTextColor(Color.WHITE);b.setBackground(bg(Color.argb(175,12,45,100),Color.argb(175,8,25,65),20));b.setLayoutParams(new LinearLayout.LayoutParams(dp(54),dp(48)));return b;}
 
-    int backgroundRes(){int[] r={R.drawable.bg_home};return r[0];}
+    int backgroundRes(){int[] r={R.drawable.bg_home_clear};return r[0];}
     void base(){
         screen=new FrameLayout(this);
         ImageView image=new ImageView(this);
         image.setImageResource(backgroundRes());
         image.setScaleType(ImageView.ScaleType.CENTER_CROP);
         screen.addView(image,new FrameLayout.LayoutParams(-1,-1));
-        View shade=new View(this); shade.setBackgroundColor(Color.argb(8,2,10,35));
-        screen.addView(shade,new FrameLayout.LayoutParams(-1,-1));
-        ScrollView scroll=new ScrollView(this); scroll.setFillViewport(true); scroll.setClipToPadding(false);
-        root=new LinearLayout(this); root.setOrientation(LinearLayout.VERTICAL); root.setGravity(Gravity.CENTER_HORIZONTAL); root.setPadding(dp(14),dp(10),dp(14),dp(20)); root.setLayoutDirection(View.LAYOUT_DIRECTION_RTL);
-        scroll.addView(root); FrameLayout.LayoutParams sp=new FrameLayout.LayoutParams(-1,-1); screen.addView(scroll,sp); setContentView(screen);
+        // Keep the historical background fully visible; do not blur or darken it.
+        ScrollView scroll=new ScrollView(this);
+        scroll.setFillViewport(true);
+        scroll.setClipToPadding(false);
+        root=new LinearLayout(this);
+        root.setOrientation(LinearLayout.VERTICAL);
+        root.setGravity(Gravity.CENTER_HORIZONTAL);
+        root.setPadding(dp(14),dp(10),dp(14),dp(96));
+        root.setLayoutDirection(View.LAYOUT_DIRECTION_RTL);
+        scroll.addView(root);
+        FrameLayout.LayoutParams sp=new FrameLayout.LayoutParams(-1,-1);
+        screen.addView(scroll,sp);
+        setContentView(screen);
     }
 
     ImageView imageView(int res,int h){ImageView v=new ImageView(this);v.setImageResource(res);v.setScaleType(ImageView.ScaleType.CENTER_CROP);v.setBackground(bg(Color.argb(120,0,0,0),Color.argb(80,0,0,0),28));v.setPadding(dp(3),dp(3),dp(3),dp(3));root.addView(v,new LinearLayout.LayoutParams(-1,dp(h)));return v;}
@@ -682,7 +689,7 @@ public class MainActivity extends Activity {
         final ImageView avatar=new ImageView(this); avatar.setScaleType(ImageView.ScaleType.CENTER_CROP); avatar.setBackground(bg(Color.rgb(25,75,145),Color.rgb(8,30,75),80));
         LinearLayout.LayoutParams ap=new LinearLayout.LayoutParams(dp(112),dp(112)); ap.setMargins(0,0,0,dp(12)); box.addView(avatar,ap);
         if(!profileImageUri.isEmpty()) try{avatar.setImageURI(Uri.parse(profileImageUri));}catch(Exception ignored){}
-        else {avatar.setImageResource(R.drawable.icon_dana); avatar.setPadding(dp(12),dp(12),dp(12),dp(12));}
+        else {avatar.setImageResource(R.drawable.icon_dana_neat); avatar.setPadding(dp(12),dp(12),dp(12),dp(12));}
         avatar.setOnClickListener(v->openProfilePicker());
         TextView hint=text("برای انتخاب عکس روی تصویر بزن",13); hint.setTextColor(Color.LTGRAY); box.addView(hint,new LinearLayout.LayoutParams(-1,dp(32)));
         EditText name=new EditText(this); name.setText(profileName); name.setHint("نام شما"); name.setTextSize(18); name.setGravity(Gravity.RIGHT|Gravity.CENTER_VERTICAL); name.setSingleLine(true); name.setTextColor(Color.WHITE); name.setHintTextColor(Color.LTGRAY); name.setPadding(dp(14),0,dp(14),0); name.setBackground(bg(Color.rgb(25,65,120),Color.rgb(10,30,70),18)); box.addView(name,new LinearLayout.LayoutParams(-1,dp(54)));
@@ -695,7 +702,7 @@ public class MainActivity extends Activity {
         LinearLayout card=new LinearLayout(this); card.setOrientation(LinearLayout.HORIZONTAL); card.setGravity(Gravity.CENTER_VERTICAL); card.setPadding(dp(12),dp(10),dp(12),dp(10)); card.setLayoutDirection(View.LAYOUT_DIRECTION_RTL); card.setBackground(bg(Color.argb(225,20,53,105),Color.argb(225,7,22,60),26));
         ImageView avatar=new ImageView(this); avatar.setScaleType(ImageView.ScaleType.CENTER_CROP); avatar.setBackground(bg(Color.rgb(255,197,55),Color.rgb(180,105,12),80));
         if(!profileImageUri.isEmpty()) try{avatar.setImageURI(Uri.parse(profileImageUri));}catch(Exception ignored){}
-        else {avatar.setImageResource(R.drawable.icon_dana); avatar.setPadding(dp(8),dp(8),dp(8),dp(8));}
+        else {avatar.setImageResource(R.drawable.icon_dana_neat); avatar.setPadding(dp(8),dp(8),dp(8),dp(8));}
         card.addView(avatar,new LinearLayout.LayoutParams(dp(68),dp(68)));
         LinearLayout info=new LinearLayout(this); info.setOrientation(LinearLayout.VERTICAL); info.setGravity(Gravity.CENTER_VERTICAL|Gravity.RIGHT); info.setPadding(dp(12),0,dp(8),0); info.setLayoutDirection(View.LAYOUT_DIRECTION_RTL);
         TextView n=text(profileName.isEmpty()?"ساخت پروفایل":"درود، "+profileName,17); n.setGravity(Gravity.RIGHT|Gravity.CENTER_VERTICAL); TextView sub=text(profileName.isEmpty()?"نام و عکس خودت را اضافه کن":"پروفایل من",12); sub.setTextColor(Color.rgb(220,230,255)); sub.setGravity(Gravity.RIGHT|Gravity.CENTER_VERTICAL); info.addView(n,new LinearLayout.LayoutParams(-1,dp(34))); info.addView(sub,new LinearLayout.LayoutParams(-1,dp(28))); card.addView(info,new LinearLayout.LayoutParams(0,-1,1));
@@ -710,55 +717,66 @@ public class MainActivity extends Activity {
         try{tone.stopTone();}catch(Exception ignored){}
         backArmed=false; currentBackground=0; base();
 
-        // Compact top bar: profile/avatar and settings remain accessible without
-        // adding the old welcome card, score card, or app logo to the home screen.
+        // Clean top bar: settings on the left, profile circle on the right, and only the coin count.
         LinearLayout top=new LinearLayout(this);
         top.setOrientation(LinearLayout.HORIZONTAL);
         top.setGravity(Gravity.CENTER_VERTICAL);
-        top.setLayoutDirection(View.LAYOUT_DIRECTION_RTL);
+        top.setLayoutDirection(View.LAYOUT_DIRECTION_LTR);
 
-        TextView profileTop=text("👤",22);
-        profileTop.setGravity(Gravity.CENTER);
-        profileTop.setTextColor(Color.WHITE);
-        profileTop.setBackground(bg(Color.argb(220,20,72,145),Color.argb(220,7,30,78),50));
-        profileTop.setOnClickListener(v->showProfileEditor());
-        top.addView(profileTop,new LinearLayout.LayoutParams(dp(52),dp(52)));
+        TextView settings=text("⚙",25);
+        settings.setGravity(Gravity.CENTER);
+        settings.setTextColor(Color.WHITE);
+        settings.setBackground(bg(Color.argb(190,12,48,100),Color.argb(190,7,28,65),50));
+        settings.setOnClickListener(v->showSettingsDialog());
+        top.addView(settings,new LinearLayout.LayoutParams(dp(48),dp(48)));
 
-        TextView gear=text("⚙",24);
-        gear.setGravity(Gravity.CENTER);
-        gear.setTextColor(Color.WHITE);
-        gear.setBackground(bg(Color.argb(210,20,65,125),Color.argb(210,7,28,70),50));
-        gear.setOnClickListener(v->showProfileEditor());
-        LinearLayout.LayoutParams gp=new LinearLayout.LayoutParams(dp(52),dp(52));
-        gp.setMargins(dp(8),0,0,0);
-        top.addView(gear,gp);
+        Space gap=new Space(this);
+        top.addView(gap,new LinearLayout.LayoutParams(0,dp(48),1));
 
-        Space topSpace=new Space(this);
-        top.addView(topSpace,new LinearLayout.LayoutParams(0,dp(52),1));
+        TextView coinText=text("🪙  "+fa(coin)+" سکه",14);
+        coinText.setTextColor(Color.rgb(255,225,90));
+        coinText.setGravity(Gravity.CENTER);
+        coinText.setBackground(bg(Color.argb(185,12,43,90),Color.argb(185,7,25,60),22));
+        LinearLayout.LayoutParams coinLp=new LinearLayout.LayoutParams(dp(104),dp(44));
+        coinLp.setMargins(0,0,dp(8),0);
+        top.addView(coinText,coinLp);
 
-        TextView coinPill=text("🪙  "+fa(coin)+"  سکه",15);
-        coinPill.setTextColor(Color.rgb(255,220,85));
-        coinPill.setGravity(Gravity.CENTER);
-        coinPill.setSingleLine(true);
-        coinPill.setBackground(bg(Color.argb(235,15,43,95),Color.argb(225,7,22,58),24));
-        top.addView(coinPill,new LinearLayout.LayoutParams(dp(122),dp(48)));
-        root.addView(top,new LinearLayout.LayoutParams(-1,dp(56)));
+        ImageView profileIcon=new ImageView(this);
+        profileIcon.setScaleType(ImageView.ScaleType.CENTER_CROP);
+        profileIcon.setBackground(bg(Color.argb(205,25,78,150),Color.argb(205,8,30,78),50));
+        if(!profileImageUri.isEmpty()){
+            try{profileIcon.setImageURI(Uri.parse(profileImageUri));}catch(Exception ignored){}
+        }else{
+            profileIcon.setImageResource(android.R.drawable.ic_menu_myplaces);
+            profileIcon.setColorFilter(Color.WHITE);
+            profileIcon.setPadding(dp(8),dp(8),dp(8),dp(8));
+        }
+        profileIcon.setOnClickListener(v->showProfileEditor());
+        top.addView(profileIcon,new LinearLayout.LayoutParams(dp(48),dp(48)));
+        root.addView(top,new LinearLayout.LayoutParams(-1,dp(50)));
 
-        // The only primary action on the home screen.
-        Space visualGap=new Space(this);
-        root.addView(visualGap,new LinearLayout.LayoutParams(1,dp(230)));
+        // No app logo, title, greeting card, score/lives card, or extra shortcut buttons on the home screen.
+        Space heroGap=new Space(this);
+        root.addView(heroGap,new LinearLayout.LayoutParams(1,0,1));
 
         Button start=button("✦   شروع چالش   ›");
-        start.setTextSize(responsiveTextSize(19));
+        start.setTextSize(18);
         start.setTextColor(Color.rgb(45,25,0));
         start.setBackground(bg(Color.rgb(255,220,75),Color.rgb(255,143,18),25));
         start.setOnClickListener(v->startGame());
-        LinearLayout.LayoutParams sb=new LinearLayout.LayoutParams(-1,dp(70));
-        sb.setMargins(dp(18),0,dp(18),dp(24));
+        LinearLayout.LayoutParams sb=new LinearLayout.LayoutParams(-1,dp(68));
+        sb.setMargins(0,0,0,dp(18));
         root.addView(start,sb);
 
-        // Home / rankings / English questions / profile stay at the bottom.
         addBottomNavStandalone();
+    }
+
+    void showSettingsDialog(){
+        AlertDialog d=new AlertDialog.Builder(this)
+                .setTitle("تنظیمات")
+                .setMessage("تنظیمات برنامه آماده است.")
+                .setPositiveButton("باشه",null).create();
+        d.show();
     }
 
     void addPageHeader(String heading){
@@ -818,11 +836,25 @@ public class MainActivity extends Activity {
     }
 
     void addBottomNavStandalone(){
-        Space sp=new Space(this); root.addView(sp,new LinearLayout.LayoutParams(1,dp(10)));
-        LinearLayout nav=new LinearLayout(this); nav.setOrientation(LinearLayout.HORIZONTAL); nav.setGravity(Gravity.CENTER); nav.setPadding(dp(6),dp(4),dp(6),dp(4)); nav.setBackground(bg(Color.argb(230,5,44,75),Color.argb(230,4,22,50),22));
-        String[] labels={"⌂\nخانه","🏆\nرتبه‌ها","👤\nپروفایل"};
-        for(String lab:labels){ TextView n=text(lab,12); n.setGravity(Gravity.CENTER); nav.addView(n,new LinearLayout.LayoutParams(0,dp(64),1)); if(lab.contains("رتبه")) n.setOnClickListener(v->showRankings()); else if(lab.contains("پروفایل")) n.setOnClickListener(v->showProfileEditor()); else n.setOnClickListener(v->showHome()); }
-        root.addView(nav,new LinearLayout.LayoutParams(-1,dp(76)));
+        LinearLayout nav=new LinearLayout(this);
+        nav.setOrientation(LinearLayout.HORIZONTAL);
+        nav.setGravity(Gravity.CENTER);
+        nav.setPadding(dp(6),dp(4),dp(6),dp(4));
+        nav.setBackground(bg(Color.argb(235,5,44,75),Color.argb(235,4,22,50),22));
+        nav.setLayoutDirection(View.LAYOUT_DIRECTION_RTL);
+        String[] labels={"⌂\nخانه","🏆\nرتبه‌ها","★\nعلاقه‌مندی‌ها","👤\nپروفایل"};
+        for(String lab:labels){
+            TextView n=text(lab,12);
+            n.setGravity(Gravity.CENTER);
+            nav.addView(n,new LinearLayout.LayoutParams(0,dp(64),1));
+            if(lab.contains("رتبه")) n.setOnClickListener(v->showRankings());
+            else if(lab.contains("علاقه")) n.setOnClickListener(v->showFavorites());
+            else if(lab.contains("پروفایل")) n.setOnClickListener(v->showProfileEditor());
+            else n.setOnClickListener(v->showHome());
+        }
+        FrameLayout.LayoutParams np=new FrameLayout.LayoutParams(-1,dp(76),Gravity.BOTTOM);
+        np.setMargins(dp(10),0,dp(10),dp(8));
+        screen.addView(nav,np);
     }
 
     boolean isFavorite(Question q){ return favorites.contains(q.q); }
@@ -972,46 +1004,36 @@ public class MainActivity extends Activity {
     };
 
     final String[][] englishFacts = {
-        {"EN|What is the Persian meaning of \"brave\"?","🇬🇧","شجاع","سریع","آرام","ضعیف"},
-        {"EN|What is the Persian meaning of \"beautiful\"?","🇬🇧","زیبا","بزرگ","سرد","سخت"},
-        {"EN|What is the Persian meaning of \"ancient\"?","🇬🇧","باستانی","مدرن","روشن","کوتاه"},
-        {"EN|What is the Persian meaning of \"journey\"?","🇬🇧","سفر","پنجره","کفش","رودخانه"},
-        {"EN|What is the Persian meaning of \"mountain\"?","🇬🇧","کوه","دریا","جاده","شهر"},
-        {"EN|What is the Persian meaning of \"knowledge\"?","🇬🇧","دانش","سرعت","دوستی","قدرت"},
-        {"EN|What is the Persian meaning of \"discover\"?","🇬🇧","کشف کردن","فراموش کردن","ساختن","خوابیدن"},
-        {"EN|What is the Persian meaning of \"history\"?","🇬🇧","تاریخ","آینده","طبیعت","ورزش"},
-        {"EN|What is the Persian meaning of \"ancient city\"?","🇬🇧","شهر باستانی","شهر ساحلی","شهر صنعتی","روستای کوچک"},
-        {"EN|Which word means \"آب\" in English?","🇬🇧","water","window","winter","world"},
-        {"EN|Which word means \"خورشید\" in English?","🇬🇧","sun","son","sea","stone"},
-        {"EN|Which word means \"کتاب\" in English?","🇬🇧","book","back","look","cook"},
-        {"EN|Which word means \"خانه\" in English?","🇬🇧","house","horse","mouse","heart"},
-        {"EN|Which word means \"دوست\" in English?","🇬🇧","friend","field","flower","family"},
-        {"EN|Which word means \"سریع\" in English?","🇬🇧","fast","last","first","soft"},
-        {"EN|Which word means \"آرام\" in English?","🇬🇧","calm","cold","clean","close"},
-        {"EN|What is the opposite of \"hot\"?","🇬🇧","cold","fast","high","dark"},
-        {"EN|What is the opposite of \"old\"?","🇬🇧","young","long","small","late"},
-        {"EN|What is the opposite of \"easy\"?","🇬🇧","difficult","early","empty","quiet"},
-        {"EN|What is the opposite of \"bright\"?","🇬🇧","dark","clean","strong","wide"},
-        {"EN|Which sentence means \"من یک کتاب دارم\"?","🇬🇧","I have a book.","I am a book.","I see a book.","I read a book."},
-        {"EN|Which sentence means \"او یک دانش‌آموز است\"?","🇬🇧","She is a student.","She has a student.","She reads a student.","She is studying yesterday."},
-        {"EN|Which word is a color?","🇬🇧","purple","pencil","planet","people"},
-        {"EN|Which word is an animal?","🇬🇧","tiger","table","teacher","travel"},
-        {"EN|Which word is a place?","🇬🇧","museum","morning","music","marketable"},
-        {"EN|What does \"Where are you from?\" mean?","🇬🇧","اهل کجایی؟","کجا می‌روی؟","چه چیزی می‌خوری؟","چند سال داری؟"},
-        {"EN|What does \"How old are you?\" mean?","🇬🇧","چند سالت است؟","حالت چطور است؟","کجا زندگی می‌کنی؟","چه می‌خوانی؟"},
-        {"EN|What does \"Good morning\" mean?","🇬🇧","صبح بخیر","شب بخیر","خداحافظ","متشکرم"},
-        {"EN|What does \"Thank you\" mean?","🇬🇧","متشکرم","خواهش می‌کنم","ببخشید","سلام"},
-        {"EN|What does \"See you later\" mean?","🇬🇧","بعداً می‌بینمت","صبح بخیر","خوش آمدی","کمک کن"},
-        {"EN|Which word completes: \"I ___ happy.\"?","🇬🇧","am","is","are","be"},
-        {"EN|Which word completes: \"She ___ a teacher.\"?","🇬🇧","is","am","are","be"},
-        {"EN|Which word completes: \"They ___ ready.\"?","🇬🇧","are","is","am","be"},
-        {"EN|Which word is the past form of \"go\"?","🇬🇧","went","gone","going","goes"},
-        {"EN|Which word is the past form of \"see\"?","🇬🇧","saw","seen","seeing","sees"},
-        {"EN|Which word is the plural of \"child\"?","🇬🇧","children","childs","childes","childrens"},
-        {"EN|Which word is the plural of \"person\"?","🇬🇧","people","persons","peoples","persones"},
-        {"EN|What does \"careful\" mean?","🇬🇧","مراقب و محتاط","خسته","گرسنه","سریع"},
-        {"EN|What does \"important\" mean?","🇬🇧","مهم","ساده","دور","قدیمی"},
-        {"EN|What does \"beautiful view\" mean?","🇬🇧","منظره زیبا","خانه قدیمی","راه طولانی","هوای سرد"}
+        {"معنی کلمه "apple" چیست؟","🔤","سیب","کتاب","خانه","آب"},
+        {"معنی کلمه "book" چیست؟","🔤","کتاب","مدرسه","دوست","درخت"},
+        {"معنی کلمه "water" چیست؟","🔤","آب","نان","هوا","آتش"},
+        {"معنی کلمه "house" چیست؟","🔤","خانه","ماشین","باغ","مدرسه"},
+        {"معنی کلمه "friend" چیست؟","🔤","دوست","برادر","معلم","همسایه"},
+        {"معنی کلمه "school" چیست؟","🔤","مدرسه","بیمارستان","فروشگاه","پارک"},
+        {"معنی کلمه "book" چیست؟","🔤","کتاب","قلم","کیف","میز"},
+        {"معنی کلمه "sun" چیست؟","🔤","خورشید","ماه","ستاره","ابر"},
+        {"معنی کلمه "moon" چیست؟","🔤","ماه","خورشید","زمین","دریا"},
+        {"معنی کلمه "star" چیست؟","🔤","ستاره","ابر","باد","باران"},
+        {"معنی کلمه "beautiful" چیست؟","🔤","زیبا","سریع","بزرگ","سرد"},
+        {"معنی کلمه "happy" چیست؟","🔤","خوشحال","خسته","عصبانی","گرسنه"},
+        {"معنی کلمه "strong" چیست؟","🔤","قوی","ضعیف","کوچک","آرام"},
+        {"معنی کلمه "fast" چیست؟","🔤","سریع","آرام","بلند","کوتاه"},
+        {"معنی کلمه "small" چیست؟","🔤","کوچک","بزرگ","سنگین","بلند"},
+        {"معنی کلمه "teacher" چیست؟","🔤","معلم","دانش‌آموز","پزشک","مهندس"},
+        {"معنی کلمه "doctor" چیست؟","🔤","پزشک","معلم","راننده","کشاورز"},
+        {"معنی کلمه "watermelon" چیست؟","🔤","هندوانه","سیب","پرتقال","موز"},
+        {"معنی کلمه "morning" چیست؟","🔤","صبح","شب","ظهر","عصر"},
+        {"معنی کلمه "night" چیست؟","🔤","شب","صبح","ظهر","عصر"},
+        {"معنی کلمه "red" چیست؟","🔤","قرمز","آبی","سبز","زرد"},
+        {"معنی کلمه "green" چیست؟","🔤","سبز","قرمز","بنفش","سفید"},
+        {"معنی کلمه "blue" چیست؟","🔤","آبی","زرد","مشکی","نارنجی"},
+        {"معنی کلمه "one" چیست؟","🔤","یک","دو","سه","چهار"},
+        {"معنی کلمه "five" چیست؟","🔤","پنج","چهار","شش","هفت"},
+        {"معنی کلمه "ten" چیست؟","🔤","ده","هشت","نه","دوازده"},
+        {"معنی کلمه "car" چیست؟","🔤","ماشین","قطار","دوچرخه","هواپیما"},
+        {"معنی کلمه "book" چیست؟","🔤","کتاب","خانه","باغ","کلاس"},
+        {"معنی کلمه "family" چیست؟","🔤","خانواده","دوستان","مدرسه","کشور"},
+        {"معنی کلمه "country" چیست؟","🔤","کشور","شهر","خانه","خیابان"}
     };
 
     void buildQuestions(){
@@ -1023,39 +1045,17 @@ public class MainActivity extends Activity {
         all.addAll(Arrays.asList(extraSpecializedFacts));
         all.addAll(Arrays.asList(iranAdvancedFacts));
         all.addAll(Arrays.asList(englishFacts));
-        englishQuestionTexts.clear();
         Random rnd=new Random(System.nanoTime());
         HashSet<String> seen=new HashSet<>();
         for(String[] f:all){
             if(f.length<6 || !seen.add(f[0])) continue;
-            String displayQuestion=f[0];
-            if(displayQuestion.startsWith("EN|")){
-                displayQuestion=displayQuestion.substring(3);
-                englishQuestionTexts.add(displayQuestion);
-            }
             String[] opts={f[2],f[3],f[4],f[5]};
             ArrayList<String> shuffled=new ArrayList<>(Arrays.asList(opts));
             Collections.shuffle(shuffled,rnd);
             int correct=shuffled.indexOf(f[2]);
-            questions.add(new Question(displayQuestion,f[1],shuffled.toArray(new String[0]),correct));
+            questions.add(new Question(f[0],f[1],shuffled.toArray(new String[0]),correct));
         }
         Collections.shuffle(questions,rnd);
-    }
-
-    void startEnglishGame(){
-        index=0; score=0; coin=50; lives=5;
-        ArrayList<Question> fresh=new ArrayList<>();
-        for(Question q:questions){
-            if(englishQuestionTexts.contains(q.q) && !answeredQuestions.contains(q.q)) fresh.add(q);
-        }
-        if(fresh.isEmpty()){
-            Toast.makeText(this,"فعلاً سؤال انگلیسی جدیدی باقی نمانده است.",Toast.LENGTH_LONG).show();
-            showHome();
-            return;
-        }
-        Collections.shuffle(fresh,new Random(System.nanoTime()));
-        questions=new ArrayList<>(fresh);
-        inGame=true; showQuestion();
     }
 
     void startGame(){
@@ -1237,7 +1237,7 @@ public class MainActivity extends Activity {
         if(questionTimer!=null){questionTimer.cancel(); questionTimer=null;} currentBackground=2; base();
 
         ImageView trophy=new ImageView(this);
-        trophy.setImageResource(R.drawable.icon_dana);
+        trophy.setImageResource(R.drawable.icon_dana_neat);
         trophy.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
         root.addView(trophy,new LinearLayout.LayoutParams(-1,dp(170)));
 
