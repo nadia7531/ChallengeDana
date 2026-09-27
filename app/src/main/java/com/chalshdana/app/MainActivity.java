@@ -742,6 +742,21 @@ public class MainActivity extends Activity {
         scroll.addView(root); FrameLayout.LayoutParams sp=new FrameLayout.LayoutParams(-1,-1); screen.addView(scroll,sp); setContentView(screen);
     }
 
+    void baseHomeStatic(){
+        screen=new FrameLayout(this);
+        ImageView image=new ImageView(this);
+        image.setImageResource(backgroundRes());
+        image.setScaleType(ImageView.ScaleType.CENTER_CROP);
+        screen.addView(image,new FrameLayout.LayoutParams(-1,-1));
+        root=new LinearLayout(this);
+        root.setOrientation(LinearLayout.VERTICAL);
+        root.setGravity(Gravity.CENTER_HORIZONTAL);
+        root.setPadding(dp(14),dp(10),dp(14),dp(20));
+        root.setLayoutDirection(View.LAYOUT_DIRECTION_RTL);
+        screen.addView(root,new FrameLayout.LayoutParams(-1,-1));
+        setContentView(screen);
+    }
+
     ImageView imageView(int res,int h){ImageView v=new ImageView(this);v.setImageResource(res);v.setScaleType(ImageView.ScaleType.CENTER_CROP);v.setBackground(bg(Color.argb(120,0,0,0),Color.argb(80,0,0,0),28));v.setPadding(dp(3),dp(3),dp(3),dp(3));root.addView(v,new LinearLayout.LayoutParams(-1,dp(h)));return v;}
 
 
@@ -836,9 +851,9 @@ public class MainActivity extends Activity {
         inGame=false;
         if(questionTimer!=null){questionTimer.cancel();questionTimer=null;}
         try{tone.stopTone();}catch(Exception ignored){}
-        backArmed=false; currentBackground=0; base();
+        backArmed=false; currentBackground=0; baseHomeStatic();
 
-        // خانه: بدون لوگو/عنوان اضافی؛ فقط دکمه شروع، نوار بالا و منوی پایین.
+        // خانه: بدون لوگو/عنوان اضافی؛ صفحه کاملاً ثابت و بدون اسکرول.
         LinearLayout top=new LinearLayout(this);
         top.setOrientation(LinearLayout.HORIZONTAL);
         top.setGravity(Gravity.CENTER_VERTICAL);
@@ -854,17 +869,17 @@ public class MainActivity extends Activity {
         Space topSpace=new Space(this);
         top.addView(topSpace,new LinearLayout.LayoutParams(0,dp(46),1));
 
-        // بدون مربع/ایموجی اضافه کنار سکه
-        TextView coinPill=text(fa(coin)+" سکه",14);
+        // سکه بدون مربع/کادر اضافه
+        TextView coinPill=text("🪙  "+fa(coin),15);
         coinPill.setTextColor(Color.rgb(255,220,85));
         coinPill.setGravity(Gravity.CENTER);
         coinPill.setSingleLine(true);
-        coinPill.setBackground(bg(Color.argb(205,15,43,95),Color.argb(195,7,22,58),22));
-        top.addView(coinPill,new LinearLayout.LayoutParams(dp(96),dp(44)));
+        coinPill.setBackgroundColor(Color.TRANSPARENT);
+        top.addView(coinPill,new LinearLayout.LayoutParams(dp(82),dp(44)));
 
         ImageView profileIcon=new ImageView(this);
         profileIcon.setScaleType(ImageView.ScaleType.CENTER_CROP); profileIcon.setClipToOutline(true); profileIcon.setOutlineProvider(new android.view.ViewOutlineProvider(){ public void getOutline(View v, android.graphics.Outline o){o.setOval(0,0,v.getWidth(),v.getHeight());} });
-        profileIcon.setBackground(bg(Color.argb(205,18,75,145),Color.argb(205,7,30,78),50));
+        profileIcon.setBackgroundColor(Color.TRANSPARENT);
         if(!profileImageUri.isEmpty()){
             try{profileIcon.setImageURI(Uri.parse(profileImageUri));}catch(Exception ignored){profileIcon.setImageResource(android.R.drawable.ic_menu_myplaces);}
         }else{
@@ -878,10 +893,9 @@ public class MainActivity extends Activity {
         top.addView(profileIcon,pp);
         root.addView(top,new LinearLayout.LayoutParams(-1,dp(48)));
 
-        // فاصله متناسب با صفحه برای قرار گرفتن شروع چالش در مرکز
-        int heightDp=(int)(getResources().getDisplayMetrics().heightPixels/getResources().getDisplayMetrics().density);
-        int centerGap=Math.max(90, (heightDp-48-70-90-76)/2);
-        root.addView(new Space(this),new LinearLayout.LayoutParams(1,dp(centerGap)));
+        // دکمه شروع دقیقاً در مرکز فضای اصلی و منوی ناوبری همیشه پایین صفحه
+        Space topFlex=new Space(this);
+        root.addView(topFlex,new LinearLayout.LayoutParams(1,0,1f));
 
         Button start=button("✦   شروع چالش   ›");
         start.setTextSize(responsiveTextSize(18));
@@ -892,8 +906,8 @@ public class MainActivity extends Activity {
         sb.setMargins(0,0,0,dp(8));
         root.addView(start,sb);
 
-        int remaining=Math.max(70,heightDp-centerGap-48-70-76-40);
-        root.addView(new Space(this),new LinearLayout.LayoutParams(1,dp(remaining)));
+        Space bottomFlex=new Space(this);
+        root.addView(bottomFlex,new LinearLayout.LayoutParams(1,0,1f));
         addBottomNavStandalone();
     }
 
@@ -1116,39 +1130,118 @@ public class MainActivity extends Activity {
 
     ArrayList<String[]> generatedEnglish500(){
         String[][] w={
-            {"hello","سلام"},{"goodbye","خداحافظ"},{"please","لطفاً"},{"thanks","ممنون"},{"sorry","متأسفم"},
-            {"yes","بله"},{"no","نه"},{"water","آب"},{"food","غذا"},{"bread","نان"},
-            {"milk","شیر"},{"apple","سیب"},{"orange","پرتقال"},{"banana","موز"},{"book","کتاب"},
-            {"pen","خودکار"},{"pencil","مداد"},{"school","مدرسه"},{"teacher","معلم"},{"student","دانش‌آموز"},
-            {"house","خانه"},{"room","اتاق"},{"door","در"},{"window","پنجره"},{"table","میز"},
-            {"chair","صندلی"},{"bed","تخت"},{"car","ماشین"},{"bus","اتوبوس"},{"train","قطار"},
-            {"road","جاده"},{"street","خیابان"},{"city","شهر"},{"country","کشور"},{"world","جهان"},
-            {"family","خانواده"},{"mother","مادر"},{"father","پدر"},{"brother","برادر"},{"sister","خواهر"},
-            {"friend","دوست"},{"child","کودک"},{"man","مرد"},{"woman","زن"},{"person","شخص"},
-            {"happy","خوشحال"},{"sad","غمگین"},{"big","بزرگ"},{"small","کوچک"},{"fast","سریع"},
-            {"slow","آهسته"},{"hot","گرم"},{"cold","سرد"},{"new","جدید"},{"old","قدیمی"},
-            {"easy","آسان"},{"difficult","سخت"},{"beautiful","زیبا"},{"strong","قوی"},{"weak","ضعیف"},
-            {"clean","تمیز"},{"dirty","کثیف"},{"early","زود"},{"late","دیر"},{"day","روز"},
-            {"night","شب"},{"morning","صبح"},{"evening","عصر"},{"today","امروز"},{"tomorrow","فردا"},
-            {"yesterday","دیروز"},{"time","زمان"},{"year","سال"},{"month","ماه"},{"week","هفته"},
-            {"one","یک"},{"two","دو"},{"three","سه"},{"four","چهار"},{"five","پنج"},
-            {"red","قرمز"},{"blue","آبی"},{"green","سبز"},{"white","سفید"},{"black","سیاه"},
-            {"sun","خورشید"},{"moon","ماه"},{"star","ستاره"},{"sky","آسمان"},{"rain","باران"},
-            {"book","کتاب"},{"read","خواندن"},{"write","نوشتن"},{"speak","صحبت کردن"},{"listen","گوش دادن"},
-            {"see","دیدن"},{"look","نگاه کردن"},{"go","رفتن"},{"come","آمدن"},{"eat","خوردن"},
-            {"drink","نوشیدن"},{"sleep","خوابیدن"},{"run","دویدن"},{"walk","راه رفتن"},{"work","کار کردن"}
+            {"meticulous","very careful and precise"},
+            {"ambiguous","open to more than one interpretation"},
+            {"inevitable","certain to happen"},
+            {"plausible","seeming reasonable or likely to be true"},
+            {"reluctant","unwilling or hesitant"},
+            {"substantial","large in amount or importance"},
+            {"deteriorate","become progressively worse"},
+            {"coherent","logical and consistent"},
+            {"concise","brief but complete and clear"},
+            {"versatile","able to adapt to many different uses"},
+            {"resilient","able to recover quickly from difficulty"},
+            {"skeptical","not easily convinced"},
+            {"obsolete","no longer useful because something newer exists"},
+            {"feasible","possible and practical to achieve"},
+            {"compelling","very convincing or persuasive"},
+            {"controversial","causing disagreement or argument"},
+            {"intricate","very detailed or complicated"},
+            {"subtle","not obvious and difficult to notice"},
+            {"pragmatic","focused on practical results"},
+            {"profound","very deep or significant"},
+            {"arbitrary","based on personal choice rather than a clear reason"},
+            {"explicit","stated clearly and directly"},
+            {"implicit","suggested without being directly stated"},
+            {"diligent","careful and hardworking"},
+            {"inherent","existing as a natural or permanent part"},
+            {"adverse","harmful or unfavorable"},
+            {"redundant","unnecessary because it is repeated or no longer needed"},
+            {"innovative","introducing new ideas or methods"},
+            {"credible","able to be trusted or believed"},
+            {"allocate","distribute something for a particular purpose"},
+            {"anticipate","expect or predict something"},
+            {"assess","evaluate the nature or quality of something"},
+            {"clarify","make something easier to understand"},
+            {"constrain","limit or restrict something"},
+            {"derive","obtain something from a particular source"},
+            {"enhance","improve or increase the quality of something"},
+            {"facilitate","make an action or process easier"},
+            {"implement","put a plan or decision into effect"},
+            {"infer","reach a conclusion from evidence"},
+            {"mitigate","reduce the harmful effect of something"},
+            {"negotiate","try to reach an agreement through discussion"},
+            {"refute","prove that a claim is false"},
+            {"scrutinize","examine something very carefully"},
+            {"sustain","keep something going over time"},
+            {"adapt","adjust to new conditions"},
+            {"advocate","publicly support a cause or idea"},
+            {"coincide","happen at the same time"},
+            {"comprise","consist of particular parts"},
+            {"contradict","state the opposite of something"},
+            {"depict","represent or show something in a particular way"},
+            {"diminish","make or become smaller or less important"},
+            {"disclose","reveal information"},
+            {"emerge","become known or visible"},
+            {"empirical","based on observation or experiment"},
+            {"ethical","relating to principles of right and wrong"},
+            {"fundamental","forming the essential basis of something"},
+            {"hypothetical","based on an imagined situation"},
+            {"objective","not influenced by personal feelings"},
+            {"persistent","continuing firmly despite difficulty"},
+            {"precise","exact and accurate"},
+            {"preliminary","coming before the main event or action"},
+            {"rational","based on reason rather than emotion"},
+            {"relevant","closely connected with the matter at hand"},
+            {"rigorous","extremely thorough and demanding"},
+            {"scarce","insufficient or hard to find"},
+            {"subsequent","coming after something else"},
+            {"tentative","not certain or definite"},
+            {"transform","change something substantially"},
+            {"undermine","weaken gradually or indirectly"},
+            {"validate","confirm that something is accurate or legitimate"},
+            {"viable","capable of working successfully"},
+            {"widespread","found or occurring over a large area"},
+            {"accommodate","provide enough space or adjust to someone's needs"},
+            {"conventional","based on traditional or widely accepted practice"},
+            {"discrete","separate or distinct"},
+            {"elaborate","detailed and carefully developed"},
+            {"exceed","go beyond a limit or expectation"},
+            {"fluctuate","change irregularly in amount or level"},
+            {"formulate","create or develop a plan or idea"},
+            {"hinder","make progress difficult"},
+            {"justify","show that something is reasonable or necessary"},
+            {"notion","an idea or belief about something"},
+            {"paradox","a statement that seems contradictory but may be true"},
+            {"precede","come before in time or order"},
+            {"retain","continue to have or keep"},
+            {"simulate","imitate the conditions of a real situation"},
+            {"speculate","form an opinion without firm evidence"},
+            {"transparent","easy to understand or openly shown"},
+            {"unprecedented","never having happened before"},
+            {"undertake","begin and accept responsibility for a task"},
+            {"utilize","make practical use of something"},
+            {"whereas","used to contrast two facts or situations"},
+            {"contemporary","existing or happening at the same time or in the present"},
+            {"discrepancy","a difference between things that should agree"},
+            {"exacerbate","make a problem worse"},
+            {"indispensable","absolutely necessary"},
+            {"inhibit","prevent or slow an action"},
+            {"integrity","honesty and strong moral principles"},
+            {"legitimate","lawful or reasonable"},
+            {"novel","new and original"},
         };
         ArrayList<String[]> out=new ArrayList<>();
         for(int i=0;i<w.length;i++){
-            String en=w[i][0], fa=w[i][1];
-            int j1=(i+7)%w.length, j2=(i+17)%w.length, j3=(i+31)%w.length;
-            String e1=w[j1][0], e2=w[j2][0], e3=w[j3][0];
-            String f1=w[j1][1], f2=w[j2][1], f3=w[j3][1];
-            out.add(new String[]{"What is the English word for \""+fa+"\"?","🇬🇧",en,e1,e2,e3});
-            out.add(new String[]{"What is the Persian meaning of \""+en+"\"?","🇬🇧",fa,f1,f2,f3});
-            out.add(new String[]{"Choose the correct translation for \""+en+"\".","🇬🇧",fa,f1,f2,f3});
-            out.add(new String[]{"Which English word means \""+fa+"\"?","🇬🇧",en,e2,e3,e1});
-            out.add(new String[]{"Select the English equivalent of \""+fa+"\".","🇬🇧",en,e3,e1,e2});
+            String term=w[i][0], def=w[i][1];
+            int j1=(i+11)%w.length, j2=(i+37)%w.length, j3=(i+63)%w.length;
+            String d1=w[j1][1], d2=w[j2][1], d3=w[j3][1];
+            String t1=w[j1][0], t2=w[j2][0], t3=w[j3][0];
+            out.add(new String[]{"Which word best matches this definition: \""+def+"\"?","🇬🇧",term,t1,t2,t3});
+            out.add(new String[]{"Which definition best matches the word \""+term+"\"?","🇬🇧",def,d1,d2,d3});
+            out.add(new String[]{"Choose the closest meaning of \""+term+"\".","🇬🇧",def,d1,d2,d3});
+            out.add(new String[]{"Select the word that means \""+def+"\".","🇬🇧",term,t2,t3,t1});
+            out.add(new String[]{"In formal English, which option correctly matches \""+term+"\"?","🇬🇧",def,d3,d1,d2});
         }
         return out;
     }
@@ -1157,14 +1250,16 @@ public class MainActivity extends Activity {
         questions.clear();
         ArrayList<String[]> all=new ArrayList<>();
         all.addAll(Arrays.asList(facts));
-        all.addAll(Arrays.asList(englishFacts));
-        all.addAll(Arrays.asList(moreEnglishFacts));
         all.addAll(Arrays.asList(iranFacts));
         all.addAll(Arrays.asList(specializedFacts));
         all.addAll(Arrays.asList(extraSpecializedFacts));
         all.addAll(Arrays.asList(iranAdvancedFacts));
-        all.addAll(generatedEnglish500());
+        ArrayList<String[]> english=new ArrayList<>(generatedEnglish500());
         Random rnd=new Random(System.nanoTime());
+        Collections.shuffle(all,rnd);
+        Collections.shuffle(english,rnd);
+        ArrayList<Question> nonEnglishQ=new ArrayList<>();
+        ArrayList<Question> englishQ=new ArrayList<>();
         HashSet<String> seen=new HashSet<>();
         for(String[] f:all){
             if(f.length<6 || !seen.add(f[0])) continue;
@@ -1172,9 +1267,23 @@ public class MainActivity extends Activity {
             ArrayList<String> shuffled=new ArrayList<>(Arrays.asList(opts));
             Collections.shuffle(shuffled,rnd);
             int correct=shuffled.indexOf(f[2]);
-            questions.add(new Question(f[0],f[1],shuffled.toArray(new String[0]),correct));
+            nonEnglishQ.add(new Question(f[0],f[1],shuffled.toArray(new String[0]),correct));
         }
-        Collections.shuffle(questions,rnd);
+        seen.clear();
+        for(String[] f:english){
+            if(f.length<6 || !seen.add(f[0])) continue;
+            String[] opts={f[2],f[3],f[4],f[5]};
+            ArrayList<String> shuffled=new ArrayList<>(Arrays.asList(opts));
+            Collections.shuffle(shuffled,rnd);
+            int correct=shuffled.indexOf(f[2]);
+            englishQ.add(new Question(f[0],f[1],shuffled.toArray(new String[0]),correct));
+        }
+        int ni=0, ei=0;
+        while(ni<nonEnglishQ.size()){
+            for(int k=0;k<10 && ni<nonEnglishQ.size();k++) questions.add(nonEnglishQ.get(ni++));
+            if(ei<englishQ.size()) questions.add(englishQ.get(ei++));
+        }
+        while(ei<englishQ.size()) questions.add(englishQ.get(ei++));
     }
 
     void startGame(){
@@ -1187,7 +1296,7 @@ public class MainActivity extends Activity {
             return;
         }
         questions=new ArrayList<>(fresh);
-        Collections.shuffle(questions,new Random(System.nanoTime()));
+        // ترتیب ۱۰ سؤال عمومی + ۱ سؤال انگلیسی حفظ می‌شود؛ در شروع بازی دوباره shuffle نمی‌کنیم.
         inGame=true;showQuestion();
     }
 
@@ -1219,8 +1328,8 @@ public class MainActivity extends Activity {
         tp.setMargins(dp(8),0,dp(8),0);
         top.addView(timerView,tp);
 
-        TextView lifeView=text("♥  "+fa(lives),16);
-        lifeView.setTextColor(Color.rgb(255,105,130));
+        TextView lifeView=text("جان  "+fa(lives),16);
+        lifeView.setTextColor(Color.WHITE);
         lifeView.setGravity(Gravity.CENTER);
         lifeView.setBackground(bg(Color.argb(230,75,22,55),Color.argb(220,35,12,42),22));
         top.addView(lifeView,new LinearLayout.LayoutParams(dp(74),dp(48)));
@@ -1326,9 +1435,6 @@ public class MainActivity extends Activity {
         if(questionTimer!=null){questionTimer.cancel();questionTimer=null;}
         try{tone.stopTone();}catch(Exception ignored){}
         currentBackground=4; base();
-        TextView icon=title("♥",56);
-        icon.setTextColor(Color.rgb(255,95,120));
-        root.addView(icon,new LinearLayout.LayoutParams(-1,dp(90)));
         TextView h=title("جان‌ها تمام شد",27);
         h.setGravity(Gravity.CENTER);
         root.addView(h,new LinearLayout.LayoutParams(-1,dp(60)));
