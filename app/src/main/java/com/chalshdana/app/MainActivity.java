@@ -136,6 +136,108 @@ public class MainActivity extends Activity {
         {"Complete: They ___ friends.","🇬🇧","are","is","am","be"}
     };
 
+    final String[][] moreEnglishFacts = {
+        {"What does \"car\" mean in Persian?","🇬🇧","ماشین","bus","car","train"},
+        {"What does \"school\" mean in Persian?","🇬🇧","مدرسه","hospital","school","office"},
+        {"What does \"teacher\" mean in Persian?","🇬🇧","معلم","teacher","student","doctor"},
+        {"What does \"book\" mean in Persian?","🇬🇧","کتاب","pen","book","bag"},
+        {"What does \"window\" mean in Persian?","🇬🇧","پنجره","window","wall","door"},
+        {"What does \"door\" mean in Persian?","🇬🇧","در","roof","door","room"},
+        {"What does \"chair\" mean in Persian?","🇬🇧","صندلی","chair","table","bed"},
+        {"What does \"table\" mean in Persian?","🇬🇧","میز","table","plate","cup"},
+        {"What does \"phone\" mean in Persian?","🇬🇧","تلفن","phone","camera","radio"},
+        {"What does \"computer\" mean in Persian?","🇬🇧","رایانه","computer","printer","screen"},
+        {"What does \"red\" mean in Persian?","🇬🇧","قرمز","red","green","blue"},
+        {"What does \"green\" mean in Persian?","🇬🇧","سبز","green","white","yellow"},
+        {"What does \"yellow\" mean in Persian?","🇬🇧","زرد","purple","yellow","orange"},
+        {"What does \"black\" mean in Persian?","🇬🇧","سیاه","black","white","gray"},
+        {"What does \"white\" mean in Persian?","🇬🇧","سفید","white","black","red"},
+        {"What does \"one\" mean in Persian?","🇬🇧","یک","two","one","three"},
+        {"What does \"five\" mean in Persian?","🇬🇧","پنج","four","five","six"},
+        {"What does \"ten\" mean in Persian?","🇬🇧","ده","eight","nine","ten"},
+        {"What does \"Monday\" mean in Persian?","🇬🇧","دوشنبه","Monday","Friday","Sunday"},
+        {"What does \"Sunday\" mean in Persian?","🇬🇧","یکشنبه","Sunday","Monday","Saturday"},
+        {"What does \"summer\" mean in Persian?","🇬🇧","تابستان","winter","summer","spring"},
+        {"What does \"winter\" mean in Persian?","🇬🇧","زمستان","winter","summer","spring"},
+        {"What does \"rain\" mean in Persian?","🇬🇧","باران","rain","snow","wind"},
+        {"What does \"sun\" mean in Persian?","🇬🇧","خورشید","moon","sun","star"},
+        {"What does \"moon\" mean in Persian?","🇬🇧","ماه","moon","sun","planet"},
+        {"What does \"family\" mean in Persian?","🇬🇧","خانواده","family","friend","neighbor"},
+        {"What does \"mother\" mean in Persian?","🇬🇧","مادر","mother","sister","aunt"},
+        {"What does \"father\" mean in Persian?","🇬🇧","پدر","father","brother","uncle"},
+        {"What does \"water\" mean in Persian?","🇬🇧","آب","water","milk","juice"},
+        {"What does \"bread\" mean in Persian?","🇬🇧","نان","bread","rice","cheese"},
+        {"Which word means \"کتاب\" in English?","🇬🇧","book","book","pen","page"},
+        {"Which word means \"مدرسه\" in English?","🇬🇧","school","school","house","shop"},
+        {"Which word means \"معلم\" in English?","🇬🇧","teacher","teacher","doctor","student"},
+        {"Which word means \"ماشین\" in English?","🇬🇧","car","car","bus","bike"},
+        {"Which word means \"پنجره\" in English?","🇬🇧","window","window","door","wall"},
+        {"Which word means \"دویدن\" in English?","🇬🇧","run","run","walk","sit"},
+        {"Which word means \"خوابیدن\" in English?","🇬🇧","sleep","sleep","eat","read"},
+        {"Which word means \"خوردن\" in English?","🇬🇧","eat","eat","drink","run"},
+        {"Which word means \"نوشیدن\" in English?","🇬🇧","drink","drink","eat","cook"},
+        {"Which word means \"دیدن\" in English?","🇬🇧","see","see","hear","say"},
+        {"What is the opposite of \"old\"?","🇬🇧","young","young","slow","small"},
+        {"What is the opposite of \"easy\"?","🇬🇧","difficult","difficult","early","quiet"},
+        {"What is the opposite of \"clean\"?","🇬🇧","dirty","dirty","bright","empty"},
+        {"What is the opposite of \"early\"?","🇬🇧","late","late","fast","young"},
+        {"What is the opposite of \"open\"?","🇬🇧","closed","closed","wide","high"},
+        {"What is the opposite of \"strong\"?","🇬🇧","weak","weak","heavy","hard"},
+        {"What is the opposite of \"new\"?","🇬🇧","old","old","young","small"},
+        {"What is the opposite of \"near\"?","🇬🇧","far","far","early","high"},
+        {"Complete: He ___ a doctor.","🇬🇧","is","is","are","am"},
+        {"Complete: We ___ ready.","🇬🇧","are","are","is","am"},
+        {"Complete: I ___ happy.","🇬🇧","am","am","is","are"},
+        {"Complete: It ___ cold.","🇬🇧","is","is","are","am"},
+        {"Complete: You ___ my friend.","🇬🇧","are","are","is","am"},
+        {"Complete: She ___ English.","🇬🇧","speaks","speaks","speak","speaking"},
+        {"Complete: They ___ football every day.","🇬🇧","play","play","plays","playing"},
+        {"Complete: He ___ coffee every morning.","🇬🇧","drinks","drinks","drink","drinking"},
+        {"Choose the correct article: ___ apple.","🇬🇧","an","a","an","the"},
+        {"Choose the correct article: ___ book.","🇬🇧","a","a","an","the"},
+        {"Choose the correct article: ___ orange.","🇬🇧","an","a","an","the"},
+        {"Choose the correct plural: one cat, two ___.","🇬🇧","cats","cats","cat","cates"},
+        {"Choose the correct plural: one box, two ___.","🇬🇧","boxes","boxes","boxs","box"},
+        {"Choose the correct plural: one man, two ___.","🇬🇧","men","men","mans","manes"},
+        {"Choose the correct plural: one woman, two ___.","🇬🇧","women","women","womans","womanes"},
+        {"Which word is a fruit?","🇬🇧","banana","banana","chair","teacher"},
+        {"Which word is a drink?","🇬🇧","milk","milk","bread","apple"},
+        {"Which word is a place?","🇬🇧","hospital","hospital","happy","blue"},
+        {"Which word is an action?","🇬🇧","run","run","table","yellow"},
+        {"Which word is a person?","🇬🇧","doctor","doctor","water","green"},
+        {"Which word is an animal?","🇬🇧","rabbit","rabbit","window","teacher"},
+        {"Which word is a number?","🇬🇧","seven","seven","summer","silver"},
+        {"Which word is a day?","🇬🇧","Friday","Friday","January","winter"},
+        {"Which word is a month?","🇬🇧","January","January","Monday","summer"},
+        {"Which word is a color?","🇬🇧","purple","purple","teacher","house"},
+        {"What is the English word for \"سلام\"?","🇬🇧","hello","hello","goodbye","thanks"},
+        {"What is the English word for \"ممنون\"?","🇬🇧","thanks","thanks","hello","sorry"},
+        {"What is the English word for \"بله\"?","🇬🇧","yes","yes","no","why"},
+        {"What is the English word for \"نه\"?","🇬🇧","no","no","yes","maybe"},
+        {"What is the English word for \"لطفاً\"?","🇬🇧","please","please","sorry","thanks"},
+        {"What is the English word for \"ببخشید\"?","🇬🇧","sorry","sorry","please","welcome"},
+        {"What does \"where\" ask about?","🇬🇧","place","place","time","person"},
+        {"What does \"when\" ask about?","🇬🇧","time","time","place","person"},
+        {"What does \"who\" ask about?","🇬🇧","person","person","place","time"},
+        {"What does \"why\" ask about?","🇬🇧","reason","reason","place","time"},
+        {"What does \"how\" ask about?","🇬🇧","way or manner","way or manner","place","person"},
+        {"Choose the correct question: ___ are you?","🇬🇧","How","How","Where","When"},
+        {"Choose the correct question: ___ is your name?","🇬🇧","What","What","Who","Where"},
+        {"Choose the correct question: ___ do you live?","🇬🇧","Where","Where","Why","Who"},
+        {"Choose the correct question: ___ is your birthday?","🇬🇧","When","When","Where","Who"},
+        {"Choose the correct word: This is ___ book.","🇬🇧","my","my","me","I"},
+        {"Choose the correct word: That is ___ car.","🇬🇧","her","her","she","herself"},
+        {"Choose the correct word: This bag is ___.","🇬🇧","mine","mine","my","I"},
+        {"Choose the correct word: They are ___ friends.","🇬🇧","our","our","we","us"},
+        {"Choose the correct word: The dog is ___ the table.","🇬🇧","under","under","quick","blue"},
+        {"Choose the correct word: The book is ___ the desk.","🇬🇧","on","on","fast","green"},
+        {"Choose the correct word: I go ___ school every day.","🇬🇧","to","to","at","on"},
+        {"Choose the correct word: She is good ___ English.","🇬🇧","at","at","on","to"},
+        {"Choose the correct word: I am interested ___ music.","🇬🇧","in","in","at","on"},
+        {"Choose the correct word: We arrived ___ Monday.","🇬🇧","on","on","in","at"},
+        {"Choose the correct word: I wake up ___ 7 o’clock.","🇬🇧","at","at","on","in"},
+    };
+
     final String[][] specializedFacts = {
         {"نماد شیمیایی اکسیژن چیست؟","⚗️","O","H","N","C"},
         {"نماد شیمیایی کربن چیست؟","⚗️","C","Ca","Co","Cr"},
@@ -705,7 +807,7 @@ public class MainActivity extends Activity {
 
     void showProfileEditor(){
         final LinearLayout box=new LinearLayout(this); box.setOrientation(LinearLayout.VERTICAL); box.setGravity(Gravity.CENTER_HORIZONTAL); box.setPadding(dp(20),dp(8),dp(20),dp(8)); box.setLayoutDirection(View.LAYOUT_DIRECTION_RTL);
-        final ImageView avatar=new ImageView(this); avatar.setScaleType(ImageView.ScaleType.CENTER_CROP); avatar.setBackground(bg(Color.rgb(25,75,145),Color.rgb(8,30,75),80));
+        final ImageView avatar=new ImageView(this); avatar.setScaleType(ImageView.ScaleType.CENTER_CROP); avatar.setClipToOutline(true); avatar.setOutlineProvider(new android.view.ViewOutlineProvider(){ public void getOutline(View v, android.graphics.Outline o){o.setOval(0,0,v.getWidth(),v.getHeight());} }); avatar.setBackground(bg(Color.argb(30,255,255,255),Color.argb(20,255,255,255),80));
         LinearLayout.LayoutParams ap=new LinearLayout.LayoutParams(dp(112),dp(112)); ap.setMargins(0,0,0,dp(12)); box.addView(avatar,ap);
         if(!profileImageUri.isEmpty()) try{avatar.setImageURI(Uri.parse(profileImageUri));}catch(Exception ignored){}
         else {avatar.setImageResource(R.drawable.icon_dana); avatar.setPadding(dp(12),dp(12),dp(12),dp(12));}
@@ -719,7 +821,7 @@ public class MainActivity extends Activity {
 
     void addProfileCard(){
         LinearLayout card=new LinearLayout(this); card.setOrientation(LinearLayout.HORIZONTAL); card.setGravity(Gravity.CENTER_VERTICAL); card.setPadding(dp(12),dp(10),dp(12),dp(10)); card.setLayoutDirection(View.LAYOUT_DIRECTION_RTL); card.setBackground(bg(Color.argb(225,20,53,105),Color.argb(225,7,22,60),26));
-        ImageView avatar=new ImageView(this); avatar.setScaleType(ImageView.ScaleType.CENTER_CROP); avatar.setBackground(bg(Color.rgb(255,197,55),Color.rgb(180,105,12),80));
+        ImageView avatar=new ImageView(this); avatar.setScaleType(ImageView.ScaleType.CENTER_CROP); avatar.setClipToOutline(true); avatar.setOutlineProvider(new android.view.ViewOutlineProvider(){ public void getOutline(View v, android.graphics.Outline o){o.setOval(0,0,v.getWidth(),v.getHeight());} }); avatar.setBackground(bg(Color.argb(20,255,255,255),Color.argb(10,255,255,255),80));
         if(!profileImageUri.isEmpty()) try{avatar.setImageURI(Uri.parse(profileImageUri));}catch(Exception ignored){}
         else {avatar.setImageResource(R.drawable.icon_dana); avatar.setPadding(dp(8),dp(8),dp(8),dp(8));}
         card.addView(avatar,new LinearLayout.LayoutParams(dp(68),dp(68)));
@@ -736,47 +838,50 @@ public class MainActivity extends Activity {
         try{tone.stopTone();}catch(Exception ignored){}
         backArmed=false; currentBackground=0; base();
 
-        // Clean top bar: coins on the left, profile + settings on the right.
+        // خانه: بدون لوگو/عنوان اضافی؛ فقط دکمه شروع، نوار بالا و منوی پایین.
         LinearLayout top=new LinearLayout(this);
         top.setOrientation(LinearLayout.HORIZONTAL);
         top.setGravity(Gravity.CENTER_VERTICAL);
         top.setLayoutDirection(View.LAYOUT_DIRECTION_LTR);
 
-        TextView coinPill=text("🪙  "+fa(coin)+" سکه",14);
+        TextView gear=text("⚙",22);
+        gear.setGravity(Gravity.CENTER);
+        gear.setTextColor(Color.WHITE);
+        gear.setBackground(bg(Color.argb(205,18,75,145),Color.argb(205,7,30,78),50));
+        gear.setOnClickListener(v->showProfileEditor());
+        top.addView(gear,new LinearLayout.LayoutParams(dp(46),dp(46)));
+
+        Space topSpace=new Space(this);
+        top.addView(topSpace,new LinearLayout.LayoutParams(0,dp(46),1));
+
+        // بدون مربع/ایموجی اضافه کنار سکه
+        TextView coinPill=text(fa(coin)+" سکه",14);
         coinPill.setTextColor(Color.rgb(255,220,85));
         coinPill.setGravity(Gravity.CENTER);
         coinPill.setSingleLine(true);
-        coinPill.setBackground(bg(Color.argb(210,15,43,95),Color.argb(200,7,22,58),22));
-        top.addView(coinPill,new LinearLayout.LayoutParams(dp(112),dp(44)));
-
-        Space topSpace=new Space(this);
-        top.addView(topSpace,new LinearLayout.LayoutParams(0,dp(44),1));
+        coinPill.setBackground(bg(Color.argb(205,15,43,95),Color.argb(195,7,22,58),22));
+        top.addView(coinPill,new LinearLayout.LayoutParams(dp(96),dp(44)));
 
         ImageView profileIcon=new ImageView(this);
-        profileIcon.setScaleType(ImageView.ScaleType.CENTER_CROP);
-        profileIcon.setBackground(bg(Color.argb(210,18,75,145),Color.argb(210,7,30,78),50));
+        profileIcon.setScaleType(ImageView.ScaleType.CENTER_CROP); profileIcon.setClipToOutline(true); profileIcon.setOutlineProvider(new android.view.ViewOutlineProvider(){ public void getOutline(View v, android.graphics.Outline o){o.setOval(0,0,v.getWidth(),v.getHeight());} });
+        profileIcon.setBackground(bg(Color.argb(205,18,75,145),Color.argb(205,7,30,78),50));
         if(!profileImageUri.isEmpty()){
-            try{profileIcon.setImageURI(Uri.parse(profileImageUri));}catch(Exception ignored){profileIcon.setImageResource(R.drawable.icon_dana);}
+            try{profileIcon.setImageURI(Uri.parse(profileImageUri));}catch(Exception ignored){profileIcon.setImageResource(android.R.drawable.ic_menu_myplaces);}
         }else{
             profileIcon.setImageResource(android.R.drawable.ic_menu_myplaces);
             profileIcon.setColorFilter(Color.WHITE);
         }
-        profileIcon.setPadding(dp(9),dp(9),dp(9),dp(9));
+        profileIcon.setPadding(dp(8),dp(8),dp(8),dp(8));
         profileIcon.setOnClickListener(v->showProfileEditor());
-        top.addView(profileIcon,new LinearLayout.LayoutParams(dp(46),dp(46)));
-
-        TextView gear=text("⚙",22);
-        gear.setGravity(Gravity.CENTER);
-        gear.setTextColor(Color.WHITE);
-        gear.setBackground(bg(Color.argb(210,18,75,145),Color.argb(210,7,30,78),50));
-        gear.setOnClickListener(v->showProfileEditor());
-        LinearLayout.LayoutParams gp=new LinearLayout.LayoutParams(dp(46),dp(46));
-        gp.setMargins(dp(7),0,0,0);
-        top.addView(gear,gp);
+        LinearLayout.LayoutParams pp=new LinearLayout.LayoutParams(dp(46),dp(46));
+        pp.setMargins(dp(7),0,0,0);
+        top.addView(profileIcon,pp);
         root.addView(top,new LinearLayout.LayoutParams(-1,dp(48)));
 
-        Space upper=new Space(this);
-        root.addView(upper,new LinearLayout.LayoutParams(1,dp(95)));
+        // فاصله متناسب با صفحه برای قرار گرفتن شروع چالش در مرکز
+        int heightDp=(int)(getResources().getDisplayMetrics().heightPixels/getResources().getDisplayMetrics().density);
+        int centerGap=Math.max(90, (heightDp-48-70-90-76)/2);
+        root.addView(new Space(this),new LinearLayout.LayoutParams(1,dp(centerGap)));
 
         Button start=button("✦   شروع چالش   ›");
         start.setTextSize(responsiveTextSize(18));
@@ -787,10 +892,8 @@ public class MainActivity extends Activity {
         sb.setMargins(0,0,0,dp(8));
         root.addView(start,sb);
 
-        // Keep the lower navigation at the bottom without adding extra home cards.
-        int heightDp=(int)(getResources().getDisplayMetrics().heightPixels/getResources().getDisplayMetrics().density);
-        int spacerDp=Math.max(100,heightDp-390);
-        root.addView(new Space(this),new LinearLayout.LayoutParams(1,dp(spacerDp)));
+        int remaining=Math.max(70,heightDp-centerGap-48-70-76-40);
+        root.addView(new Space(this),new LinearLayout.LayoutParams(1,dp(remaining)));
         addBottomNavStandalone();
     }
 
@@ -850,9 +953,16 @@ public class MainActivity extends Activity {
         addBottomNavStandalone();
     }
 
+    GradientDrawable goldNavBg(){
+        GradientDrawable g=new GradientDrawable(GradientDrawable.Orientation.TL_BR, new int[]{Color.argb(235,8,48,82),Color.argb(230,4,24,52)});
+        g.setCornerRadius(dp(22));
+        g.setStroke(dp(2),Color.argb(210,255,205,70));
+        return g;
+    }
+
     void addBottomNavStandalone(){
         Space sp=new Space(this); root.addView(sp,new LinearLayout.LayoutParams(1,dp(10)));
-        LinearLayout nav=new LinearLayout(this); nav.setOrientation(LinearLayout.HORIZONTAL); nav.setGravity(Gravity.CENTER); nav.setPadding(dp(6),dp(4),dp(6),dp(4)); nav.setBackground(bg(Color.argb(230,5,44,75),Color.argb(230,4,22,50),22));
+        LinearLayout nav=new LinearLayout(this); nav.setOrientation(LinearLayout.HORIZONTAL); nav.setGravity(Gravity.CENTER); nav.setPadding(dp(6),dp(4),dp(6),dp(4)); nav.setBackground(goldNavBg());
         String[] labels={"⌂\nخانه","🏆\nرتبه‌ها","★\nعلاقه‌مندی‌ها","👤\nپروفایل"};
         for(String lab:labels){ TextView n=text(lab,12); n.setGravity(Gravity.CENTER); nav.addView(n,new LinearLayout.LayoutParams(0,dp(64),1)); if(lab.contains("رتبه")) n.setOnClickListener(v->showRankings()); else if(lab.contains("علاقه")) n.setOnClickListener(v->showFavorites()); else if(lab.contains("پروفایل")) n.setOnClickListener(v->showProfileEditor()); else n.setOnClickListener(v->showHome()); }
         root.addView(nav,new LinearLayout.LayoutParams(-1,dp(76)));
@@ -1004,15 +1114,56 @@ public class MainActivity extends Activity {
         {"کدام شهر ایران به تولید زعفران و زرشک در خراسان جنوبی شناخته می‌شود؟","🌱","قائنات","بندر انزلی","کاشان","کرمانشاه"}
     };
 
+    ArrayList<String[]> generatedEnglish500(){
+        String[][] w={
+            {"hello","سلام"},{"goodbye","خداحافظ"},{"please","لطفاً"},{"thanks","ممنون"},{"sorry","متأسفم"},
+            {"yes","بله"},{"no","نه"},{"water","آب"},{"food","غذا"},{"bread","نان"},
+            {"milk","شیر"},{"apple","سیب"},{"orange","پرتقال"},{"banana","موز"},{"book","کتاب"},
+            {"pen","خودکار"},{"pencil","مداد"},{"school","مدرسه"},{"teacher","معلم"},{"student","دانش‌آموز"},
+            {"house","خانه"},{"room","اتاق"},{"door","در"},{"window","پنجره"},{"table","میز"},
+            {"chair","صندلی"},{"bed","تخت"},{"car","ماشین"},{"bus","اتوبوس"},{"train","قطار"},
+            {"road","جاده"},{"street","خیابان"},{"city","شهر"},{"country","کشور"},{"world","جهان"},
+            {"family","خانواده"},{"mother","مادر"},{"father","پدر"},{"brother","برادر"},{"sister","خواهر"},
+            {"friend","دوست"},{"child","کودک"},{"man","مرد"},{"woman","زن"},{"person","شخص"},
+            {"happy","خوشحال"},{"sad","غمگین"},{"big","بزرگ"},{"small","کوچک"},{"fast","سریع"},
+            {"slow","آهسته"},{"hot","گرم"},{"cold","سرد"},{"new","جدید"},{"old","قدیمی"},
+            {"easy","آسان"},{"difficult","سخت"},{"beautiful","زیبا"},{"strong","قوی"},{"weak","ضعیف"},
+            {"clean","تمیز"},{"dirty","کثیف"},{"early","زود"},{"late","دیر"},{"day","روز"},
+            {"night","شب"},{"morning","صبح"},{"evening","عصر"},{"today","امروز"},{"tomorrow","فردا"},
+            {"yesterday","دیروز"},{"time","زمان"},{"year","سال"},{"month","ماه"},{"week","هفته"},
+            {"one","یک"},{"two","دو"},{"three","سه"},{"four","چهار"},{"five","پنج"},
+            {"red","قرمز"},{"blue","آبی"},{"green","سبز"},{"white","سفید"},{"black","سیاه"},
+            {"sun","خورشید"},{"moon","ماه"},{"star","ستاره"},{"sky","آسمان"},{"rain","باران"},
+            {"book","کتاب"},{"read","خواندن"},{"write","نوشتن"},{"speak","صحبت کردن"},{"listen","گوش دادن"},
+            {"see","دیدن"},{"look","نگاه کردن"},{"go","رفتن"},{"come","آمدن"},{"eat","خوردن"},
+            {"drink","نوشیدن"},{"sleep","خوابیدن"},{"run","دویدن"},{"walk","راه رفتن"},{"work","کار کردن"}
+        };
+        ArrayList<String[]> out=new ArrayList<>();
+        for(int i=0;i<w.length;i++){
+            String en=w[i][0], fa=w[i][1];
+            int j1=(i+7)%w.length, j2=(i+17)%w.length, j3=(i+31)%w.length;
+            String e1=w[j1][0], e2=w[j2][0], e3=w[j3][0];
+            String f1=w[j1][1], f2=w[j2][1], f3=w[j3][1];
+            out.add(new String[]{"What is the English word for \""+fa+"\"?","🇬🇧",en,e1,e2,e3});
+            out.add(new String[]{"What is the Persian meaning of \""+en+"\"?","🇬🇧",fa,f1,f2,f3});
+            out.add(new String[]{"Choose the correct translation for \""+en+"\".","🇬🇧",fa,f1,f2,f3});
+            out.add(new String[]{"Which English word means \""+fa+"\"?","🇬🇧",en,e2,e3,e1});
+            out.add(new String[]{"Select the English equivalent of \""+fa+"\".","🇬🇧",en,e3,e1,e2});
+        }
+        return out;
+    }
+
     void buildQuestions(){
         questions.clear();
         ArrayList<String[]> all=new ArrayList<>();
         all.addAll(Arrays.asList(facts));
         all.addAll(Arrays.asList(englishFacts));
+        all.addAll(Arrays.asList(moreEnglishFacts));
         all.addAll(Arrays.asList(iranFacts));
         all.addAll(Arrays.asList(specializedFacts));
         all.addAll(Arrays.asList(extraSpecializedFacts));
         all.addAll(Arrays.asList(iranAdvancedFacts));
+        all.addAll(generatedEnglish500());
         Random rnd=new Random(System.nanoTime());
         HashSet<String> seen=new HashSet<>();
         for(String[] f:all){
