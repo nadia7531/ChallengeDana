@@ -1,10 +1,29 @@
 plugins { id 'com.android.application' }
 
 android { namespace 'com.chalshdana.app'; compileSdk 35
+    signingConfigs {
+        release {
+            def ks = System.getenv('DANA_KEYSTORE_FILE')
+            if (ks != null && !ks.isEmpty()) {
+                storeFile file(ks)
+                storePassword System.getenv('DANA_KEYSTORE_PASSWORD')
+                keyAlias System.getenv('DANA_KEY_ALIAS')
+                keyPassword System.getenv('DANA_KEY_PASSWORD')
+            }
+        }
+    }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_17
         targetCompatibility JavaVersion.VERSION_17
     }
 
-    defaultConfig { applicationId 'com.chalshdana.app'; minSdk 23; targetSdk 35; versionCode 3; versionName '1.2' }
+    defaultConfig { applicationId 'com.chalshdana.app'; minSdk 23; targetSdk 35; versionCode 4; versionName '1.3' }
+    buildTypes {
+        release {
+            minifyEnabled false
+            if (System.getenv('DANA_KEYSTORE_FILE') != null) {
+                signingConfig signingConfigs.release
+            }
+        }
+    }
 }

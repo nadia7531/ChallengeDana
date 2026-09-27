@@ -1,0 +1,11 @@
+راهنمای امضای نسخه Release چلنج دانا
+
+برای ساخت APK امضاشده در GitHub Actions، این ۴ Secret و یک Secret مربوط به فایل را در Repository بسازید:
+DANA_KEYSTORE_BASE64
+DANA_KEYSTORE_PASSWORD
+DANA_KEY_ALIAS
+DANA_KEY_PASSWORD
+
+فایل keystore را نباید داخل پروژه یا ZIP عمومی قرار دهید. مقدار DANA_KEYSTORE_BASE64 باید Base64 همان فایل keystore باشد.
+
+اگر هنوز keystore ندارید، در Android Studio یک keystore برای Release بسازید و آن را امن نگه دارید.

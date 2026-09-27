@@ -1,4 +1,4 @@
-name: Build APK
+name: Build Release APK
 
 on:
   push:
@@ -30,12 +30,23 @@ jobs:
         with:
           gradle-version: "8.7"
 
-      - name: Build Debug APK
-        run: gradle --no-daemon assembleDebug --stacktrace
+      - name: Prepare signing key
+        if: ${{ secrets.DANA_KEYSTORE_BASE64 != '' }}
+        env:
+          DANA_KEYSTORE_BASE64: ${{ secrets.DANA_KEYSTORE_BASE64 }}
+        run: |
+          echo "$DANA_KEYSTORE_BASE64" | base64 --decode > "$RUNNER_TEMP/dana-release.jks"
+          echo "DANA_KEYSTORE_FILE=$RUNNER_TEMP/dana-release.jks" >> "$GITHUB_ENV"
+          echo "DANA_KEYSTORE_PASSWORD=${{ secrets.DANA_KEYSTORE_PASSWORD }}" >> "$GITHUB_ENV"
+          echo "DANA_KEY_ALIAS=${{ secrets.DANA_KEY_ALIAS }}" >> "$GITHUB_ENV"
+          echo "DANA_KEY_PASSWORD=${{ secrets.DANA_KEY_PASSWORD }}" >> "$GITHUB_ENV"
 
-      - name: Upload APK
+      - name: Build Release APK
+        run: gradle --no-daemon assembleRelease --stacktrace
+
+      - name: Upload Release APK
         uses: actions/upload-artifact@v4
         with:
-          name: challenge-dana-apk
-          path: app/build/outputs/apk/debug/app-debug.apk
+          name: challenge-dana-release-apk
+          path: app/build/outputs/apk/release/app-release.apk
           if-no-files-found: error
