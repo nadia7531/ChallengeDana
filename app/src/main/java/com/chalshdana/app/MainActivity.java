@@ -4,7 +4,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.os.Bundle;
 import android.os.CountDownTimer;
-import android.graphics.Color;
+import android.graphics.*;
 import android.graphics.Typeface;
 import android.graphics.drawable.GradientDrawable;
 import android.view.Gravity;
@@ -805,12 +805,37 @@ public class MainActivity extends Activity {
         }
     }
 
+    void setCircularImage(ImageView view, Uri uri, int fallbackRes){
+        try{
+            if(uri!=null){
+                android.graphics.Bitmap src=null;
+                try(java.io.InputStream in=getContentResolver().openInputStream(uri)){ if(in!=null) src=BitmapFactory.decodeStream(in); }
+                if(src!=null){
+                    int size=Math.min(src.getWidth(),src.getHeight());
+                    int left=(src.getWidth()-size)/2, top=(src.getHeight()-size)/2;
+                    Bitmap square=Bitmap.createBitmap(src,left,top,size,size);
+                    Bitmap out=Bitmap.createBitmap(size,size,Bitmap.Config.ARGB_8888);
+                    Canvas c=new Canvas(out); Paint paint=new Paint(Paint.ANTI_ALIAS_FLAG);
+                    c.drawCircle(size/2f,size/2f,size/2f,paint);
+                    paint.setShader(new BitmapShader(square,Shader.TileMode.CLAMP,Shader.TileMode.CLAMP));
+                    c.drawCircle(size/2f,size/2f,size/2f,paint);
+                    view.setImageBitmap(out);
+                    view.setPadding(0,0,0,0);
+                    view.setBackgroundColor(Color.TRANSPARENT);
+                    return;
+                }
+            }
+        }catch(Exception ignored){}
+        view.setImageResource(fallbackRes);
+        view.setPadding(0,0,0,0);
+        view.setBackgroundColor(Color.TRANSPARENT);
+    }
+
     void showProfileEditor(){
         final LinearLayout box=new LinearLayout(this); box.setOrientation(LinearLayout.VERTICAL); box.setGravity(Gravity.CENTER_HORIZONTAL); box.setPadding(dp(20),dp(8),dp(20),dp(8)); box.setLayoutDirection(View.LAYOUT_DIRECTION_RTL);
-        final ImageView avatar=new ImageView(this); avatar.setScaleType(ImageView.ScaleType.CENTER_CROP); avatar.setClipToOutline(true); avatar.setOutlineProvider(new android.view.ViewOutlineProvider(){ public void getOutline(View v, android.graphics.Outline o){o.setOval(0,0,v.getWidth(),v.getHeight());} }); avatar.setBackground(bg(Color.argb(30,255,255,255),Color.argb(20,255,255,255),80));
+        final ImageView avatar=new ImageView(this); avatar.setScaleType(ImageView.ScaleType.CENTER_CROP); avatar.setClipToOutline(true); avatar.setOutlineProvider(new android.view.ViewOutlineProvider(){ public void getOutline(View v, android.graphics.Outline o){o.setOval(0,0,v.getWidth(),v.getHeight());} }); avatar.setBackgroundColor(Color.TRANSPARENT);
         LinearLayout.LayoutParams ap=new LinearLayout.LayoutParams(dp(112),dp(112)); ap.setMargins(0,0,0,dp(12)); box.addView(avatar,ap);
-        if(!profileImageUri.isEmpty()) try{avatar.setImageURI(Uri.parse(profileImageUri));}catch(Exception ignored){}
-        else {avatar.setImageResource(R.drawable.icon_dana); avatar.setPadding(dp(12),dp(12),dp(12),dp(12));}
+        setCircularImage(avatar, profileImageUri.isEmpty()?null:Uri.parse(profileImageUri), R.drawable.icon_dana);
         avatar.setOnClickListener(v->openProfilePicker());
         TextView hint=text("برای انتخاب عکس روی تصویر بزن",13); hint.setTextColor(Color.LTGRAY); box.addView(hint,new LinearLayout.LayoutParams(-1,dp(32)));
         EditText name=new EditText(this); name.setText(profileName); name.setHint("نام شما"); name.setTextSize(18); name.setGravity(Gravity.RIGHT|Gravity.CENTER_VERTICAL); name.setSingleLine(true); name.setTextColor(Color.WHITE); name.setHintTextColor(Color.LTGRAY); name.setPadding(dp(14),0,dp(14),0); name.setBackground(bg(Color.rgb(25,65,120),Color.rgb(10,30,70),18)); box.addView(name,new LinearLayout.LayoutParams(-1,dp(54)));
@@ -821,9 +846,8 @@ public class MainActivity extends Activity {
 
     void addProfileCard(){
         LinearLayout card=new LinearLayout(this); card.setOrientation(LinearLayout.HORIZONTAL); card.setGravity(Gravity.CENTER_VERTICAL); card.setPadding(dp(12),dp(10),dp(12),dp(10)); card.setLayoutDirection(View.LAYOUT_DIRECTION_RTL); card.setBackground(bg(Color.argb(225,20,53,105),Color.argb(225,7,22,60),26));
-        ImageView avatar=new ImageView(this); avatar.setScaleType(ImageView.ScaleType.CENTER_CROP); avatar.setClipToOutline(true); avatar.setOutlineProvider(new android.view.ViewOutlineProvider(){ public void getOutline(View v, android.graphics.Outline o){o.setOval(0,0,v.getWidth(),v.getHeight());} }); avatar.setBackground(bg(Color.argb(20,255,255,255),Color.argb(10,255,255,255),80));
-        if(!profileImageUri.isEmpty()) try{avatar.setImageURI(Uri.parse(profileImageUri));}catch(Exception ignored){}
-        else {avatar.setImageResource(R.drawable.icon_dana); avatar.setPadding(dp(8),dp(8),dp(8),dp(8));}
+        ImageView avatar=new ImageView(this); avatar.setScaleType(ImageView.ScaleType.CENTER_CROP); avatar.setClipToOutline(true); avatar.setOutlineProvider(new android.view.ViewOutlineProvider(){ public void getOutline(View v, android.graphics.Outline o){o.setOval(0,0,v.getWidth(),v.getHeight());} }); avatar.setBackgroundColor(Color.TRANSPARENT);
+        setCircularImage(avatar, profileImageUri.isEmpty()?null:Uri.parse(profileImageUri), R.drawable.icon_dana);
         card.addView(avatar,new LinearLayout.LayoutParams(dp(68),dp(68)));
         LinearLayout info=new LinearLayout(this); info.setOrientation(LinearLayout.VERTICAL); info.setGravity(Gravity.CENTER_VERTICAL|Gravity.RIGHT); info.setPadding(dp(12),0,dp(8),0); info.setLayoutDirection(View.LAYOUT_DIRECTION_RTL);
         TextView n=text(profileName.isEmpty()?"ساخت پروفایل":"درود، "+profileName,17); n.setGravity(Gravity.RIGHT|Gravity.CENTER_VERTICAL); TextView sub=text(profileName.isEmpty()?"نام و عکس خودت را اضافه کن":"پروفایل من",12); sub.setTextColor(Color.rgb(220,230,255)); sub.setGravity(Gravity.RIGHT|Gravity.CENTER_VERTICAL); info.addView(n,new LinearLayout.LayoutParams(-1,dp(34))); info.addView(sub,new LinearLayout.LayoutParams(-1,dp(28))); card.addView(info,new LinearLayout.LayoutParams(0,-1,1));
@@ -846,6 +870,8 @@ public class MainActivity extends Activity {
 
         TextView gear=text("⚙",22);
         gear.setGravity(Gravity.CENTER);
+        gear.setIncludeFontPadding(false);
+        gear.setPadding(0,0,0,0);
         gear.setTextColor(Color.WHITE);
         gear.setBackground(bg(Color.argb(205,18,75,145),Color.argb(205,7,30,78),50));
         gear.setOnClickListener(v->showProfileEditor());
@@ -864,14 +890,8 @@ public class MainActivity extends Activity {
 
         ImageView profileIcon=new ImageView(this);
         profileIcon.setScaleType(ImageView.ScaleType.CENTER_CROP); profileIcon.setClipToOutline(true); profileIcon.setOutlineProvider(new android.view.ViewOutlineProvider(){ public void getOutline(View v, android.graphics.Outline o){o.setOval(0,0,v.getWidth(),v.getHeight());} });
-        profileIcon.setBackground(bg(Color.argb(205,18,75,145),Color.argb(205,7,30,78),50));
-        if(!profileImageUri.isEmpty()){
-            try{profileIcon.setImageURI(Uri.parse(profileImageUri));}catch(Exception ignored){profileIcon.setImageResource(android.R.drawable.ic_menu_myplaces);}
-        }else{
-            profileIcon.setImageResource(android.R.drawable.ic_menu_myplaces);
-            profileIcon.setColorFilter(Color.WHITE);
-        }
-        profileIcon.setPadding(dp(8),dp(8),dp(8),dp(8));
+        profileIcon.setBackgroundColor(Color.TRANSPARENT);
+        setCircularImage(profileIcon, profileImageUri.isEmpty()?null:Uri.parse(profileImageUri), android.R.drawable.ic_menu_myplaces);
         profileIcon.setOnClickListener(v->showProfileEditor());
         LinearLayout.LayoutParams pp=new LinearLayout.LayoutParams(dp(46),dp(46));
         pp.setMargins(dp(7),0,0,0);
@@ -880,7 +900,7 @@ public class MainActivity extends Activity {
 
         // فاصله متناسب با صفحه برای قرار گرفتن شروع چالش در مرکز
         int heightDp=(int)(getResources().getDisplayMetrics().heightPixels/getResources().getDisplayMetrics().density);
-        int centerGap=Math.max(90, (heightDp-48-70-90-76)/2);
+        int centerGap=Math.max(70, (heightDp-48-70-76)/2);
         root.addView(new Space(this),new LinearLayout.LayoutParams(1,dp(centerGap)));
 
         Button start=button("✦   شروع چالش   ›");
@@ -892,7 +912,7 @@ public class MainActivity extends Activity {
         sb.setMargins(0,0,0,dp(8));
         root.addView(start,sb);
 
-        int remaining=Math.max(70,heightDp-centerGap-48-70-76-40);
+        int remaining=Math.max(40,heightDp-centerGap-48-70-76-20);
         root.addView(new Space(this),new LinearLayout.LayoutParams(1,dp(remaining)));
         addBottomNavStandalone();
     }
@@ -915,7 +935,11 @@ public class MainActivity extends Activity {
         inGame=false; backArmed=false; currentBackground=2; base();
         addPageHeader("رتبه‌ها 🏆");
         addProfileCard();
-        TextView mine=text("رتبه من\n"+fa(Math.max(1, 1000-score/10))+"   •   امتیاز "+fa(score),20);
+        String rankName = profileName.isEmpty() ? "رتبه من" : "رتبه من • درود، "+profileName;
+        TextView mine=text(rankName+"\n"+fa(Math.max(1, 1000-score/10))+"   •   امتیاز "+fa(score),18);
+        mine.setGravity(Gravity.RIGHT|Gravity.CENTER_VERTICAL);
+        mine.setMaxLines(2);
+        mine.setEllipsize(null);
         mine.setBackground(bg(Color.argb(230,55,28,105),Color.argb(220,18,22,70),26));
         root.addView(mine,new LinearLayout.LayoutParams(-1,dp(100)));
         root.addView(title("جدول امتیاز",22),new LinearLayout.LayoutParams(-1,dp(48)));
@@ -1144,11 +1168,12 @@ public class MainActivity extends Activity {
             int j1=(i+7)%w.length, j2=(i+17)%w.length, j3=(i+31)%w.length;
             String e1=w[j1][0], e2=w[j2][0], e3=w[j3][0];
             String f1=w[j1][1], f2=w[j2][1], f3=w[j3][1];
-            out.add(new String[]{"What is the English word for \""+fa+"\"?","🇬🇧",en,e1,e2,e3});
-            out.add(new String[]{"What is the Persian meaning of \""+en+"\"?","🇬🇧",fa,f1,f2,f3});
-            out.add(new String[]{"Choose the correct translation for \""+en+"\".","🇬🇧",fa,f1,f2,f3});
-            out.add(new String[]{"Which English word means \""+fa+"\"?","🇬🇧",en,e2,e3,e1});
-            out.add(new String[]{"Select the English equivalent of \""+fa+"\".","🇬🇧",en,e3,e1,e2});
+            int mode=i%5;
+            if(mode==0) out.add(new String[]{"What is the English word for \""+fa+"\"?","🇬🇧",en,e1,e2,e3});
+            else if(mode==1) out.add(new String[]{"What is the Persian meaning of \""+en+"\"?","🇬🇧",fa,f1,f2,f3});
+            else if(mode==2) out.add(new String[]{"Choose the correct translation for \""+en+"\".","🇬🇧",fa,f1,f2,f3});
+            else if(mode==3) out.add(new String[]{"Which English word means \""+fa+"\"?","🇬🇧",en,e2,e3,e1});
+            else out.add(new String[]{"Select the English equivalent of \""+fa+"\".","🇬🇧",en,e3,e1,e2});
         }
         return out;
     }
@@ -1326,9 +1351,6 @@ public class MainActivity extends Activity {
         if(questionTimer!=null){questionTimer.cancel();questionTimer=null;}
         try{tone.stopTone();}catch(Exception ignored){}
         currentBackground=4; base();
-        TextView icon=title("♥",56);
-        icon.setTextColor(Color.rgb(255,95,120));
-        root.addView(icon,new LinearLayout.LayoutParams(-1,dp(90)));
         TextView h=title("جان‌ها تمام شد",27);
         h.setGravity(Gravity.CENTER);
         root.addView(h,new LinearLayout.LayoutParams(-1,dp(60)));
