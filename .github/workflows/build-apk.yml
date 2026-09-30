@@ -47,14 +47,30 @@ jobs:
       - name: Build Release APK
         run: gradle --no-daemon assembleRelease --stacktrace
 
-      - name: Show generated APKs
+      - name: Show and stage generated APKs
+        shell: bash
         run: |
+          set -e
           echo "Generated APK files:"
-          find app/build/outputs/apk -type f -name "*.apk" -print || true
+          find . -type f -path '*/build/outputs/apk/*/*.apk' -print || true
+          mkdir -p artifact
+          apk_count=0
+          while IFS= read -r apk; do
+            [ -n "$apk" ] || continue
+            apk_count=$((apk_count + 1))
+            name=$(basename "$apk")
+            cp "$apk" "artifact/$name"
+            echo "Staged: artifact/$name"
+          done < <(find . -type f -path '*/build/outputs/apk/*/*.apk' -print)
+          if [ "$apk_count" -eq 0 ]; then
+            echo "ERROR: No APK was generated."
+            exit 1
+          fi
+          ls -lah artifact
 
       - name: Upload Release APK
         uses: actions/upload-artifact@v4
         with:
           name: challenge-dana-release-apk
-          path: app/build/outputs/apk/release/*.apk
+          path: artifact/*.apk
           if-no-files-found: error
