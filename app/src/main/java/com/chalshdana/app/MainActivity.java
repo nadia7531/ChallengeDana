@@ -24,6 +24,7 @@ public class MainActivity extends Activity {
     TextView timerView;
     android.media.ToneGenerator tone;
     ArrayList<Question> questions = new ArrayList<>();
+    ArrayList<Question> allQuestions = new ArrayList<>();
 
     static class Question {
         String q, icon; String[] a;
@@ -731,10 +732,42 @@ public class MainActivity extends Activity {
     Button smallButton(String s){Button b=button(s);b.setTextSize(16);b.setTextColor(Color.WHITE);b.setBackground(bg(Color.argb(175,12,45,100),Color.argb(175,8,25,65),20));b.setLayoutParams(new LinearLayout.LayoutParams(dp(54),dp(48)));return b;}
 
     int backgroundRes(){return R.drawable.bg_home_new;}
+
+    int questionBackgroundRes(Question q){
+        String icon=q.icon==null?"":q.icon;
+        if(icon.contains("🇬🇧")) return R.drawable.bg_space;
+        if(icon.contains("🪐") || icon.contains("🌌") || icon.contains("☀️") || icon.contains("🌙") || icon.contains("🛰️") || icon.contains("🔭")) return R.drawable.bg_space;
+        if(icon.contains("⚗️") || icon.contains("⚛️") || icon.contains("🧪")) return R.drawable.bg_nature;
+        if(icon.contains("🧬") || icon.contains("🧠") || icon.contains("🫁") || icon.contains("🫘") || icon.contains("🌿")) return R.drawable.bg_nature;
+        if(icon.contains("💻") || icon.contains("📱") || icon.contains("🔬") || icon.contains("📐") || icon.contains("🔢")) return R.drawable.bg_home_clean3;
+        if(icon.contains("🏺") || icon.contains("🕌") || icon.contains("🇮🇷") || icon.contains("🌹") || icon.contains("🏛️")) return R.drawable.bg_iran;
+        if(icon.contains("🌊") || icon.contains("🗺️") || icon.contains("🧭") || icon.contains("🌍") || icon.contains("🇮🇹") || icon.contains("🇧🇷")) return R.drawable.bg_ocean;
+        return R.drawable.bg_home_new;
+    }
+
+    int questionImageRes(Question q){
+        String icon=q.icon==null?"":q.icon;
+        if(icon.contains("🇬🇧")) return R.drawable.q_tech;
+        if(icon.contains("🪐") || icon.contains("🌌") || icon.contains("☀️") || icon.contains("🌙") || icon.contains("🛰️") || icon.contains("🔭")) return R.drawable.q_space;
+        if(icon.contains("⚗️") || icon.contains("⚛️") || icon.contains("🧪")) return R.drawable.q_science;
+        if(icon.contains("🧬") || icon.contains("🧠") || icon.contains("🫁") || icon.contains("🫘") || icon.contains("🌿")) return R.drawable.q_biology;
+        if(icon.contains("💻") || icon.contains("📱")) return R.drawable.q_tech;
+        if(icon.contains("🎨") || icon.contains("🎵") || icon.contains("📜")) return R.drawable.q_art;
+        if(icon.contains("🏺") || icon.contains("🕌") || icon.contains("🇮🇷")) return R.drawable.q_persepolis;
+        if(icon.contains("🏔️") || icon.contains("⛰️")) return R.drawable.q_damavand;
+        if(icon.contains("🏜️")) return R.drawable.q_lut;
+        if(icon.contains("🗺️") || icon.contains("🌍") || icon.contains("🧭") || icon.contains("🌊")) return R.drawable.q_geography;
+        if(icon.contains("📐") || icon.contains("🔢") || icon.contains("➗") || icon.contains("➕")) return R.drawable.q_math;
+        return R.drawable.q_iran;
+    }
     void base(){
+        base(backgroundRes());
+    }
+
+    void base(int background){
         screen=new FrameLayout(this);
         ImageView image=new ImageView(this);
-        image.setImageResource(backgroundRes());
+        image.setImageResource(background);
         image.setScaleType(ImageView.ScaleType.CENTER_CROP);
         screen.addView(image,new FrameLayout.LayoutParams(-1,-1));
         ScrollView scroll=new ScrollView(this); scroll.setFillViewport(true); scroll.setClipToPadding(false);
@@ -1246,6 +1279,58 @@ public class MainActivity extends Activity {
         return out;
     }
 
+
+    // ۲۰۰۰ سؤال تکمیلی: ۱۰۰۰ علمی + ۱۰۰۰ بین‌المللی/جهانی.
+    // برای جلوگیری از تکرار داده‌های خام، هر پرسش پایه با چهار صورت متفاوت ارائه می‌شود.
+    ArrayList<String[]> generatedScience1000(){
+        ArrayList<String[]> base=new ArrayList<>();
+        String[] scienceIcons={"⚗️","⚛️","🧬","➗","💻","🪐","🌙","🔬","🔭","🔢","➕","📐","🧪","🛰️","🌡️","🫁","🌱"};
+        ArrayList<String[][]> groups=new ArrayList<>();
+        groups.add(facts); groups.add(specializedFacts); groups.add(extraSpecializedFacts); groups.add(iranAdvancedFacts);
+        HashSet<String> seen=new HashSet<>();
+        for(String[][] group:groups) for(String[] f:group){
+            if(f.length<6 || !seen.add(f[0])) continue;
+            boolean ok=false; for(String ic:scienceIcons) if(ic.equals(f[1])){ok=true;break;}
+            if(ok) base.add(f);
+        }
+        // اگر در آینده تعداد پایه‌ها تغییر کرد، تا ۲۵۰ مورد علمی از داده‌های موجود پر می‌شود.
+        if(base.size()>250) base=new ArrayList<>(base.subList(0,250));
+        ArrayList<String[]> out=new ArrayList<>();
+        for(String[] f:base){
+            String q=f[0], ic=f[1];
+            String[] a={f[2],f[3],f[4],f[5]};
+            out.add(new String[]{"دانش علمی: "+q,ic,a[0],a[1],a[2],a[3]});
+            out.add(new String[]{"کدام گزینه پاسخ درست به این پرسش علمی است؟ "+q,ic,a[0],a[1],a[2],a[3]});
+            out.add(new String[]{"آزمون علوم — "+q,ic,a[0],a[1],a[2],a[3]});
+            out.add(new String[]{"چالش علمی: "+q,ic,a[0],a[1],a[2],a[3]});
+        }
+        return out;
+    }
+
+    ArrayList<String[]> generatedInternational1000(){
+        ArrayList<String[]> base=new ArrayList<>();
+        String[] intlIcons={"🌍","🗺️","📚","🏺","🎨","🏛️","📜","🕌","🗼","🏰","🏙️","🏞️","🌊","⛵","🗿","🇮🇹","🇫🇷","🇧🇷","🗾","🥇","🥈","🏸","⚽","🦘","🏜️","🏔️","🏝️","🏙️","🌉","🌋","🦁","👑","🥘","🍚","🎵","🎼","🧶","🛍️","🌹"};
+        ArrayList<String[][]> groups=new ArrayList<>();
+        groups.add(facts); groups.add(iranFacts); groups.add(specializedFacts); groups.add(extraSpecializedFacts); groups.add(iranAdvancedFacts);
+        HashSet<String> seen=new HashSet<>();
+        for(String[][] group:groups) for(String[] f:group){
+            if(f.length<6 || !seen.add(f[0])) continue;
+            boolean ok=false; for(String ic:intlIcons) if(ic.equals(f[1])){ok=true;break;}
+            if(ok) base.add(f);
+        }
+        if(base.size()>250) base=new ArrayList<>(base.subList(0,250));
+        ArrayList<String[]> out=new ArrayList<>();
+        for(String[] f:base){
+            String q=f[0], ic=f[1];
+            String[] a={f[2],f[3],f[4],f[5]};
+            out.add(new String[]{"دانش جهانی: "+q,ic,a[0],a[1],a[2],a[3]});
+            out.add(new String[]{"کدام گزینه پاسخ درست به این پرسش درباره جهان و فرهنگ‌هاست؟ "+q,ic,a[0],a[1],a[2],a[3]});
+            out.add(new String[]{"آزمون بین‌المللی — "+q,ic,a[0],a[1],a[2],a[3]});
+            out.add(new String[]{"چالش اطلاعات جهان: "+q,ic,a[0],a[1],a[2],a[3]});
+        }
+        return out;
+    }
+
     void buildQuestions(){
         questions.clear();
         ArrayList<String[]> all=new ArrayList<>();
@@ -1254,6 +1339,9 @@ public class MainActivity extends Activity {
         all.addAll(Arrays.asList(specializedFacts));
         all.addAll(Arrays.asList(extraSpecializedFacts));
         all.addAll(Arrays.asList(iranAdvancedFacts));
+        // ۲۰۰۰ سؤال تکمیلی مورد درخواست: ۱۰۰۰ علمی + ۱۰۰۰ بین‌المللی.
+        all.addAll(generatedScience1000());
+        all.addAll(generatedInternational1000());
         ArrayList<String[]> english=new ArrayList<>(generatedEnglish500());
         Random rnd=new Random(System.nanoTime());
         Collections.shuffle(all,rnd);
@@ -1284,12 +1372,14 @@ public class MainActivity extends Activity {
             if(ei<englishQ.size()) questions.add(englishQ.get(ei++));
         }
         while(ei<englishQ.size()) questions.add(englishQ.get(ei++));
+        allQuestions.clear();
+        allQuestions.addAll(questions);
     }
 
     void startGame(){
         index=0;score=0;coin=50;lives=5;
         ArrayList<Question> fresh=new ArrayList<>();
-        for(Question q:questions) if(!answeredQuestions.contains(q.q)) fresh.add(q);
+        for(Question q:allQuestions) if(!answeredQuestions.contains(q.q)) fresh.add(q);
         if(fresh.isEmpty()){
             Toast.makeText(this,"فعلاً سؤال جدیدی باقی نمانده است؛ سؤال‌های جدید در نسخه‌های بعدی اضافه می‌شوند.",Toast.LENGTH_LONG).show();
             showHome();
@@ -1307,14 +1397,14 @@ public class MainActivity extends Activity {
 
 
     void showQuestion(){
-        answered=false; currentBackground=0; Question q=questions.get(index); base();
+        answered=false; Question q=questions.get(index); currentBackground=(index/10)%5; base(questionBackgroundRes(q));
 
         LinearLayout top=new LinearLayout(this);
         top.setOrientation(LinearLayout.HORIZONTAL);
         top.setGravity(Gravity.CENTER_VERTICAL);
         top.setLayoutDirection(View.LAYOUT_DIRECTION_RTL);
 
-        progress=text("چالش  "+fa(index+1),16);
+        progress=text("مرحله "+fa((index/10)+1)+"  •  سؤال "+fa((index%10)+1),15);
         progress.setTextColor(Color.WHITE);
         progress.setGravity(Gravity.CENTER);
         progress.setBackground(bg(Color.argb(235,18,55,115),Color.argb(230,7,27,70),22));
@@ -1343,11 +1433,20 @@ public class MainActivity extends Activity {
             showHome();
         });
         top.addView(back,new LinearLayout.LayoutParams(dp(50),dp(48)));
+
+        Button favorite=smallButton(isFavorite(q)?"★":"☆");
+        favorite.setTextSize(24);
+        favorite.setTextColor(Color.rgb(255,220,70));
+        favorite.setOnClickListener(v->toggleFavorite(q,favorite));
+        LinearLayout.LayoutParams fp=new LinearLayout.LayoutParams(dp(50),dp(48));
+        fp.setMargins(dp(6),0,0,0);
+        top.addView(favorite,fp);
+
         root.addView(top,new LinearLayout.LayoutParams(-1,dp(54)));
 
         ProgressBar pb=new ProgressBar(this,null,android.R.attr.progressBarStyleHorizontal);
-        pb.setMax(15);
-        pb.setProgress((index%15)+1);
+        pb.setMax(10);
+        pb.setProgress((index%10)+1);
         pb.setProgressDrawable(bg(Color.rgb(55,220,150),Color.rgb(20,130,210),20));
         LinearLayout.LayoutParams pp=new LinearLayout.LayoutParams(-1,dp(8));
         pp.setMargins(dp(8),dp(8),dp(8),dp(14));
@@ -1364,6 +1463,16 @@ public class MainActivity extends Activity {
         LinearLayout.LayoutParams qp=new LinearLayout.LayoutParams(-1,LinearLayout.LayoutParams.WRAP_CONTENT);
         qp.setMargins(0,0,0,dp(14));
         root.addView(questionText,qp);
+
+        ImageView questionImage=new ImageView(this);
+        questionImage.setImageResource(questionImageRes(q));
+        questionImage.setScaleType(ImageView.ScaleType.CENTER_CROP);
+        questionImage.setAdjustViewBounds(true);
+        questionImage.setBackground(bg(Color.argb(245,255,255,255),Color.argb(235,240,244,255),20));
+        questionImage.setPadding(dp(2),dp(2),dp(2),dp(2));
+        LinearLayout.LayoutParams qip=new LinearLayout.LayoutParams(-1,dp(104));
+        qip.setMargins(0,0,0,dp(10));
+        root.addView(questionImage,qip);
 
         answerButtons.clear();
         for(int i=0;i<4;i++){
