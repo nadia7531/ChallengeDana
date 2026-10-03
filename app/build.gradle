@@ -1,29 +1,36 @@
 plugins { id 'com.android.application' }
 
-android { namespace 'com.chalshdana.app'; compileSdk 35
+android {
+    namespace 'com.chalshdana.app'
+    compileSdk 35
+
     signingConfigs {
         release {
-            def ks = System.getenv('DANA_KEYSTORE_FILE')
-            if (ks != null && !ks.isEmpty()) {
-                storeFile file(ks)
-                storePassword System.getenv('DANA_KEYSTORE_PASSWORD')
-                keyAlias System.getenv('DANA_KEY_ALIAS')
-                keyPassword System.getenv('DANA_KEY_PASSWORD')
-            }
+            def bundledKs = file("${rootProject.projectDir}/dana-signing.jks")
+            storeFile bundledKs
+            storePassword "dana12345"
+            keyAlias "dana"
+            keyPassword "dana12345"
         }
     }
+
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_17
         targetCompatibility JavaVersion.VERSION_17
     }
 
-    defaultConfig { applicationId 'com.chalshdana.app'; minSdk 23; targetSdk 35; versionCode 5; versionName '1.4' }
+    defaultConfig {
+        applicationId 'com.chalshdana.app'
+        minSdk 23
+        targetSdk 35
+        versionCode 5
+        versionName '1.4'
+    }
+
     buildTypes {
         release {
             minifyEnabled false
-            if (System.getenv('DANA_KEYSTORE_FILE') != null) {
-                signingConfig signingConfigs.release
-            }
+            signingConfig signingConfigs.release
         }
     }
 }

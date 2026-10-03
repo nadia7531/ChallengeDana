@@ -1,0 +1,4 @@
+The APKs are signed with the included stable test key so repeated builds keep the same signature.
+If Google Play Protect still blocks a sideloaded APK as harmful, that is a device/security classification,
+not an APK build failure. The supported way to remove that warning is distribution through Google Play
+(or review/allow the app on the device if Android offers that option).
