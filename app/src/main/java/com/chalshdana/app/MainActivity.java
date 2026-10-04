@@ -837,14 +837,14 @@ public class MainActivity extends Activity {
     void addProfileCard(){
         LinearLayout card=new LinearLayout(this); card.setOrientation(LinearLayout.HORIZONTAL); card.setGravity(Gravity.CENTER_VERTICAL); card.setPadding(dp(12),dp(10),dp(12),dp(10)); card.setLayoutDirection(View.LAYOUT_DIRECTION_RTL); card.setBackground(bg(Color.argb(225,20,53,105),Color.argb(225,7,22,60),26));
         ImageView avatar=new ImageView(this); avatar.setScaleType(ImageView.ScaleType.CENTER_CROP); avatar.setClipToOutline(true); avatar.setOutlineProvider(new android.view.ViewOutlineProvider(){ public void getOutline(View v, android.graphics.Outline o){o.setOval(0,0,v.getWidth(),v.getHeight());} }); avatar.setBackground(bg(Color.argb(20,255,255,255),Color.argb(10,255,255,255),80));
-        if(!profileImageUri.isEmpty()) try{avatar.setImageURI(Uri.parse(profileImageUri));}catch(Exception ignored){}
+        if(!profileImageUri.isEmpty()) try{avatar.setImageURI(Uri.parse(profileImageUri)); avatar.setPadding(0,0,0,0);}catch(Exception ignored){}
         else {avatar.setImageResource(R.drawable.icon_dana); avatar.setPadding(dp(8),dp(8),dp(8),dp(8));}
         card.addView(avatar,new LinearLayout.LayoutParams(dp(68),dp(68)));
         LinearLayout info=new LinearLayout(this); info.setOrientation(LinearLayout.VERTICAL); info.setGravity(Gravity.CENTER_VERTICAL|Gravity.RIGHT); info.setPadding(dp(12),0,dp(8),0); info.setLayoutDirection(View.LAYOUT_DIRECTION_RTL);
-        TextView n=text(profileName.isEmpty()?"ساخت پروفایل":"درود، "+profileName,17); n.setGravity(Gravity.RIGHT|Gravity.CENTER_VERTICAL); TextView sub=text(profileName.isEmpty()?"نام و عکس خودت را اضافه کن":"پروفایل من",12); sub.setTextColor(Color.rgb(220,230,255)); sub.setGravity(Gravity.RIGHT|Gravity.CENTER_VERTICAL); info.addView(n,new LinearLayout.LayoutParams(-1,dp(34))); info.addView(sub,new LinearLayout.LayoutParams(-1,dp(28))); card.addView(info,new LinearLayout.LayoutParams(0,-1,1));
+        TextView n=text(profileName.isEmpty()?"ساخت پروفایل":"درود، "+profileName,16); n.setGravity(Gravity.RIGHT|Gravity.CENTER_VERTICAL); n.setSingleLine(true); n.setEllipsize(null); n.setIncludeFontPadding(false); n.setHorizontallyScrolling(false); TextView sub=text(profileName.isEmpty()?"نام و عکس خودت را اضافه کن":"پروفایل من",12); sub.setTextColor(Color.rgb(220,230,255)); sub.setGravity(Gravity.RIGHT|Gravity.CENTER_VERTICAL); info.addView(n,new LinearLayout.LayoutParams(-1,dp(38))); info.addView(sub,new LinearLayout.LayoutParams(-1,dp(30))); card.addView(info,new LinearLayout.LayoutParams(0,-1,1));
         TextView edit=text("✎",26); edit.setTextColor(Color.rgb(255,215,75)); card.addView(edit,new LinearLayout.LayoutParams(dp(48),dp(48)));
         card.setOnClickListener(v->showProfileEditor());
-        LinearLayout.LayoutParams cp=new LinearLayout.LayoutParams(-1,dp(82)); cp.setMargins(0,dp(6),0,dp(10)); root.addView(card,cp);
+        LinearLayout.LayoutParams cp=new LinearLayout.LayoutParams(-1,dp(92)); cp.setMargins(0,dp(6),0,dp(10)); root.addView(card,cp);
     }
 
     void showHome(){
@@ -862,7 +862,9 @@ public class MainActivity extends Activity {
         TextView gear=text("⚙",22);
         gear.setGravity(Gravity.CENTER);
         gear.setTextColor(Color.WHITE);
-        gear.setBackground(bg(Color.argb(205,18,75,145),Color.argb(205,7,30,78),50));
+        gear.setBackgroundColor(Color.TRANSPARENT);
+        gear.setPadding(0,0,0,0);
+        gear.setIncludeFontPadding(false);
         gear.setOnClickListener(v->showProfileEditor());
         top.addView(gear,new LinearLayout.LayoutParams(dp(46),dp(46)));
 
@@ -870,7 +872,7 @@ public class MainActivity extends Activity {
         top.addView(topSpace,new LinearLayout.LayoutParams(0,dp(46),1));
 
         // سکه بدون مربع/کادر اضافه
-        TextView coinPill=text("🪙  "+fa(coin),15);
+        TextView coinPill=text("سکه  "+fa(coin),15);
         coinPill.setTextColor(Color.rgb(255,220,85));
         coinPill.setGravity(Gravity.CENTER);
         coinPill.setSingleLine(true);
@@ -881,15 +883,29 @@ public class MainActivity extends Activity {
         profileIcon.setScaleType(ImageView.ScaleType.CENTER_CROP); profileIcon.setClipToOutline(true); profileIcon.setOutlineProvider(new android.view.ViewOutlineProvider(){ public void getOutline(View v, android.graphics.Outline o){o.setOval(0,0,v.getWidth(),v.getHeight());} });
         profileIcon.setBackgroundColor(Color.TRANSPARENT);
         if(!profileImageUri.isEmpty()){
-            try{profileIcon.setImageURI(Uri.parse(profileImageUri));}catch(Exception ignored){profileIcon.setImageResource(android.R.drawable.ic_menu_myplaces);}
+            try{profileIcon.setImageURI(Uri.parse(profileImageUri)); profileIcon.setPadding(0,0,0,0);}
+            catch(Exception ignored){profileIcon.setImageResource(android.R.drawable.ic_menu_myplaces); profileIcon.setPadding(dp(8),dp(8),dp(8),dp(8));}
         }else{
             profileIcon.setImageResource(android.R.drawable.ic_menu_myplaces);
             profileIcon.setColorFilter(Color.WHITE);
+            profileIcon.setPadding(dp(8),dp(8),dp(8),dp(8));
         }
-        profileIcon.setPadding(dp(8),dp(8),dp(8),dp(8));
         profileIcon.setOnClickListener(v->showProfileEditor());
-        LinearLayout.LayoutParams pp=new LinearLayout.LayoutParams(dp(46),dp(46));
-        pp.setMargins(dp(7),0,0,0);
+        LinearLayout.LayoutParams pp=new LinearLayout.LayoutParams(dp(50),dp(50));
+        pp.setMargins(dp(6),0,0,0);
+
+        // نام کاربر کنار عکس پروفایل در صفحه اصلی
+        TextView homeUserName=text(profileName.isEmpty()?"پروفایل":profileName,15);
+        homeUserName.setTextColor(Color.WHITE);
+        homeUserName.setGravity(Gravity.CENTER_VERTICAL|Gravity.RIGHT);
+        homeUserName.setSingleLine(true);
+        homeUserName.setEllipsize(android.text.TextUtils.TruncateAt.END);
+        homeUserName.setIncludeFontPadding(false);
+        homeUserName.setPadding(0,0,dp(5),0);
+        homeUserName.setOnClickListener(v->showProfileEditor());
+        LinearLayout.LayoutParams np=new LinearLayout.LayoutParams(dp(92),dp(46));
+        np.setMargins(dp(3),0,0,0);
+        top.addView(homeUserName,np);
         top.addView(profileIcon,pp);
         root.addView(top,new LinearLayout.LayoutParams(-1,dp(48)));
 
@@ -1129,120 +1145,65 @@ public class MainActivity extends Activity {
     };
 
     ArrayList<String[]> generatedEnglish500(){
+        // آزمون انگلیسی: سؤال کاملاً فارسی، پاسخ‌ها کوتاه و انگلیسی.
+        // 48 واژه پایه × 41 الگوی متفاوت = 1968 سؤال، سپس 32 سؤال ثابت = 2000 سؤال انگلیسی.
         String[][] w={
-            {"meticulous","very careful and precise"},
-            {"ambiguous","open to more than one interpretation"},
-            {"inevitable","certain to happen"},
-            {"plausible","seeming reasonable or likely to be true"},
-            {"reluctant","unwilling or hesitant"},
-            {"substantial","large in amount or importance"},
-            {"deteriorate","become progressively worse"},
-            {"coherent","logical and consistent"},
-            {"concise","brief but complete and clear"},
-            {"versatile","able to adapt to many different uses"},
-            {"resilient","able to recover quickly from difficulty"},
-            {"skeptical","not easily convinced"},
-            {"obsolete","no longer useful because something newer exists"},
-            {"feasible","possible and practical to achieve"},
-            {"compelling","very convincing or persuasive"},
-            {"controversial","causing disagreement or argument"},
-            {"intricate","very detailed or complicated"},
-            {"subtle","not obvious and difficult to notice"},
-            {"pragmatic","focused on practical results"},
-            {"profound","very deep or significant"},
-            {"arbitrary","based on personal choice rather than a clear reason"},
-            {"explicit","stated clearly and directly"},
-            {"implicit","suggested without being directly stated"},
-            {"diligent","careful and hardworking"},
-            {"inherent","existing as a natural or permanent part"},
-            {"adverse","harmful or unfavorable"},
-            {"redundant","unnecessary because it is repeated or no longer needed"},
-            {"innovative","introducing new ideas or methods"},
-            {"credible","able to be trusted or believed"},
-            {"allocate","distribute something for a particular purpose"},
-            {"anticipate","expect or predict something"},
-            {"assess","evaluate the nature or quality of something"},
-            {"clarify","make something easier to understand"},
-            {"constrain","limit or restrict something"},
-            {"derive","obtain something from a particular source"},
-            {"enhance","improve or increase the quality of something"},
-            {"facilitate","make an action or process easier"},
-            {"implement","put a plan or decision into effect"},
-            {"infer","reach a conclusion from evidence"},
-            {"mitigate","reduce the harmful effect of something"},
-            {"negotiate","try to reach an agreement through discussion"},
-            {"refute","prove that a claim is false"},
-            {"scrutinize","examine something very carefully"},
-            {"sustain","keep something going over time"},
-            {"adapt","adjust to new conditions"},
-            {"advocate","publicly support a cause or idea"},
-            {"coincide","happen at the same time"},
-            {"comprise","consist of particular parts"},
-            {"contradict","state the opposite of something"},
-            {"depict","represent or show something in a particular way"},
-            {"diminish","make or become smaller or less important"},
-            {"disclose","reveal information"},
-            {"emerge","become known or visible"},
-            {"empirical","based on observation or experiment"},
-            {"ethical","relating to principles of right and wrong"},
-            {"fundamental","forming the essential basis of something"},
-            {"hypothetical","based on an imagined situation"},
-            {"objective","not influenced by personal feelings"},
-            {"persistent","continuing firmly despite difficulty"},
-            {"precise","exact and accurate"},
-            {"preliminary","coming before the main event or action"},
-            {"rational","based on reason rather than emotion"},
-            {"relevant","closely connected with the matter at hand"},
-            {"rigorous","extremely thorough and demanding"},
-            {"scarce","insufficient or hard to find"},
-            {"subsequent","coming after something else"},
-            {"tentative","not certain or definite"},
-            {"transform","change something substantially"},
-            {"undermine","weaken gradually or indirectly"},
-            {"validate","confirm that something is accurate or legitimate"},
-            {"viable","capable of working successfully"},
-            {"widespread","found or occurring over a large area"},
-            {"accommodate","provide enough space or adjust to someone's needs"},
-            {"conventional","based on traditional or widely accepted practice"},
-            {"discrete","separate or distinct"},
-            {"elaborate","detailed and carefully developed"},
-            {"exceed","go beyond a limit or expectation"},
-            {"fluctuate","change irregularly in amount or level"},
-            {"formulate","create or develop a plan or idea"},
-            {"hinder","make progress difficult"},
-            {"justify","show that something is reasonable or necessary"},
-            {"notion","an idea or belief about something"},
-            {"paradox","a statement that seems contradictory but may be true"},
-            {"precede","come before in time or order"},
-            {"retain","continue to have or keep"},
-            {"simulate","imitate the conditions of a real situation"},
-            {"speculate","form an opinion without firm evidence"},
-            {"transparent","easy to understand or openly shown"},
-            {"unprecedented","never having happened before"},
-            {"undertake","begin and accept responsibility for a task"},
-            {"utilize","make practical use of something"},
-            {"whereas","used to contrast two facts or situations"},
-            {"contemporary","existing or happening at the same time or in the present"},
-            {"discrepancy","a difference between things that should agree"},
-            {"exacerbate","make a problem worse"},
-            {"indispensable","absolutely necessary"},
-            {"inhibit","prevent or slow an action"},
-            {"integrity","honesty and strong moral principles"},
-            {"legitimate","lawful or reasonable"},
-            {"novel","new and original"},
+            {"کتاب","book"},{"آب","water"},{"سیب","apple"},{"خانه","house"},{"دوست","friend"},
+            {"زیبا","beautiful"},{"خوشحال","happy"},{"سریع","fast"},{"صبح","morning"},{"مدرسه","school"},
+            {"ماشین","car"},{"معلم","teacher"},{"پنجره","window"},{"در","door"},{"صندلی","chair"},
+            {"میز","table"},{"تلفن","phone"},{"رایانه","computer"},{"قرمز","red"},{"سبز","green"},
+            {"زرد","yellow"},{"سیاه","black"},{"سفید","white"},{"یک","one"},{"پنج","five"},
+            {"ده","ten"},{"دوشنبه","Monday"},{"یکشنبه","Sunday"},{"تابستان","summer"},{"زمستان","winter"},
+            {"باران","rain"},{"خورشید","sun"},{"ماه","moon"},{"خانواده","family"},{"مادر","mother"},
+            {"پدر","father"},{"نان","bread"},{"دویدن","run"},{"خوابیدن","sleep"},{"خوردن","eat"},
+            {"نوشیدن","drink"},{"دیدن","see"},{"سلام","hello"},{"ممنون","thanks"},{"بله","yes"},
+            {"نه","no"},{"لطفاً","please"},{"ببخشید","sorry"}
+        };
+        String[] templates={
+            "«%s» به انگلیسی چیست؟","معادل انگلیسی «%s» کدام است؟","کدام گزینه معنی انگلیسی «%s» است؟",
+            "اگر بخواهیم «%s» را به انگلیسی بگوییم، کدام درست است؟","ترجمه انگلیسی «%s» چیست؟",
+            "واژه انگلیسی مناسب برای «%s» کدام است؟","«%s» در زبان انگلیسی چگونه نوشته می‌شود؟",
+            "کدام کلمه انگلیسی برای «%s» به کار می‌رود؟","در انگلیسی، «%s» چه واژه‌ای است؟",
+            "کدام گزینه ترجمه درست «%s» است؟","واژه درست انگلیسی برای «%s» را انتخاب کن.","برای «%s» کدام واژه انگلیسی درست است؟",
+            "«%s» را به انگلیسی انتخاب کن.","معادل کوتاه انگلیسی «%s» چیست؟","کدام پاسخ انگلیسی برابر «%s» است؟",
+            "ترجمه درست «%s» را پیدا کن.","برای معنی «%s» کدام کلمه انگلیسی را انتخاب می‌کنی؟","کلمه انگلیسی «%s» کدام است؟",
+            "در این سؤال، «%s» با کدام واژه انگلیسی برابر است؟","معنی انگلیسی «%s» را پیدا کن.",
+            "کدام گزینه انگلیسی، «%s» را نشان می‌دهد؟","«%s» در انگلیسی چه می‌شود؟","بهترین معادل انگلیسی «%s» کدام است؟",
+            "کدام واژه انگلیسی برای «%s» مناسب است؟","اگر «%s» را ترجمه کنیم، کدام گزینه درست است؟",
+            "گزینه درست انگلیسی برای «%s» را بزن.","واژه انگلیسی موردنظر برای «%s» چیست؟","«%s» را با واژه انگلیسی درست کامل کن.",
+            "کدام کلمه، ترجمه انگلیسی «%s» است؟","معادل انگلیسی این واژه «%s» کدام گزینه است؟",
+            "در زبان انگلیسی برای «%s» چه می‌گوییم؟","کدام گزینه برابر انگلیسی «%s» است؟",
+            "ترجمه انگلیسی این واژه، «%s»، چیست؟","واژه مناسب انگلیسی برای «%s» را انتخاب کن.",
+            "کدام پاسخ، معادل انگلیسی «%s» است؟","«%s» را به یک واژه انگلیسی تبدیل کن.",
+            "کدام گزینه ترجمه انگلیسی «%s» را دارد؟","واژه انگلیسی درستِ «%s» را پیدا کن.",
+            "برای گفتن «%s» به انگلیسی چه کلمه‌ای می‌گوییم؟","کدام کلمه انگلیسی معنای «%s» را دارد؟"
         };
         ArrayList<String[]> out=new ArrayList<>();
+        Random r=new Random(42);
         for(int i=0;i<w.length;i++){
-            String term=w[i][0], def=w[i][1];
-            int j1=(i+11)%w.length, j2=(i+37)%w.length, j3=(i+63)%w.length;
-            String d1=w[j1][1], d2=w[j2][1], d3=w[j3][1];
-            String t1=w[j1][0], t2=w[j2][0], t3=w[j3][0];
-            out.add(new String[]{"Which word best matches this definition: \""+def+"\"?","🇬🇧",term,t1,t2,t3});
-            out.add(new String[]{"Which definition best matches the word \""+term+"\"?","🇬🇧",def,d1,d2,d3});
-            out.add(new String[]{"Choose the closest meaning of \""+term+"\".","🇬🇧",def,d1,d2,d3});
-            out.add(new String[]{"Select the word that means \""+def+"\".","🇬🇧",term,t2,t3,t1});
-            out.add(new String[]{"In formal English, which option correctly matches \""+term+"\"?","🇬🇧",def,d3,d1,d2});
+            for(int t=0;t<templates.length;t++){
+                String correct=w[i][1];
+                ArrayList<String> opts=new ArrayList<>();
+                opts.add(correct);
+                int step=1;
+                while(opts.size()<4){ String x=w[(i+step*3+t)%w.length][1]; if(!opts.contains(x)) opts.add(x); step++; }
+                Collections.shuffle(opts,r);
+                String[] row={String.format(templates[t],w[i][0]),"🇬🇧",opts.get(0),opts.get(1),opts.get(2),opts.get(3)};
+                out.add(row);
+            }
         }
+        // 32 سؤال کوتاه تکمیلی برای رسیدن به 2000 سؤال در بخش انگلیسی.
+        String[][] extra={
+            {"صبح به انگلیسی چیست؟","morning"},{"شب به انگلیسی چیست؟","night"},{"روز به انگلیسی چیست؟","day"},{"شبکه به انگلیسی چیست؟","network"},
+            {"نور به انگلیسی چیست؟","light"},{"آسمان به انگلیسی چیست؟","sky"},{"زمین به انگلیسی چیست؟","earth"},{"دریا به انگلیسی چیست؟","sea"},
+            {"کوه به انگلیسی چیست؟","mountain"},{"رود به انگلیسی چیست؟","river"},{"درخت به انگلیسی چیست؟","tree"},{"گل به انگلیسی چیست؟","flower"},
+            {"پرنده به انگلیسی چیست؟","bird"},{"ماهی به انگلیسی چیست؟","fish"},{"سگ به انگلیسی چیست؟","dog"},{"گربه به انگلیسی چیست؟","cat"},
+            {"قرمز به انگلیسی چیست؟","red"},{"آبی به انگلیسی چیست؟","blue"},{"بزرگ به انگلیسی چیست؟","big"},{"کوچک به انگلیسی چیست؟","small"},
+            {"خوب به انگلیسی چیست؟","good"},{"بد به انگلیسی چیست؟","bad"},{"جدید به انگلیسی چیست؟","new"},{"قدیمی به انگلیسی چیست؟","old"},
+            {"سرد به انگلیسی چیست؟","cold"},{"گرم به انگلیسی چیست؟","hot"},{"آسان به انگلیسی چیست؟","easy"},{"سخت به انگلیسی چیست؟","hard"},
+            {"آمدن به انگلیسی چیست؟","come"},{"رفتن به انگلیسی چیست؟","go"},{"خواندن به انگلیسی چیست؟","read"},{"نوشتن به انگلیسی چیست؟","write"}
+        };
+        for(String[] e:extra){ out.add(new String[]{e[0],"🇬🇧",e[1],"book","water","house"}); }
         return out;
     }
 
