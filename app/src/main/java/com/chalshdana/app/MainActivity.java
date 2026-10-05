@@ -20,6 +20,7 @@ public class MainActivity extends Activity {
     TextView progress, coins, questionText, picture;
     int index = 0, score = 0, coin = 50, lives = 5;
     int sessionScore = 0;
+    int statsCorrect = 0, statsWrong = 0, statsAnswered = 0, currentStreak = 0, bestStreak = 0;
     boolean answered = false;
     CountDownTimer questionTimer;
     TextView timerView;
@@ -707,6 +708,7 @@ public class MainActivity extends Activity {
         profileName = prefs.getString("name", "");
         profileImageUri = prefs.getString("image", "");
         score = prefs.getInt("score", 0);
+        statsCorrect=prefs.getInt("stats_correct",0); statsWrong=prefs.getInt("stats_wrong",0); statsAnswered=prefs.getInt("stats_answered",0); currentStreak=prefs.getInt("stats_streak",0); bestStreak=prefs.getInt("stats_best_streak",0);
         coin = prefs.getInt("coins", 50);
         favorites.addAll(prefs.getStringSet("favorites", new HashSet<String>()));
         answeredQuestions.addAll(prefs.getStringSet("answered_questions", new HashSet<String>()));
@@ -872,13 +874,13 @@ public class MainActivity extends Activity {
         top.addView(gear,new LinearLayout.LayoutParams(dp(46),dp(46)));
 
         // سکه دقیقاً کنار تنظیمات قرار می‌گیرد؛ بدون مربع یا کادر اضافه.
-        TextView coinPill=text("سکه  "+fa(coin),15);
+        TextView coinPill=text("🪙  "+fa(coin)+" سکه",16);
         coinPill.setTextColor(Color.rgb(255,220,85));
         coinPill.setGravity(Gravity.CENTER);
         coinPill.setSingleLine(true);
         coinPill.setBackgroundColor(Color.TRANSPARENT);
-        LinearLayout.LayoutParams cpill=new LinearLayout.LayoutParams(dp(82),dp(44));
-        cpill.setMargins(dp(4),0,0,0);
+        LinearLayout.LayoutParams cpill=new LinearLayout.LayoutParams(dp(118),dp(46));
+        cpill.setMargins(dp(6),0,0,0);
         top.addView(coinPill,cpill);
 
         Space topSpace=new Space(this);
@@ -977,7 +979,32 @@ public class MainActivity extends Activity {
     }
 
     void saveProgress(){
-        prefs.edit().putInt("score",score).putInt("coins",coin).apply();
+        prefs.edit().putInt("score",score).putInt("coins",coin)
+            .putInt("stats_correct",statsCorrect).putInt("stats_wrong",statsWrong)
+            .putInt("stats_answered",statsAnswered).putInt("stats_streak",currentStreak)
+            .putInt("stats_best_streak",bestStreak).apply();
+    }
+
+    void showStats(){
+        inGame=false; backArmed=false; currentBackground=2; base();
+        addPageHeader("آمار من 📊");
+        addProfileCard();
+        int pct=statsAnswered==0?0:(int)Math.round(statsCorrect*100.0/statsAnswered);
+        TextView total=text("تعداد سؤال‌های پاسخ‌داده‌شده\n"+fa(statsAnswered),20);
+        TextView correct=text("پاسخ‌های درست\n"+fa(statsCorrect)+" ✓",19);
+        TextView wrong=text("پاسخ‌های اشتباه\n"+fa(statsWrong)+" ✕",19);
+        TextView accuracy=text("درصد موفقیت\n"+fa(pct)+"٪",19);
+        TextView streak=text("پیاپی درست\n"+fa(currentStreak)+"  |  بهترین رکورد: "+fa(bestStreak),17);
+        TextView points=text("امتیاز فعلی\n"+fa(score)+" ⭐",20);
+        TextView badge=text("نشان فعلی: "+badgeTitle(),18);
+        badge.setTextColor(badgeColor());
+        TextView[] cards={total,correct,wrong,accuracy,streak,points,badge};
+        for(int i=0;i<cards.length;i++){
+            TextView v=cards[i]; v.setGravity(Gravity.CENTER); v.setTextColor(i==2?Color.rgb(255,150,155):i==1?Color.rgb(110,245,175):Color.WHITE);
+            v.setBackground(bg(Color.argb(225,20,53,105),Color.argb(220,7,22,60),20));
+            LinearLayout.LayoutParams lp=new LinearLayout.LayoutParams(-1,dp(i==4?66:62)); lp.setMargins(0,dp(4),0,dp(4)); root.addView(v,lp);
+        }
+        addBottomNavStandalone();
     }
 
     void addBadgeRow(LinearLayout table, String threshold, String badge, int color, boolean unlocked){
@@ -992,17 +1019,17 @@ public class MainActivity extends Activity {
         state.setTextColor(unlocked?Color.rgb(95,235,165):Color.LTGRAY);
         row.addView(state,new LinearLayout.LayoutParams(dp(42),dp(46)));
 
-        TextView badgeView=text("◆  "+badge,15);
+        TextView badgeView=text("◆  "+badge,14);
         badgeView.setGravity(Gravity.RIGHT|Gravity.CENTER_VERTICAL);
         badgeView.setTextColor(unlocked?color:Color.rgb(170,180,195));
         row.addView(badgeView,new LinearLayout.LayoutParams(0,dp(46),1));
 
-        TextView points=text(threshold+" امتیاز",14);
+        TextView points=text(threshold+" امتیاز",13);
         points.setGravity(Gravity.CENTER);
         points.setTextColor(Color.WHITE);
         row.addView(points,new LinearLayout.LayoutParams(dp(105),dp(46)));
 
-        table.addView(row,new LinearLayout.LayoutParams(-1,dp(56)));
+        table.addView(row,new LinearLayout.LayoutParams(-1,dp(50)));
     }
 
     void showRankings(){
@@ -1015,26 +1042,26 @@ public class MainActivity extends Activity {
         current.setGravity(Gravity.CENTER);
         current.setPadding(dp(12),dp(10),dp(12),dp(10));
         current.setBackground(bg(Color.argb(235,55,28,105),Color.argb(225,18,22,70),26));
-        TextView myScore=text("امتیاز واقعی من",15);
-        TextView scoreText=text(fa(score)+" ⭐",30);
+        TextView myScore=text("امتیاز فعلی من",14);
+        TextView scoreText=text(fa(score)+" ⭐",26);
         scoreText.setTextColor(Color.rgb(255,220,75));
-        TextView badge=text("نشان فعلی: "+badgeTitle(),17);
+        TextView badge=text("نشان فعلی: "+badgeTitle(),15);
         badge.setTextColor(badgeColor());
-        current.addView(myScore,new LinearLayout.LayoutParams(-1,dp(30)));
-        current.addView(scoreText,new LinearLayout.LayoutParams(-1,dp(48)));
-        current.addView(badge,new LinearLayout.LayoutParams(-1,dp(34)));
-        root.addView(current,new LinearLayout.LayoutParams(-1,dp(125)));
+        current.addView(myScore,new LinearLayout.LayoutParams(-1,dp(27)));
+        current.addView(scoreText,new LinearLayout.LayoutParams(-1,dp(42)));
+        current.addView(badge,new LinearLayout.LayoutParams(-1,dp(32)));
+        root.addView(current,new LinearLayout.LayoutParams(-1,dp(112)));
 
         int next=nextBadgeScore();
         String progressText = score>=30000 ? "همه نشان‌ها را به دست آوردی! 👑" : "تا نشان بعدی: "+fa(Math.max(0,next-score))+" امتیاز";
-        TextView nextText=text(progressText,15);
+        TextView nextText=text(progressText,14);
         nextText.setTextColor(Color.rgb(230,240,255));
         nextText.setBackground(bg(Color.argb(215,10,48,95),Color.argb(205,6,25,65),18));
-        root.addView(nextText,new LinearLayout.LayoutParams(-1,dp(58)));
+        root.addView(nextText,new LinearLayout.LayoutParams(-1,dp(50)));
 
-        TextView tableTitle=text("نشان‌ها و حد امتیاز",18);
+        TextView tableTitle=text("نشان‌ها و حد امتیاز",16);
         tableTitle.setGravity(Gravity.RIGHT|Gravity.CENTER_VERTICAL);
-        root.addView(tableTitle,new LinearLayout.LayoutParams(-1,dp(48)));
+        root.addView(tableTitle,new LinearLayout.LayoutParams(-1,dp(40)));
 
         LinearLayout table=new LinearLayout(this);
         table.setOrientation(LinearLayout.VERTICAL);
@@ -1044,12 +1071,15 @@ public class MainActivity extends Activity {
         addBadgeRow(table,"۱۰٬۰۰۰","پلاتینی",Color.rgb(205,225,240),score>=10000);
         addBadgeRow(table,"۲۰٬۰۰۰","الماسی",Color.rgb(90,220,245),score>=20000);
         addBadgeRow(table,"۳۰٬۰۰۰","استاد دانا",Color.rgb(125,235,255),score>=30000);
-        root.addView(table,new LinearLayout.LayoutParams(-1,dp(6*56+5*5)));
+        root.addView(table,new LinearLayout.LayoutParams(-1,dp(6*50+5*4)));
 
-        TextView note=text("امتیاز فقط با پاسخ درست به سؤال‌ها به دست می‌آید؛ با هر پاسخ درست ۱۰ امتیاز می‌گیری.",14);
+        TextView note=text("هر پاسخ درست ۱۰ امتیاز دارد و امتیاز شما ذخیره می‌شود.",13);
         note.setTextColor(Color.rgb(220,230,245));
         note.setGravity(Gravity.CENTER);
-        root.addView(note,new LinearLayout.LayoutParams(-1,dp(65)));
+        root.addView(note,new LinearLayout.LayoutParams(-1,dp(52)));
+        Button statsButton=button("📊 مشاهده آمار من");
+        statsButton.setOnClickListener(v->showStats());
+        LinearLayout.LayoutParams stp=new LinearLayout.LayoutParams(-1,dp(52)); stp.setMargins(0,dp(3),0,dp(3)); root.addView(statsButton,stp);
         addBottomNavStandalone();
     }
 
@@ -1097,23 +1127,37 @@ public class MainActivity extends Activity {
                 if(!profileImageUri.isEmpty()){
                     try{ avatar.setImageURI(Uri.parse(profileImageUri)); }catch(Exception ignored){ avatar.setImageResource(android.R.drawable.ic_menu_myplaces); }
                 }else{ avatar.setImageResource(android.R.drawable.ic_menu_myplaces); avatar.setColorFilter(Color.WHITE); avatar.setPadding(dp(5),dp(5),dp(5),dp(5)); }
-                item.addView(avatar,new LinearLayout.LayoutParams(dp(30),dp(30)));
-                TextView lab=text("پروفایل",11); lab.setGravity(Gravity.CENTER); item.addView(lab,new LinearLayout.LayoutParams(-1,dp(25)));
+                avatar.setPadding(0,0,0,0);
+                item.addView(avatar,new LinearLayout.LayoutParams(dp(40),dp(40)));
+                TextView lab=text("پروفایل",11); lab.setGravity(Gravity.CENTER); item.addView(lab,new LinearLayout.LayoutParams(-1,dp(21)));
                 item.setOnClickListener(v->showProfileEditor());
-                nav.addView(item,new LinearLayout.LayoutParams(0,dp(64),1));
+                nav.addView(item,new LinearLayout.LayoutParams(0,dp(68),1));
             }else{
-                TextView n=text(labels[i],12); n.setGravity(Gravity.CENTER); nav.addView(n,new LinearLayout.LayoutParams(0,dp(64),1));
+                TextView n=text(labels[i],12); n.setGravity(Gravity.CENTER); nav.addView(n,new LinearLayout.LayoutParams(0,dp(68),1));
                 if(i==1) n.setOnClickListener(v->showRankings());
                 else if(i==2) n.setOnClickListener(v->showFavorites());
                 else n.setOnClickListener(v->showHome());
             }
         }
-        root.addView(nav,new LinearLayout.LayoutParams(-1,dp(76)));
+        root.addView(nav,new LinearLayout.LayoutParams(-1,dp(80)));
     }
 
     boolean isFavorite(Question q){ return favorites.contains(q.q); }
     void saveFavorites(){ prefs.edit().putStringSet("favorites",new HashSet<>(favorites)).apply(); }
-    void toggleFavorite(Question q, Button b){ if(isFavorite(q)){favorites.remove(q.q); b.setText("☆");}else{favorites.add(q.q); b.setText("★");} saveFavorites(); }
+    void toggleFavorite(Question q, Button b){
+        if(isFavorite(q)){
+            favorites.remove(q.q);
+            b.setText("☆");
+            b.setTextColor(Color.WHITE);
+            Toast.makeText(this,"از علاقه‌مندی‌ها حذف شد",Toast.LENGTH_SHORT).show();
+        }else{
+            favorites.add(q.q);
+            b.setText("★");
+            b.setTextColor(Color.rgb(255,215,70));
+            Toast.makeText(this,"به علاقه‌مندی‌ها اضافه شد",Toast.LENGTH_SHORT).show();
+        }
+        saveFavorites();
+    }
 
     final String[][] extraSpecializedFacts = {
         {"کدام عنصر بیشترین فراوانی را در پوسته زمین دارد؟","⚗️","اکسیژن","سیلیسیم","آلومینیوم","آهن"},
@@ -1325,11 +1369,11 @@ public class MainActivity extends Activity {
         // استفاده می‌کنیم؛ متن سؤال تغییر می‌کند اما پاسخ و گزینه‌ها از همان داده معتبر می‌آیند.
         ArrayList<String[]> out=new ArrayList<>();
         String[] prefixes={
-            "به این پرسش علمی/عمومی پاسخ بده: %s",
-            "دانش خودت را امتحان کن؛ %s",
             "کدام گزینه پاسخ درست این پرسش است؟ %s",
-            "در یک آزمون اطلاعات عمومی، %s",
-            "اگر بخواهیم دقیق پاسخ بدهیم: %s"
+            "پاسخ این پرسش چیست؟ %s",
+            "کدام گزینه صحیح است؟ %s",
+            "پاسخ درست را پیدا کن: %s",
+            "گزینه صحیح کدام است؟ %s"
         };
         HashSet<String> used=new HashSet<>();
         int made=0;
@@ -1350,11 +1394,11 @@ public class MainActivity extends Activity {
             if(f.length<6) continue;
             for(int k=0;k<5 && made<2000;k++){
                 String q;
-                if(k==0) q="پاسخ درست را برای این سؤال انتخاب کن: "+f[0];
-                else if(k==1) q="در آزمون دانایی، پاسخ این پرسش چیست؟ "+f[0];
-                else if(k==2) q="کدام گزینه با این پرسش هماهنگ است؟ "+f[0];
-                else if(k==3) q="یک سؤال مهم برای دانستن: "+f[0];
-                else q="گزینه صحیح را پیدا کن: "+f[0];
+                if(k==0) q="کدام گزینه پاسخ درست این پرسش است؟ "+f[0];
+                else if(k==1) q="پاسخ این پرسش چیست؟ "+f[0];
+                else if(k==2) q="کدام گزینه صحیح است؟ "+f[0];
+                else if(k==3) q="پاسخ درست را پیدا کن: "+f[0];
+                else q="گزینه صحیح کدام است؟ "+f[0];
                 if(!used.add(q)) continue;
                 out.add(new String[]{q,f[1],f[2],f[3],f[4],f[5]});
                 made++;
@@ -1453,6 +1497,14 @@ public class MainActivity extends Activity {
         progress.setBackground(bg(Color.argb(235,18,55,115),Color.argb(230,7,27,70),22));
         top.addView(progress,new LinearLayout.LayoutParams(0,dp(48),1));
 
+        Button favoriteButton=smallButton(isFavorite(q)?"★":"☆");
+        favoriteButton.setTextSize(23);
+        favoriteButton.setTextColor(isFavorite(q)?Color.rgb(255,215,70):Color.WHITE);
+        favoriteButton.setOnClickListener(v->toggleFavorite(q,favoriteButton));
+        LinearLayout.LayoutParams fp=new LinearLayout.LayoutParams(dp(52),dp(48));
+        fp.setMargins(dp(6),0,dp(6),0);
+        top.addView(favoriteButton,fp);
+
         timerView=text("⏱  "+fa(10),17);
         timerView.setTextColor(Color.WHITE);
         timerView.setGravity(Gravity.CENTER);
@@ -1534,6 +1586,7 @@ public class MainActivity extends Activity {
             public void onFinish(){
                 if(answered)return;
                 answered=true;
+                statsAnswered++; statsWrong++; currentStreak=0; saveProgress();
                 if(timerView!=null){ timerView.setText("⏱ ۰"); timerView.setBackground(bg(Color.rgb(235,78,95),Color.rgb(145,25,55),24)); }
                 try{tone.startTone(android.media.ToneGenerator.TONE_CDMA_ALERT_CALL_GUARD,260);}catch(Exception ignored){}
                 Question q=questions.get(index);
@@ -1552,7 +1605,7 @@ public class MainActivity extends Activity {
     void answer(int n,Button chosen){
         if(answered)return; answered=true;
         if(questionTimer!=null){questionTimer.cancel();questionTimer=null;}
-        Question q=questions.get(index); saveAnswered(q.q); boolean ok=n==q.correct;
+        Question q=questions.get(index); saveAnswered(q.q); boolean ok=n==q.correct; statsAnswered++; if(ok){statsCorrect++;currentStreak++;bestStreak=Math.max(bestStreak,currentStreak);}else{statsWrong++;currentStreak=0;}
         try{tone.startTone(ok?android.media.ToneGenerator.TONE_PROP_ACK:android.media.ToneGenerator.TONE_PROP_NACK,180);}catch(Exception ignored){}
         if(ok){if(timerView!=null) timerView.setBackground(bg(Color.rgb(35,170,115),Color.rgb(10,105,75),24));score+=10; sessionScore+=10; coin+=5; saveProgress();chosen.setBackground(bg(Color.rgb(35,205,130),Color.rgb(10,125,80),25));chosen.setTextColor(Color.WHITE);chosen.setText("✓  "+chosen.getText());}
         else{if(timerView!=null) timerView.setBackground(bg(Color.rgb(235,78,95),Color.rgb(145,25,55),24));coin=Math.max(0,coin-5);lives=Math.max(0,lives-1);saveProgress();chosen.setBackground(bg(Color.rgb(235,78,95),Color.rgb(145,25,55),25));chosen.setTextColor(Color.WHITE);chosen.setText("✕  "+chosen.getText()); Button correct=answerButtons.get(q.correct);correct.setBackground(bg(Color.rgb(35,205,130),Color.rgb(10,125,80),25));correct.setTextColor(Color.WHITE);correct.setText("✓  "+correct.getText());}
