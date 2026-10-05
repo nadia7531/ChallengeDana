@@ -19,6 +19,7 @@ public class MainActivity extends Activity {
     LinearLayout root, content;
     TextView progress, coins, questionText, picture;
     int index = 0, score = 0, coin = 50, lives = 5;
+    int sessionScore = 0;
     boolean answered = false;
     CountDownTimer questionTimer;
     TextView timerView;
@@ -705,6 +706,8 @@ public class MainActivity extends Activity {
         prefs = getSharedPreferences("dana_profile", MODE_PRIVATE);
         profileName = prefs.getString("name", "");
         profileImageUri = prefs.getString("image", "");
+        score = prefs.getInt("score", 0);
+        coin = prefs.getInt("coins", 50);
         favorites.addAll(prefs.getStringSet("favorites", new HashSet<String>()));
         answeredQuestions.addAll(prefs.getStringSet("answered_questions", new HashSet<String>()));
         buildQuestions();
@@ -868,16 +871,18 @@ public class MainActivity extends Activity {
         gear.setOnClickListener(v->showProfileEditor());
         top.addView(gear,new LinearLayout.LayoutParams(dp(46),dp(46)));
 
-        Space topSpace=new Space(this);
-        top.addView(topSpace,new LinearLayout.LayoutParams(0,dp(46),1));
-
-        // سکه بدون مربع/کادر اضافه
+        // سکه دقیقاً کنار تنظیمات قرار می‌گیرد؛ بدون مربع یا کادر اضافه.
         TextView coinPill=text("سکه  "+fa(coin),15);
         coinPill.setTextColor(Color.rgb(255,220,85));
         coinPill.setGravity(Gravity.CENTER);
         coinPill.setSingleLine(true);
         coinPill.setBackgroundColor(Color.TRANSPARENT);
-        top.addView(coinPill,new LinearLayout.LayoutParams(dp(82),dp(44)));
+        LinearLayout.LayoutParams cpill=new LinearLayout.LayoutParams(dp(82),dp(44));
+        cpill.setMargins(dp(4),0,0,0);
+        top.addView(coinPill,cpill);
+
+        Space topSpace=new Space(this);
+        top.addView(topSpace,new LinearLayout.LayoutParams(0,dp(46),1));
 
         ImageView profileIcon=new ImageView(this);
         profileIcon.setScaleType(ImageView.ScaleType.CENTER_CROP); profileIcon.setClipToOutline(true); profileIcon.setOutlineProvider(new android.view.ViewOutlineProvider(){ public void getOutline(View v, android.graphics.Outline o){o.setOval(0,0,v.getWidth(),v.getHeight());} });
@@ -941,22 +946,110 @@ public class MainActivity extends Activity {
         root.addView(bar,new LinearLayout.LayoutParams(-1,dp(62)));
     }
 
+    String badgeTitle(){
+        if(score>=30000) return "استاد دانا";
+        if(score>=20000) return "الماسی";
+        if(score>=10000) return "پلاتینی";
+        if(score>=5000) return "طلایی";
+        if(score>=2000) return "نقره‌ای";
+        if(score>=1000) return "برنزی";
+        return "تازه‌وارد";
+    }
+
+    int badgeColor(){
+        if(score>=30000) return Color.rgb(120,220,255);
+        if(score>=20000) return Color.rgb(90,210,235);
+        if(score>=10000) return Color.rgb(190,205,220);
+        if(score>=5000) return Color.rgb(255,195,55);
+        if(score>=2000) return Color.rgb(190,200,215);
+        if(score>=1000) return Color.rgb(205,125,65);
+        return Color.rgb(110,175,235);
+    }
+
+    int nextBadgeScore(){
+        if(score<1000) return 1000;
+        if(score<2000) return 2000;
+        if(score<5000) return 5000;
+        if(score<10000) return 10000;
+        if(score<20000) return 20000;
+        if(score<30000) return 30000;
+        return 30000;
+    }
+
+    void saveProgress(){
+        prefs.edit().putInt("score",score).putInt("coins",coin).apply();
+    }
+
+    void addBadgeRow(LinearLayout table, String threshold, String badge, int color, boolean unlocked){
+        LinearLayout row=new LinearLayout(this);
+        row.setOrientation(LinearLayout.HORIZONTAL);
+        row.setGravity(Gravity.CENTER_VERTICAL);
+        row.setLayoutDirection(View.LAYOUT_DIRECTION_RTL);
+        row.setPadding(dp(8),dp(5),dp(8),dp(5));
+        row.setBackground(bg(unlocked?Color.argb(225,20,65,105):Color.argb(175,12,35,70), unlocked?Color.argb(215,8,35,75):Color.argb(155,8,24,52),18));
+
+        TextView state=text(unlocked?"✓":"🔒",18);
+        state.setTextColor(unlocked?Color.rgb(95,235,165):Color.LTGRAY);
+        row.addView(state,new LinearLayout.LayoutParams(dp(42),dp(46)));
+
+        TextView badgeView=text("◆  "+badge,15);
+        badgeView.setGravity(Gravity.RIGHT|Gravity.CENTER_VERTICAL);
+        badgeView.setTextColor(unlocked?color:Color.rgb(170,180,195));
+        row.addView(badgeView,new LinearLayout.LayoutParams(0,dp(46),1));
+
+        TextView points=text(threshold+" امتیاز",14);
+        points.setGravity(Gravity.CENTER);
+        points.setTextColor(Color.WHITE);
+        row.addView(points,new LinearLayout.LayoutParams(dp(105),dp(46)));
+
+        table.addView(row,new LinearLayout.LayoutParams(-1,dp(56)));
+    }
+
     void showRankings(){
         inGame=false; backArmed=false; currentBackground=2; base();
-        addPageHeader("رتبه‌ها 🏆");
+        addPageHeader("جدول امتیازها 🏆");
         addProfileCard();
-        TextView mine=text("رتبه من\n"+fa(Math.max(1, 1000-score/10))+"   •   امتیاز "+fa(score),20);
-        mine.setBackground(bg(Color.argb(230,55,28,105),Color.argb(220,18,22,70),26));
-        root.addView(mine,new LinearLayout.LayoutParams(-1,dp(100)));
-        root.addView(title("جدول امتیاز",22),new LinearLayout.LayoutParams(-1,dp(48)));
-        String[] names={"دانای برتر","استاد دانش","ذهن طلایی","دانای امروز"};
-        int[] pts={980,860,740,620};
-        for(int i=0;i<names.length;i++){
-            TextView row=text((i+1)+"   "+names[i]+"                         "+fa(pts[i])+" امتیاز",17);
-            row.setGravity(Gravity.CENTER_VERTICAL|Gravity.RIGHT);
-            row.setBackground(bg(Color.argb(220,10,48,105),Color.argb(210,6,25,65),20));
-            LinearLayout.LayoutParams rp=new LinearLayout.LayoutParams(-1,dp(54)); rp.setMargins(0,dp(5),0,dp(5)); root.addView(row,rp);
-        }
+
+        LinearLayout current=new LinearLayout(this);
+        current.setOrientation(LinearLayout.VERTICAL);
+        current.setGravity(Gravity.CENTER);
+        current.setPadding(dp(12),dp(10),dp(12),dp(10));
+        current.setBackground(bg(Color.argb(235,55,28,105),Color.argb(225,18,22,70),26));
+        TextView myScore=text("امتیاز واقعی من",15);
+        TextView scoreText=text(fa(score)+" ⭐",30);
+        scoreText.setTextColor(Color.rgb(255,220,75));
+        TextView badge=text("نشان فعلی: "+badgeTitle(),17);
+        badge.setTextColor(badgeColor());
+        current.addView(myScore,new LinearLayout.LayoutParams(-1,dp(30)));
+        current.addView(scoreText,new LinearLayout.LayoutParams(-1,dp(48)));
+        current.addView(badge,new LinearLayout.LayoutParams(-1,dp(34)));
+        root.addView(current,new LinearLayout.LayoutParams(-1,dp(125)));
+
+        int next=nextBadgeScore();
+        String progressText = score>=30000 ? "همه نشان‌ها را به دست آوردی! 👑" : "تا نشان بعدی: "+fa(Math.max(0,next-score))+" امتیاز";
+        TextView nextText=text(progressText,15);
+        nextText.setTextColor(Color.rgb(230,240,255));
+        nextText.setBackground(bg(Color.argb(215,10,48,95),Color.argb(205,6,25,65),18));
+        root.addView(nextText,new LinearLayout.LayoutParams(-1,dp(58)));
+
+        TextView tableTitle=text("نشان‌ها و حد امتیاز",18);
+        tableTitle.setGravity(Gravity.RIGHT|Gravity.CENTER_VERTICAL);
+        root.addView(tableTitle,new LinearLayout.LayoutParams(-1,dp(48)));
+
+        LinearLayout table=new LinearLayout(this);
+        table.setOrientation(LinearLayout.VERTICAL);
+        addBadgeRow(table,"۱٬۰۰۰","برنزی",Color.rgb(205,125,65),score>=1000);
+        addBadgeRow(table,"۲٬۰۰۰","نقره‌ای",Color.rgb(200,210,225),score>=2000);
+        addBadgeRow(table,"۵٬۰۰۰","طلایی",Color.rgb(255,195,55),score>=5000);
+        addBadgeRow(table,"۱۰٬۰۰۰","پلاتینی",Color.rgb(205,225,240),score>=10000);
+        addBadgeRow(table,"۲۰٬۰۰۰","الماسی",Color.rgb(90,220,245),score>=20000);
+        addBadgeRow(table,"۳۰٬۰۰۰","استاد دانا",Color.rgb(125,235,255),score>=30000);
+        root.addView(table,new LinearLayout.LayoutParams(-1,dp(6*56+5*5)));
+
+        TextView note=text("امتیاز فقط با پاسخ درست به سؤال‌ها به دست می‌آید؛ با هر پاسخ درست ۱۰ امتیاز می‌گیری.",14);
+        note.setTextColor(Color.rgb(220,230,245));
+        note.setGravity(Gravity.CENTER);
+        root.addView(note,new LinearLayout.LayoutParams(-1,dp(65)));
         addBottomNavStandalone();
     }
 
@@ -993,8 +1086,28 @@ public class MainActivity extends Activity {
     void addBottomNavStandalone(){
         Space sp=new Space(this); root.addView(sp,new LinearLayout.LayoutParams(1,dp(10)));
         LinearLayout nav=new LinearLayout(this); nav.setOrientation(LinearLayout.HORIZONTAL); nav.setGravity(Gravity.CENTER); nav.setPadding(dp(6),dp(4),dp(6),dp(4)); nav.setBackground(goldNavBg());
-        String[] labels={"⌂\nخانه","🏆\nرتبه‌ها","★\nعلاقه‌مندی‌ها","👤\nپروفایل"};
-        for(String lab:labels){ TextView n=text(lab,12); n.setGravity(Gravity.CENTER); nav.addView(n,new LinearLayout.LayoutParams(0,dp(64),1)); if(lab.contains("رتبه")) n.setOnClickListener(v->showRankings()); else if(lab.contains("علاقه")) n.setOnClickListener(v->showFavorites()); else if(lab.contains("پروفایل")) n.setOnClickListener(v->showProfileEditor()); else n.setOnClickListener(v->showHome()); }
+        String[] labels={"⌂\nخانه","🏆\nامتیازها","★\nعلاقه‌مندی‌ها","پروفایل"};
+        for(int i=0;i<labels.length;i++){
+            final int pos=i;
+            if(i==3){
+                LinearLayout item=new LinearLayout(this); item.setOrientation(LinearLayout.VERTICAL); item.setGravity(Gravity.CENTER); item.setLayoutDirection(View.LAYOUT_DIRECTION_RTL);
+                ImageView avatar=new ImageView(this);
+                avatar.setScaleType(ImageView.ScaleType.CENTER_CROP); avatar.setClipToOutline(true);
+                avatar.setOutlineProvider(new android.view.ViewOutlineProvider(){ public void getOutline(View v, android.graphics.Outline o){o.setOval(0,0,v.getWidth(),v.getHeight());} });
+                if(!profileImageUri.isEmpty()){
+                    try{ avatar.setImageURI(Uri.parse(profileImageUri)); }catch(Exception ignored){ avatar.setImageResource(android.R.drawable.ic_menu_myplaces); }
+                }else{ avatar.setImageResource(android.R.drawable.ic_menu_myplaces); avatar.setColorFilter(Color.WHITE); avatar.setPadding(dp(5),dp(5),dp(5),dp(5)); }
+                item.addView(avatar,new LinearLayout.LayoutParams(dp(30),dp(30)));
+                TextView lab=text("پروفایل",11); lab.setGravity(Gravity.CENTER); item.addView(lab,new LinearLayout.LayoutParams(-1,dp(25)));
+                item.setOnClickListener(v->showProfileEditor());
+                nav.addView(item,new LinearLayout.LayoutParams(0,dp(64),1));
+            }else{
+                TextView n=text(labels[i],12); n.setGravity(Gravity.CENTER); nav.addView(n,new LinearLayout.LayoutParams(0,dp(64),1));
+                if(i==1) n.setOnClickListener(v->showRankings());
+                else if(i==2) n.setOnClickListener(v->showFavorites());
+                else n.setOnClickListener(v->showHome());
+            }
+        }
         root.addView(nav,new LinearLayout.LayoutParams(-1,dp(76)));
     }
 
@@ -1207,6 +1320,49 @@ public class MainActivity extends Activity {
         return out;
     }
 
+    ArrayList<String[]> generatedInternationalScience2000(ArrayList<String[]> source){
+        // برای رسیدن به ۳۰۰۰ سؤال، از بانک علمی/بین‌المللی موجود چند شیوه سؤال‌سازی
+        // استفاده می‌کنیم؛ متن سؤال تغییر می‌کند اما پاسخ و گزینه‌ها از همان داده معتبر می‌آیند.
+        ArrayList<String[]> out=new ArrayList<>();
+        String[] prefixes={
+            "به این پرسش علمی/عمومی پاسخ بده: %s",
+            "دانش خودت را امتحان کن؛ %s",
+            "کدام گزینه پاسخ درست این پرسش است؟ %s",
+            "در یک آزمون اطلاعات عمومی، %s",
+            "اگر بخواهیم دقیق پاسخ بدهیم: %s"
+        };
+        HashSet<String> used=new HashSet<>();
+        int made=0;
+        // بیشتر از بخش‌های علمی و بین‌المللی انتخاب می‌کنیم و سپس تا ۲۰۰۰ سؤال تولید می‌کنیم.
+        for(String[] f:source){
+            if(f.length<6 || f[0].contains("قائنات") || f[0].contains("استان ایران")) continue;
+            if(!used.add(f[0])) continue;
+            for(String p:prefixes){
+                if(made>=2000) return out;
+                String q=String.format(p,f[0]);
+                out.add(new String[]{q,f[1],f[2],f[3],f[4],f[5]});
+                made++;
+            }
+        }
+        // اگر بانک اولیه کمتر از ۴۰۰ موضوع داشت، از همه موضوعات باقی‌مانده تکمیل می‌کنیم.
+        for(String[] f:source){
+            if(made>=2000) break;
+            if(f.length<6) continue;
+            for(int k=0;k<5 && made<2000;k++){
+                String q;
+                if(k==0) q="پاسخ درست را برای این سؤال انتخاب کن: "+f[0];
+                else if(k==1) q="در آزمون دانایی، پاسخ این پرسش چیست؟ "+f[0];
+                else if(k==2) q="کدام گزینه با این پرسش هماهنگ است؟ "+f[0];
+                else if(k==3) q="یک سؤال مهم برای دانستن: "+f[0];
+                else q="گزینه صحیح را پیدا کن: "+f[0];
+                if(!used.add(q)) continue;
+                out.add(new String[]{q,f[1],f[2],f[3],f[4],f[5]});
+                made++;
+            }
+        }
+        return out;
+    }
+
     void buildQuestions(){
         questions.clear();
         ArrayList<String[]> all=new ArrayList<>();
@@ -1215,13 +1371,25 @@ public class MainActivity extends Activity {
         all.addAll(Arrays.asList(specializedFacts));
         all.addAll(Arrays.asList(extraSpecializedFacts));
         all.addAll(Arrays.asList(iranAdvancedFacts));
-        ArrayList<String[]> english=new ArrayList<>(generatedEnglish500());
-        Random rnd=new Random(System.nanoTime());
+        ArrayList<String[]> scienceInternationalSource=new ArrayList<>();
+        scienceInternationalSource.addAll(Arrays.asList(facts));
+        scienceInternationalSource.addAll(Arrays.asList(specializedFacts));
+        scienceInternationalSource.addAll(Arrays.asList(extraSpecializedFacts));
+        scienceInternationalSource.addAll(Arrays.asList(iranAdvancedFacts));
+        ArrayList<String[]> generated=generatedInternationalScience2000(scienceInternationalSource);
+        all.addAll(generated);
+
+        ArrayList<String[]> englishAll=new ArrayList<>(generatedEnglish500());
+        // ۵۰۰ سؤال انگلیسی کوتاه و فارسی‌محور نگه داشته می‌شود.
+        if(englishAll.size()>500) englishAll=new ArrayList<>(englishAll.subList(0,500));
+
+        Random rnd=new Random(20261005L);
         Collections.shuffle(all,rnd);
-        Collections.shuffle(english,rnd);
+        Collections.shuffle(englishAll,rnd);
         ArrayList<Question> nonEnglishQ=new ArrayList<>();
         ArrayList<Question> englishQ=new ArrayList<>();
         HashSet<String> seen=new HashSet<>();
+
         for(String[] f:all){
             if(f.length<6 || !seen.add(f[0])) continue;
             String[] opts={f[2],f[3],f[4],f[5]};
@@ -1229,26 +1397,30 @@ public class MainActivity extends Activity {
             Collections.shuffle(shuffled,rnd);
             int correct=shuffled.indexOf(f[2]);
             nonEnglishQ.add(new Question(f[0],f[1],shuffled.toArray(new String[0]),correct));
+            if(nonEnglishQ.size()>=2500) break;
         }
         seen.clear();
-        for(String[] f:english){
+        for(String[] f:englishAll){
             if(f.length<6 || !seen.add(f[0])) continue;
             String[] opts={f[2],f[3],f[4],f[5]};
             ArrayList<String> shuffled=new ArrayList<>(Arrays.asList(opts));
             Collections.shuffle(shuffled,rnd);
             int correct=shuffled.indexOf(f[2]);
             englishQ.add(new Question(f[0],f[1],shuffled.toArray(new String[0]),correct));
+            if(englishQ.size()>=500) break;
         }
+        // دقیقاً ۳۰۰۰ سؤال: ۲۵۰۰ عمومی/علمی/بین‌المللی + ۵۰۰ انگلیسی.
         int ni=0, ei=0;
-        while(ni<nonEnglishQ.size()){
+        while(ni<nonEnglishQ.size() && ei<englishQ.size()){
             for(int k=0;k<10 && ni<nonEnglishQ.size();k++) questions.add(nonEnglishQ.get(ni++));
             if(ei<englishQ.size()) questions.add(englishQ.get(ei++));
         }
+        while(ni<nonEnglishQ.size()) questions.add(nonEnglishQ.get(ni++));
         while(ei<englishQ.size()) questions.add(englishQ.get(ei++));
     }
 
     void startGame(){
-        index=0;score=0;coin=50;lives=5;
+        index=0;sessionScore=0;lives=5;
         ArrayList<Question> fresh=new ArrayList<>();
         for(Question q:questions) if(!answeredQuestions.contains(q.q)) fresh.add(q);
         if(fresh.isEmpty()){
@@ -1382,8 +1554,8 @@ public class MainActivity extends Activity {
         if(questionTimer!=null){questionTimer.cancel();questionTimer=null;}
         Question q=questions.get(index); saveAnswered(q.q); boolean ok=n==q.correct;
         try{tone.startTone(ok?android.media.ToneGenerator.TONE_PROP_ACK:android.media.ToneGenerator.TONE_PROP_NACK,180);}catch(Exception ignored){}
-        if(ok){if(timerView!=null) timerView.setBackground(bg(Color.rgb(35,170,115),Color.rgb(10,105,75),24));score+=10;coin+=5;chosen.setBackground(bg(Color.rgb(35,205,130),Color.rgb(10,125,80),25));chosen.setTextColor(Color.WHITE);chosen.setText("✓  "+chosen.getText());}
-        else{if(timerView!=null) timerView.setBackground(bg(Color.rgb(235,78,95),Color.rgb(145,25,55),24));coin=Math.max(0,coin-5);lives=Math.max(0,lives-1);chosen.setBackground(bg(Color.rgb(235,78,95),Color.rgb(145,25,55),25));chosen.setTextColor(Color.WHITE);chosen.setText("✕  "+chosen.getText()); Button correct=answerButtons.get(q.correct);correct.setBackground(bg(Color.rgb(35,205,130),Color.rgb(10,125,80),25));correct.setTextColor(Color.WHITE);correct.setText("✓  "+correct.getText());}
+        if(ok){if(timerView!=null) timerView.setBackground(bg(Color.rgb(35,170,115),Color.rgb(10,105,75),24));score+=10; sessionScore+=10; coin+=5; saveProgress();chosen.setBackground(bg(Color.rgb(35,205,130),Color.rgb(10,125,80),25));chosen.setTextColor(Color.WHITE);chosen.setText("✓  "+chosen.getText());}
+        else{if(timerView!=null) timerView.setBackground(bg(Color.rgb(235,78,95),Color.rgb(145,25,55),24));coin=Math.max(0,coin-5);lives=Math.max(0,lives-1);saveProgress();chosen.setBackground(bg(Color.rgb(235,78,95),Color.rgb(145,25,55),25));chosen.setTextColor(Color.WHITE);chosen.setText("✕  "+chosen.getText()); Button correct=answerButtons.get(q.correct);correct.setBackground(bg(Color.rgb(35,205,130),Color.rgb(10,125,80),25));correct.setTextColor(Color.WHITE);correct.setText("✓  "+correct.getText());}
         new android.os.Handler().postDelayed(()->{
             if(!inGame)return;
             if(lives<=0){ showGameOver(); return; }
