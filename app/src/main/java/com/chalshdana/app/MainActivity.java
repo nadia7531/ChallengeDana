@@ -983,14 +983,30 @@ public class MainActivity extends Activity {
         prefs.edit().putInt("score",score).putInt("coins",coin)
             .putInt("stats_correct",statsCorrect).putInt("stats_wrong",statsWrong)
             .putInt("stats_answered",statsAnswered).putInt("stats_streak",currentStreak)
-            .putInt("stats_best_streak",bestStreak).apply();
+            .putInt("stats_best_streak",bestStreak).commit();
+    }
+
+    void refreshStatsFromStorage(){
+        statsCorrect=prefs.getInt("stats_correct",statsCorrect);
+        statsWrong=prefs.getInt("stats_wrong",statsWrong);
+        statsAnswered=prefs.getInt("stats_answered",statsAnswered);
+        currentStreak=prefs.getInt("stats_streak",currentStreak);
+        bestStreak=prefs.getInt("stats_best_streak",bestStreak);
+        score=prefs.getInt("score",score);
+        coin=prefs.getInt("coins",coin);
+        int calculated=statsCorrect+statsWrong;
+        if(statsAnswered<calculated) statsAnswered=calculated;
     }
 
     void showStats(){
-        statsCorrect=prefs.getInt("stats_correct",statsCorrect); statsWrong=prefs.getInt("stats_wrong",statsWrong); statsAnswered=prefs.getInt("stats_answered",statsAnswered); currentStreak=prefs.getInt("stats_streak",currentStreak); bestStreak=prefs.getInt("stats_best_streak",bestStreak); score=prefs.getInt("score",score); coin=prefs.getInt("coins",coin);
+        refreshStatsFromStorage();
         inGame=false; backArmed=false; currentBackground=2; base();
         addPageHeader("آمار من 📊");
         addProfileCard();
+        TextView summary=text("درست: "+fa(statsCorrect)+"   |   غلط: "+fa(statsWrong)+"   |   کل: "+fa(statsAnswered),16);
+        summary.setTextColor(Color.WHITE);
+        summary.setBackground(bg(Color.argb(235,35,75,125),Color.argb(225,10,35,75),20));
+        root.addView(summary,new LinearLayout.LayoutParams(-1,dp(52)));
         int pct=statsAnswered==0?0:(int)Math.round(statsCorrect*100.0/statsAnswered);
         TextView total=text("تعداد سؤال‌های پاسخ‌داده‌شده\n"+fa(statsAnswered),20);
         TextView correct=text("پاسخ‌های درست\n"+fa(statsCorrect)+" ✓",19);
@@ -1035,7 +1051,7 @@ public class MainActivity extends Activity {
     }
 
     void showRankings(){
-        statsCorrect=prefs.getInt("stats_correct",statsCorrect); statsWrong=prefs.getInt("stats_wrong",statsWrong); statsAnswered=prefs.getInt("stats_answered",statsAnswered); score=prefs.getInt("score",score); coin=prefs.getInt("coins",coin);
+        refreshStatsFromStorage();
         inGame=false; backArmed=false; currentBackground=2; base();
         addPageHeader("جدول امتیازها 🏆");
         addProfileCard();
@@ -1045,15 +1061,15 @@ public class MainActivity extends Activity {
         current.setGravity(Gravity.CENTER);
         current.setPadding(dp(12),dp(10),dp(12),dp(10));
         current.setBackground(bg(Color.argb(235,55,28,105),Color.argb(225,18,22,70),26));
-        TextView myScore=text("امتیاز فعلی من",16);
-        TextView scoreText=text(fa(score)+" ⭐",26);
+        TextView myScore=text("امتیاز فعلی من",15);
+        TextView scoreText=text(fa(score)+" ⭐",22);
         scoreText.setTextColor(Color.rgb(255,220,75));
-        TextView badge=text("نشان فعلی: "+badgeTitle(),16);
+        TextView badge=text("نشان فعلی: "+badgeTitle(),14);
         badge.setTextColor(badgeColor());
-        current.addView(myScore,new LinearLayout.LayoutParams(-1,dp(34)));
-        current.addView(scoreText,new LinearLayout.LayoutParams(-1,dp(48)));
-        current.addView(badge,new LinearLayout.LayoutParams(-1,dp(38)));
-        root.addView(current,new LinearLayout.LayoutParams(-1,dp(132)));
+        current.addView(myScore,new LinearLayout.LayoutParams(-1,dp(32)));
+        current.addView(scoreText,new LinearLayout.LayoutParams(-1,dp(44)));
+        current.addView(badge,new LinearLayout.LayoutParams(-1,dp(36)));
+        root.addView(current,new LinearLayout.LayoutParams(-1,dp(122)));
 
         int next=nextBadgeScore();
         String progressText = score>=30000 ? "همه نشان‌ها را به دست آوردی! 👑" : "تا نشان بعدی: "+fa(Math.max(0,next-score))+" امتیاز";
@@ -1122,53 +1138,35 @@ public class MainActivity extends Activity {
     }
 
     void addBottomNavStandalone(){
-        Space sp=new Space(this); root.addView(sp,new LinearLayout.LayoutParams(1,dp(10)));
-        LinearLayout nav=new LinearLayout(this); nav.setOrientation(LinearLayout.HORIZONTAL); nav.setGravity(Gravity.CENTER); nav.setPadding(dp(6),dp(4),dp(6),dp(4)); nav.setBackground(goldNavBg());
-        String[] icons={"⌂","🏆","♡","♙"};
+        Space sp=new Space(this); root.addView(sp,new LinearLayout.LayoutParams(1,dp(8)));
+        LinearLayout nav=new LinearLayout(this); nav.setOrientation(LinearLayout.HORIZONTAL);
+        nav.setGravity(Gravity.CENTER); nav.setPadding(dp(8),dp(4),dp(8),dp(4)); nav.setBackground(goldNavBg());
+        int[] icons={R.drawable.nav_home,R.drawable.nav_trophy,R.drawable.nav_heart,R.drawable.nav_profile};
         String[] labels={"خانه","امتیازها","علاقه‌مندی‌ها","پروفایل"};
         for(int i=0;i<labels.length;i++){
             final int pos=i;
-            if(i==3){
-                LinearLayout item=new LinearLayout(this); item.setOrientation(LinearLayout.VERTICAL); item.setGravity(Gravity.CENTER); item.setLayoutDirection(View.LAYOUT_DIRECTION_RTL);
-                ImageView avatar=new ImageView(this);
-                avatar.setScaleType(ImageView.ScaleType.CENTER_CROP); avatar.setClipToOutline(true);
-                avatar.setOutlineProvider(new android.view.ViewOutlineProvider(){ public void getOutline(View v, android.graphics.Outline o){o.setOval(0,0,v.getWidth(),v.getHeight());} });
-                if(!profileImageUri.isEmpty()){
-                    try{ avatar.setImageURI(Uri.parse(profileImageUri)); }catch(Exception ignored){ avatar.setImageResource(android.R.drawable.ic_menu_myplaces); }
-                }else{ avatar.setImageResource(android.R.drawable.ic_menu_myplaces); avatar.setColorFilter(Color.WHITE); avatar.setPadding(dp(5),dp(5),dp(5),dp(5)); }
-                avatar.setPadding(0,0,0,0);
-                item.addView(avatar,new LinearLayout.LayoutParams(dp(36),dp(36)));
-                TextView lab=text(labels[i],10); lab.setGravity(Gravity.CENTER); lab.setSingleLine(true); lab.setEllipsize(null); item.addView(lab,new LinearLayout.LayoutParams(-1,dp(28)));
-                item.setOnClickListener(v->showProfileEditor());
-                nav.addView(item,new LinearLayout.LayoutParams(0,dp(68),1));
-            }else{
-                LinearLayout item=new LinearLayout(this); item.setOrientation(LinearLayout.VERTICAL); item.setGravity(Gravity.CENTER); item.setLayoutDirection(View.LAYOUT_DIRECTION_RTL);
-                TextView ico=text(icons[i],21); ico.setGravity(Gravity.CENTER); ico.setIncludeFontPadding(true);
-                TextView n=text(labels[i],10); n.setGravity(Gravity.CENTER); n.setSingleLine(true); n.setEllipsize(null);
-                item.addView(ico,new LinearLayout.LayoutParams(-1,dp(34))); item.addView(n,new LinearLayout.LayoutParams(-1,dp(28)));
-                nav.addView(item,new LinearLayout.LayoutParams(0,dp(72),1));
-                View clickTarget=item;
-
-                if(i==1) clickTarget.setOnClickListener(v->showRankings());
-                else if(i==2) clickTarget.setOnClickListener(v->showFavorites());
-                else clickTarget.setOnClickListener(v->showHome());
-            }
+            LinearLayout item=new LinearLayout(this); item.setOrientation(LinearLayout.VERTICAL); item.setGravity(Gravity.CENTER); item.setLayoutDirection(View.LAYOUT_DIRECTION_RTL);
+            ImageView ico=new ImageView(this); ico.setImageResource(icons[i]); ico.setScaleType(ImageView.ScaleType.CENTER_INSIDE); ico.setPadding(dp(4),dp(3),dp(4),dp(3)); ico.setColorFilter(i==2?Color.rgb(255,95,105):Color.WHITE);
+            TextView lab=text(labels[i],11); lab.setGravity(Gravity.CENTER); lab.setMaxLines(1); lab.setSingleLine(true); lab.setEllipsize(null); lab.setIncludeFontPadding(false); lab.setPadding(0,0,0,0);
+            item.addView(ico,new LinearLayout.LayoutParams(-1,dp(34))); item.addView(lab,new LinearLayout.LayoutParams(-1,dp(28)));
+            if(i==3) item.setOnClickListener(v->showProfileEditor()); else if(i==1) item.setOnClickListener(v->showRankings()); else if(i==2) item.setOnClickListener(v->showFavorites()); else item.setOnClickListener(v->showHome());
+            nav.addView(item,new LinearLayout.LayoutParams(0,dp(68),1));
         }
-        root.addView(nav,new LinearLayout.LayoutParams(-1,dp(88)));
+        root.addView(nav,new LinearLayout.LayoutParams(-1,dp(78)));
     }
 
     boolean isFavorite(Question q){ return favorites.contains(q.q); }
     void saveFavorites(){ prefs.edit().putStringSet("favorites",new HashSet<>(favorites)).apply(); }
-    void toggleFavorite(Question q, Button b){
+    void toggleFavorite(Question q, ImageButton b){
         if(isFavorite(q)){
             favorites.remove(q.q);
-            b.setText("♡");
-            b.setTextColor(Color.WHITE);
+            b.setImageResource(R.drawable.nav_heart);
+            b.setColorFilter(Color.WHITE);
             Toast.makeText(this,"از علاقه‌مندی‌ها حذف شد",Toast.LENGTH_SHORT).show();
         }else{
             favorites.add(q.q);
-            b.setText("♥");
-            b.setTextColor(Color.rgb(255,95,105));
+            b.setImageResource(R.drawable.nav_heart);
+            b.setColorFilter(Color.rgb(255,95,105));
             Toast.makeText(this,"به علاقه‌مندی‌ها اضافه شد",Toast.LENGTH_SHORT).show();
         }
         saveFavorites();
@@ -1368,41 +1366,27 @@ public class MainActivity extends Activity {
     }
 
     ArrayList<String[]> generatedInternationalScience2000(ArrayList<String[]> source){
-        // برای رسیدن به ۳۰۰۰ سؤال، از بانک علمی/بین‌المللی موجود چند شیوه سؤال‌سازی
-        // استفاده می‌کنیم؛ متن سؤال تغییر می‌کند اما پاسخ و گزینه‌ها از همان داده معتبر می‌آیند.
+        // فقط متن اصلی سؤال تولید می‌شود؛ هیچ مقدمه‌ای قبل از سؤال اضافه نمی‌شود.
         ArrayList<String[]> out=new ArrayList<>();
-        String[] prefixes={
-            "کدام گزینه پاسخ درست این پرسش است؟ %s",
-            "پاسخ این پرسش چیست؟ %s",
-            "کدام گزینه صحیح است؟ %s",
-            "پاسخ درست را پیدا کن: %s",
-            "گزینه صحیح کدام است؟ %s"
-        };
         HashSet<String> used=new HashSet<>();
         int made=0;
-        // بیشتر از بخش‌های علمی و بین‌المللی انتخاب می‌کنیم و سپس تا ۲۰۰۰ سؤال تولید می‌کنیم.
         for(String[] f:source){
             if(f.length<6 || f[0].contains("قائنات") || f[0].contains("استان ایران")) continue;
             if(!used.add(f[0])) continue;
-            for(String p:prefixes){
+            for(int k=0;k<5;k++){
                 if(made>=2000) return out;
-                String q=String.format(p,f[0]);
+                String q=f[0];
                 out.add(new String[]{q,f[1],f[2],f[3],f[4],f[5]});
                 made++;
             }
         }
-        // اگر بانک اولیه کمتر از ۴۰۰ موضوع داشت، از همه موضوعات باقی‌مانده تکمیل می‌کنیم.
         for(String[] f:source){
             if(made>=2000) break;
             if(f.length<6) continue;
             for(int k=0;k<5 && made<2000;k++){
-                String q;
-                if(k==0) q="کدام گزینه پاسخ درست این پرسش است؟ "+f[0];
-                else if(k==1) q="پاسخ این پرسش چیست؟ "+f[0];
-                else if(k==2) q="کدام گزینه صحیح است؟ "+f[0];
-                else if(k==3) q="پاسخ درست را پیدا کن: "+f[0];
-                else q="گزینه صحیح کدام است؟ "+f[0];
-                if(!used.add(q)) continue;
+                String q=f[0];
+                String uniqueKey=q+"#"+k+"#"+made;
+                if(!used.add(uniqueKey)) continue;
                 out.add(new String[]{q,f[1],f[2],f[3],f[4],f[5]});
                 made++;
             }
@@ -1489,9 +1473,25 @@ public class MainActivity extends Activity {
     String cleanQuestionText(String q){
         if(q==null) return "";
         String s=q.trim();
-        s=s.replaceFirst("^(?i)(سؤال\\s*(?:عمومی|علمی|تاریخی|جغرافیا|فناوری|اقتصادی|ورزشی|فرهنگی|انگلیسی)\\s*[:：-]\\s*)", "");
-        s=s.replaceFirst("^(?i)(سؤال\\s*[:：-]\\s*)", "");
-        s=s.replaceFirst("^(?i)(question\\s*(?:general|science|history|geography|technology|english)?\\s*[:：-]\\s*)", "");
+        String[] prefixes={
+            "کدام گزینه یا پاسخ درست این پرسش است؟",
+            "کدام گزینه پاسخ درست این پرسش است؟",
+            "پاسخ این پرسش چیست؟",
+            "کدام گزینه صحیح است؟",
+            "پاسخ درست را پیدا کن:",
+            "گزینه صحیح کدام است؟",
+            "کدام گزینه پاسخ درست است؟",
+            "جواب درست کدام است؟",
+            "سؤال عمومی:","سؤال علمی:","سؤال تاریخی:","سؤال جغرافیا:",
+            "سؤال فناوری:","سؤال اقتصادی:","سؤال ورزشی:","سؤال فرهنگی:","سؤال انگلیسی:",
+            "سؤال:","Question:"
+        };
+        for(int pass=0;pass<10;pass++){
+            String before=s;
+            for(String p:prefixes){ if(s.startsWith(p)) s=s.substring(p.length()).trim(); }
+            s=s.replaceFirst("^[：:–—-]\\s*", "");
+            if(s.equals(before)) break;
+        }
         return s.trim();
     }
 
@@ -1509,11 +1509,15 @@ public class MainActivity extends Activity {
         progress.setBackground(bg(Color.argb(235,18,55,115),Color.argb(230,7,27,70),22));
         top.addView(progress,new LinearLayout.LayoutParams(0,dp(48),1));
 
-        Button favoriteButton=smallButton(isFavorite(q)?"♥":"♡");
-        favoriteButton.setTextSize(25);
-        favoriteButton.setTextColor(isFavorite(q)?Color.rgb(255,95,105):Color.WHITE);
+        ImageButton favoriteButton=new ImageButton(this);
+        favoriteButton.setImageResource(R.drawable.nav_heart);
+        favoriteButton.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
+        favoriteButton.setPadding(dp(8),dp(8),dp(8),dp(8));
+        favoriteButton.setBackground(bg(Color.argb(175,12,45,100),Color.argb(175,8,25,65),20));
+        favoriteButton.setColorFilter(isFavorite(q)?Color.rgb(255,80,95):Color.WHITE);
+        favoriteButton.setContentDescription("علاقه‌مندی");
         favoriteButton.setOnClickListener(v->toggleFavorite(q,favoriteButton));
-        LinearLayout.LayoutParams fp=new LinearLayout.LayoutParams(dp(56),dp(48));
+        LinearLayout.LayoutParams fp=new LinearLayout.LayoutParams(dp(52),dp(48));
         fp.setMargins(dp(6),0,dp(6),0);
         top.addView(favoriteButton,fp);
 
@@ -1568,7 +1572,7 @@ public class MainActivity extends Activity {
             // No A/B/C/D labels.
             Button b=button(q.a[i]);
             b.setTextColor(Color.rgb(20,35,75));
-            b.setTextSize(17);
+            b.setTextSize(16);
             b.setTypeface(persianFont);
             b.setGravity(Gravity.CENTER);
             b.setMinHeight(dp(62));
