@@ -865,23 +865,15 @@ public class MainActivity extends Activity {
         top.setGravity(Gravity.CENTER_VERTICAL);
         top.setLayoutDirection(View.LAYOUT_DIRECTION_LTR);
 
-        TextView gear=text("⚙",22);
-        gear.setGravity(Gravity.CENTER);
-        gear.setTextColor(Color.WHITE);
-        gear.setBackgroundColor(Color.TRANSPARENT);
-        gear.setPadding(0,0,0,0);
-        gear.setIncludeFontPadding(false);
-        gear.setOnClickListener(v->showProfileEditor());
-        top.addView(gear,new LinearLayout.LayoutParams(dp(46),dp(46)));
-
-        // سکه دقیقاً کنار تنظیمات قرار می‌گیرد؛ بدون مربع یا کادر اضافه.
-        TextView coinPill=text(fa(coin)+" سکه",16);
+        // تنظیمات حذف شد؛ سکه جای همان بخش قرار می‌گیرد.
+        TextView coinPill=text("🪙 "+fa(coin),16);
         coinPill.setTextColor(Color.rgb(255,220,85));
         coinPill.setGravity(Gravity.CENTER);
         coinPill.setSingleLine(true);
+        coinPill.setIncludeFontPadding(false);
         coinPill.setBackgroundColor(Color.TRANSPARENT);
-        LinearLayout.LayoutParams cpill=new LinearLayout.LayoutParams(dp(118),dp(46));
-        cpill.setMargins(dp(6),0,0,0);
+        LinearLayout.LayoutParams cpill=new LinearLayout.LayoutParams(dp(92),dp(46));
+        cpill.setMargins(0,0,dp(6),0);
         top.addView(coinPill,cpill);
 
         Space topSpace=new Space(this);
@@ -1067,10 +1059,10 @@ public class MainActivity extends Activity {
         scoreText.setTextColor(Color.rgb(255,220,75));
         TextView badge=text("نشان فعلی: "+badgeTitle(),14);
         badge.setTextColor(badgeColor());
-        current.addView(myScore,new LinearLayout.LayoutParams(-1,dp(32)));
-        current.addView(scoreText,new LinearLayout.LayoutParams(-1,dp(44)));
-        current.addView(badge,new LinearLayout.LayoutParams(-1,dp(36)));
-        root.addView(current,new LinearLayout.LayoutParams(-1,dp(122)));
+        current.addView(myScore,new LinearLayout.LayoutParams(-1,dp(36)));
+        current.addView(scoreText,new LinearLayout.LayoutParams(-1,dp(50)));
+        current.addView(badge,new LinearLayout.LayoutParams(-1,dp(42)));
+        root.addView(current,new LinearLayout.LayoutParams(-1,dp(138)));
 
         int next=nextBadgeScore();
         String progressText = score>=30000 ? "همه نشان‌ها را به دست آوردی! 👑" : "تا نشان بعدی: "+fa(Math.max(0,next-score))+" امتیاز";
@@ -1120,10 +1112,14 @@ public class MainActivity extends Activity {
                 Question found=null;
                 for(Question q:questions) if(q.q.equals(key)){found=q;break;}
                 if(found==null) continue;
-                TextView row=text("♥  "+found.q,17);
+                TextView row=text("♥  "+cleanQuestionText(found.q),15);
                 row.setGravity(Gravity.RIGHT|Gravity.CENTER_VERTICAL);
+                row.setPadding(dp(14),dp(10),dp(14),dp(10));
+                row.setMaxLines(5);
+                row.setSingleLine(false);
+                row.setEllipsize(null);
                 row.setBackground(bg(Color.argb(225,55,37,105),Color.argb(215,15,24,65),22));
-                LinearLayout.LayoutParams rp=new LinearLayout.LayoutParams(-1,dp(78)); rp.setMargins(0,dp(5),0,dp(5)); root.addView(row,rp);
+                LinearLayout.LayoutParams rp=new LinearLayout.LayoutParams(-1,LinearLayout.LayoutParams.WRAP_CONTENT); rp.setMinimumHeight(dp(78)); rp.setMargins(0,dp(5),0,dp(5)); root.addView(row,rp);
                 final String removeKey=key;
                 row.setOnClickListener(v->{favorites.remove(removeKey); saveFavorites(); showFavorites();});
             }
@@ -1147,13 +1143,25 @@ public class MainActivity extends Activity {
         for(int i=0;i<labels.length;i++){
             final int pos=i;
             LinearLayout item=new LinearLayout(this); item.setOrientation(LinearLayout.VERTICAL); item.setGravity(Gravity.CENTER); item.setLayoutDirection(View.LAYOUT_DIRECTION_RTL);
-            ImageView ico=new ImageView(this); ico.setImageResource(icons[i]); ico.setScaleType(ImageView.ScaleType.CENTER_INSIDE); ico.setPadding(dp(4),dp(3),dp(4),dp(3)); ico.setColorFilter(i==2?Color.rgb(255,95,105):Color.WHITE);
-            TextView lab=text(labels[i],11); lab.setGravity(Gravity.CENTER); lab.setMaxLines(1); lab.setSingleLine(true); lab.setEllipsize(null); lab.setIncludeFontPadding(false); lab.setPadding(0,0,0,0);
-            item.addView(ico,new LinearLayout.LayoutParams(-1,dp(34))); item.addView(lab,new LinearLayout.LayoutParams(-1,dp(28)));
+            ImageView ico=new ImageView(this);
+            if(i==3 && !profileImageUri.isEmpty()){
+                try{ ico.setImageURI(Uri.parse(profileImageUri)); }catch(Exception ignored){ ico.setImageResource(icons[i]); }
+                ico.setScaleType(ImageView.ScaleType.CENTER_CROP);
+                ico.setClipToOutline(true);
+                ico.setOutlineProvider(new android.view.ViewOutlineProvider(){ public void getOutline(View v, android.graphics.Outline o){ o.setOval(0,0,v.getWidth(),v.getHeight()); }});
+                ico.setPadding(0,0,0,0);
+            }else{
+                ico.setImageResource(icons[i]);
+                ico.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
+                ico.setPadding(dp(3),dp(2),dp(3),dp(2));
+                ico.setColorFilter(i==2?Color.rgb(255,95,105):Color.WHITE);
+            }
+            TextView lab=text(labels[i],10); lab.setGravity(Gravity.CENTER); lab.setMaxLines(1); lab.setSingleLine(true); lab.setEllipsize(android.text.TextUtils.TruncateAt.END); lab.setIncludeFontPadding(false); lab.setPadding(0,0,0,0);
+            item.addView(ico,new LinearLayout.LayoutParams(-1,dp(30))); item.addView(lab,new LinearLayout.LayoutParams(-1,dp(28)));
             if(i==3) item.setOnClickListener(v->showProfileEditor()); else if(i==1) item.setOnClickListener(v->showRankings()); else if(i==2) item.setOnClickListener(v->showFavorites()); else item.setOnClickListener(v->showHome());
-            nav.addView(item,new LinearLayout.LayoutParams(0,dp(68),1));
+            nav.addView(item,new LinearLayout.LayoutParams(0,dp(64),1));
         }
-        root.addView(nav,new LinearLayout.LayoutParams(-1,dp(78)));
+        root.addView(nav,new LinearLayout.LayoutParams(-1,dp(72)));
     }
 
     boolean isFavorite(Question q){ return favorites.contains(q.q); }
@@ -1346,7 +1354,6 @@ public class MainActivity extends Activity {
                 opts.add(correct);
                 int step=1;
                 while(opts.size()<4){ String x=w[(i+step*3+t)%w.length][1]; if(!opts.contains(x)) opts.add(x); step++; }
-                Collections.shuffle(opts,r);
                 String[] row={String.format(templates[t],w[i][0]),"🇬🇧",opts.get(0),opts.get(1),opts.get(2),opts.get(3)};
                 out.add(row);
             }
@@ -1362,7 +1369,7 @@ public class MainActivity extends Activity {
             {"سرد به انگلیسی چیست؟","cold"},{"گرم به انگلیسی چیست؟","hot"},{"آسان به انگلیسی چیست؟","easy"},{"سخت به انگلیسی چیست؟","hard"},
             {"آمدن به انگلیسی چیست؟","come"},{"رفتن به انگلیسی چیست؟","go"},{"خواندن به انگلیسی چیست؟","read"},{"نوشتن به انگلیسی چیست؟","write"}
         };
-        for(int ei=0;ei<extra.length;ei++){ String[] e=extra[ei]; ArrayList<String> opts=new ArrayList<>(); opts.add(e[1]); int step=1; while(opts.size()<4){ String d=w[(ei+step*5)%w.length][1]; if(!opts.contains(d)) opts.add(d); step++; } Collections.shuffle(opts,r); out.add(new String[]{e[0],"🇬🇧",opts.get(0),opts.get(1),opts.get(2),opts.get(3)}); }
+        for(int ei=0;ei<extra.length;ei++){ String[] e=extra[ei]; ArrayList<String> opts=new ArrayList<>(); opts.add(e[1]); int step=1; while(opts.size()<4){ String d=w[(ei+step*5)%w.length][1]; if(!opts.contains(d)) opts.add(d); step++; } out.add(new String[]{e[0],"🇬🇧",opts.get(0),opts.get(1),opts.get(2),opts.get(3)}); }
         return out;
     }
 
@@ -1490,6 +1497,10 @@ public class MainActivity extends Activity {
         for(int pass=0;pass<10;pass++){
             String before=s;
             for(String p:prefixes){ if(s.startsWith(p)) s=s.substring(p.length()).trim(); }
+            // Remove common generated question-intros even when spacing/punctuation differs.
+            s=s.replaceFirst("^(?:کدام\\s+گزینه(?:\\s+یا)?\\s+)?(?:پاسخ\\s+درست(?:\\s+را)?|جواب\\s+درست)(?:\\s+را)?\\s+(?:پیدا\\s+کن|کدام\\s+است)\\s*[؟?:：-]?\\s*", "");
+            s=s.replaceFirst("^کدام\\s+گزینه\\s+(?:پاسخ\\s+درست\\s+این\\s+پرسش|صحیح)\\s+است\\s*[؟?:：-]?\\s*", "");
+            s=s.replaceFirst("^(?:سؤال|سوال)(?:\\s+عمومی|\\s+علمی|\\s+تاریخی|\\s+جغرافیا|\\s+فناوری|\\s+اقتصادی|\\s+ورزشی|\\s+فرهنگی|\\s+انگلیسی)?\\s*[：:]\\s*", "");
             s=s.replaceFirst("^[：:–—-]\\s*", "");
             if(s.equals(before)) break;
         }
