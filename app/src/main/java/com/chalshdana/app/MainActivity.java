@@ -1008,19 +1008,20 @@ public class MainActivity extends Activity {
         summary.setBackground(bg(Color.argb(235,35,75,125),Color.argb(225,10,35,75),20));
         root.addView(summary,new LinearLayout.LayoutParams(-1,dp(52)));
         int pct=statsAnswered==0?0:(int)Math.round(statsCorrect*100.0/statsAnswered);
-        TextView total=text("تعداد سؤال‌های پاسخ‌داده‌شده\n"+fa(statsAnswered),20);
-        TextView correct=text("پاسخ‌های درست\n"+fa(statsCorrect)+" ✓",19);
-        TextView wrong=text("پاسخ‌های اشتباه\n"+fa(statsWrong)+" ✕",19);
-        TextView accuracy=text("درصد موفقیت\n"+fa(pct)+"٪",19);
-        TextView streak=text("پیاپی درست\n"+fa(currentStreak)+"  |  بهترین رکورد: "+fa(bestStreak),17);
-        TextView points=text("امتیاز فعلی\n"+fa(score)+" ⭐",20);
-        TextView badge=text("نشان فعلی: "+badgeTitle(),18);
+        // Keep each statistic on one line so the value can never be hidden on smaller screens.
+        TextView total=text("تعداد سؤال‌های پاسخ‌داده‌شده: "+fa(statsAnswered),18);
+        TextView correct=text("پاسخ‌های درست: "+fa(statsCorrect)+" ✓",18);
+        TextView wrong=text("پاسخ‌های اشتباه: "+fa(statsWrong)+" ✕",18);
+        TextView accuracy=text("درصد موفقیت: "+fa(pct)+"٪",18);
+        TextView streak=text("پیاپی درست: "+fa(currentStreak)+"  |  بهترین رکورد: "+fa(bestStreak),16);
+        TextView points=text("امتیاز فعلی: "+fa(score)+" ⭐",18);
+        TextView badge=text("نشان فعلی: "+badgeTitle(),17);
         badge.setTextColor(badgeColor());
         TextView[] cards={total,correct,wrong,accuracy,streak,points,badge};
         for(int i=0;i<cards.length;i++){
             TextView v=cards[i]; v.setGravity(Gravity.CENTER); v.setTextColor(i==2?Color.rgb(255,150,155):i==1?Color.rgb(110,245,175):Color.WHITE);
             v.setBackground(bg(Color.argb(225,20,53,105),Color.argb(220,7,22,60),20));
-            LinearLayout.LayoutParams lp=new LinearLayout.LayoutParams(-1,dp(i==4?66:62)); lp.setMargins(0,dp(4),0,dp(4)); root.addView(v,lp);
+            LinearLayout.LayoutParams lp=new LinearLayout.LayoutParams(-1,dp(i==4?62:58)); lp.setMargins(0,dp(4),0,dp(4)); root.addView(v,lp);
         }
         addBottomNavStandalone();
     }
@@ -1621,7 +1622,11 @@ public class MainActivity extends Activity {
     void answer(int n,Button chosen){
         if(answered)return; answered=true;
         if(questionTimer!=null){questionTimer.cancel();questionTimer=null;}
-        Question q=questions.get(index); saveAnswered(q.q); boolean ok=(n>=0 && n<q.a.length && q.a[n].equals(q.correctAnswer())); statsAnswered++; if(ok){statsCorrect++;currentStreak++;bestStreak=Math.max(bestStreak,currentStreak);}else{statsWrong++;currentStreak=0;}
+        Question q=questions.get(index); saveAnswered(q.q); boolean ok=(n>=0 && n<q.a.length && q.a[n].equals(q.correctAnswer()));
+        statsAnswered++;
+        if(ok){statsCorrect++;currentStreak++;bestStreak=Math.max(bestStreak,currentStreak);}else{statsWrong++;currentStreak=0;}
+        // Save the statistics immediately after every answer so they survive screen changes/app restarts.
+        saveProgress();
         try{tone.startTone(ok?android.media.ToneGenerator.TONE_PROP_ACK:android.media.ToneGenerator.TONE_PROP_NACK,180);}catch(Exception ignored){}
         if(ok){if(timerView!=null) timerView.setBackground(bg(Color.rgb(35,170,115),Color.rgb(10,105,75),24));score+=10; sessionScore+=10; coin+=5; saveProgress();chosen.setBackground(bg(Color.rgb(35,205,130),Color.rgb(10,125,80),25));chosen.setTextColor(Color.WHITE);chosen.setText("✓  "+chosen.getText());}
         else{if(timerView!=null) timerView.setBackground(bg(Color.rgb(235,78,95),Color.rgb(145,25,55),24));coin=Math.max(0,coin-5);lives=Math.max(0,lives-1);saveProgress();chosen.setBackground(bg(Color.rgb(235,78,95),Color.rgb(145,25,55),25));chosen.setTextColor(Color.WHITE);chosen.setText("✕  "+chosen.getText()); Button correct=answerButtons.get(q.correct);correct.setBackground(bg(Color.rgb(35,205,130),Color.rgb(10,125,80),25));correct.setTextColor(Color.WHITE);correct.setText("✓  "+correct.getText());}
