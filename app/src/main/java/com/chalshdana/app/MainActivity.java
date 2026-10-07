@@ -1664,7 +1664,7 @@ public class MainActivity extends Activity {
         msg.setEllipsize(null);
         msg.setIncludeFontPadding(true);
         LinearLayout.LayoutParams mp=new LinearLayout.LayoutParams(-1,LinearLayout.LayoutParams.WRAP_CONTENT);
-        mp.setMinimumHeight(dp(92));
+        msg.setMinimumHeight(dp(92));
         root.addView(msg,mp);
         Button again=button("▶   شروع دوباره");
         again.setTextSize(18);
