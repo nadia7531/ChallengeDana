@@ -1119,7 +1119,7 @@ public class MainActivity extends Activity {
                 row.setSingleLine(false);
                 row.setEllipsize(null);
                 row.setBackground(bg(Color.argb(225,55,37,105),Color.argb(215,15,24,65),22));
-                LinearLayout.LayoutParams rp=new LinearLayout.LayoutParams(-1,LinearLayout.LayoutParams.WRAP_CONTENT); rp.setMinimumHeight(dp(78)); rp.setMargins(0,dp(5),0,dp(5)); root.addView(row,rp);
+                LinearLayout.LayoutParams rp=new LinearLayout.LayoutParams(-1,LinearLayout.LayoutParams.WRAP_CONTENT); row.setMinimumHeight(dp(78)); rp.setMargins(0,dp(5),0,dp(5)); root.addView(row,rp);
                 final String removeKey=key;
                 row.setOnClickListener(v->{favorites.remove(removeKey); saveFavorites(); showFavorites();});
             }
