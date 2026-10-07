@@ -866,7 +866,7 @@ public class MainActivity extends Activity {
         top.setLayoutDirection(View.LAYOUT_DIRECTION_LTR);
 
         // تنظیمات حذف شد؛ سکه جای همان بخش قرار می‌گیرد.
-        TextView coinPill=text("🪙 "+fa(coin),16);
+        TextView coinPill=text(fa(coin)+" سکه",16);
         coinPill.setTextColor(Color.rgb(255,220,85));
         coinPill.setGravity(Gravity.CENTER);
         coinPill.setSingleLine(true);
@@ -1005,7 +1005,7 @@ public class MainActivity extends Activity {
         TextView correct=text("پاسخ‌های درست: "+fa(statsCorrect)+" ✓",18);
         TextView wrong=text("پاسخ‌های اشتباه: "+fa(statsWrong)+" ✕",18);
         TextView accuracy=text("درصد موفقیت: "+fa(pct)+"٪",18);
-        TextView streak=text("پیاپی درست: "+fa(currentStreak)+"  |  بهترین رکورد: "+fa(bestStreak),16);
+        TextView streak=text("بهترین رکورد پیاپی: "+fa(bestStreak),16);
         TextView points=text("امتیاز فعلی: "+fa(score)+" ⭐",18);
         TextView badge=text("نشان فعلی: "+badgeTitle(),17);
         badge.setTextColor(badgeColor());
@@ -1157,7 +1157,7 @@ public class MainActivity extends Activity {
                 ico.setColorFilter(i==2?Color.rgb(255,95,105):Color.WHITE);
             }
             TextView lab=text(labels[i],10); lab.setGravity(Gravity.CENTER); lab.setMaxLines(1); lab.setSingleLine(true); lab.setEllipsize(android.text.TextUtils.TruncateAt.END); lab.setIncludeFontPadding(false); lab.setPadding(0,0,0,0);
-            item.addView(ico,new LinearLayout.LayoutParams(-1,dp(30))); item.addView(lab,new LinearLayout.LayoutParams(-1,dp(28)));
+            LinearLayout.LayoutParams ip=new LinearLayout.LayoutParams(dp(30),dp(30)); ip.gravity=Gravity.CENTER_HORIZONTAL; item.addView(ico,ip); item.addView(lab,new LinearLayout.LayoutParams(-1,dp(28)));
             if(i==3) item.setOnClickListener(v->showProfileEditor()); else if(i==1) item.setOnClickListener(v->showRankings()); else if(i==2) item.setOnClickListener(v->showFavorites()); else item.setOnClickListener(v->showHome());
             nav.addView(item,new LinearLayout.LayoutParams(0,dp(64),1));
         }
@@ -1656,11 +1656,16 @@ public class MainActivity extends Activity {
         TextView h=title("جان‌ها تمام شد",27);
         h.setGravity(Gravity.CENTER);
         root.addView(h,new LinearLayout.LayoutParams(-1,dp(60)));
-        TextView msg=text("اشکالی ندارد؛ چالش را دوباره شروع کن و این بار جان‌هایت را حفظ کن.",17);
+        TextView msg=text("جان‌هایت تمام شد؛ دوباره شروع کن و این بار مراقب جان‌هایت باش.",17);
         msg.setBackground(bg(Color.argb(235,18,48,95),Color.argb(225,7,24,58),24));
-        msg.setPadding(dp(18),dp(16),dp(18),dp(16));
+        msg.setPadding(dp(18),dp(14),dp(18),dp(14));
+        msg.setGravity(Gravity.CENTER);
         msg.setMaxLines(3);
-        root.addView(msg,new LinearLayout.LayoutParams(-1,dp(105)));
+        msg.setEllipsize(null);
+        msg.setIncludeFontPadding(true);
+        LinearLayout.LayoutParams mp=new LinearLayout.LayoutParams(-1,LinearLayout.LayoutParams.WRAP_CONTENT);
+        mp.setMinimumHeight(dp(92));
+        root.addView(msg,mp);
         Button again=button("▶   شروع دوباره");
         again.setTextSize(18);
         again.setTextColor(Color.rgb(45,25,0));
