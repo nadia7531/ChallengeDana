@@ -872,7 +872,7 @@ public class MainActivity extends Activity {
         coinPill.setSingleLine(true);
         coinPill.setIncludeFontPadding(false);
         coinPill.setBackgroundColor(Color.TRANSPARENT);
-        LinearLayout.LayoutParams cpill=new LinearLayout.LayoutParams(dp(92),dp(46));
+        LinearLayout.LayoutParams cpill=new LinearLayout.LayoutParams(dp(118),dp(46));
         cpill.setMargins(0,0,dp(6),0);
         top.addView(coinPill,cpill);
 
@@ -895,6 +895,10 @@ public class MainActivity extends Activity {
         pp.setMargins(dp(6),0,0,0);
 
         // نام کاربر کنار عکس پروفایل در صفحه اصلی
+        LinearLayout userAndBadge=new LinearLayout(this);
+        userAndBadge.setOrientation(LinearLayout.HORIZONTAL);
+        userAndBadge.setGravity(Gravity.CENTER_VERTICAL);
+        userAndBadge.setLayoutDirection(View.LAYOUT_DIRECTION_RTL);
         TextView homeUserName=text(profileName.isEmpty()?"پروفایل":profileName,15);
         homeUserName.setTextColor(Color.WHITE);
         homeUserName.setGravity(Gravity.CENTER_VERTICAL|Gravity.RIGHT);
@@ -903,9 +907,19 @@ public class MainActivity extends Activity {
         homeUserName.setIncludeFontPadding(false);
         homeUserName.setPadding(0,0,dp(5),0);
         homeUserName.setOnClickListener(v->showProfileEditor());
-        LinearLayout.LayoutParams np=new LinearLayout.LayoutParams(dp(92),dp(46));
+        userAndBadge.addView(homeUserName,new LinearLayout.LayoutParams(dp(78),dp(42)));
+        TextView badgeChip=text("◆ "+badgeTitle(),10);
+        badgeChip.setTextColor(badgeColor());
+        badgeChip.setGravity(Gravity.CENTER);
+        badgeChip.setSingleLine(true);
+        badgeChip.setEllipsize(android.text.TextUtils.TruncateAt.END);
+        badgeChip.setPadding(dp(3),0,dp(3),0);
+        badgeChip.setBackground(bg(Color.argb(180,10,32,68),Color.argb(210,255,205,70),12));
+        badgeChip.setOnClickListener(v->showRankings());
+        userAndBadge.addView(badgeChip,new LinearLayout.LayoutParams(dp(70),dp(32)));
+        LinearLayout.LayoutParams np=new LinearLayout.LayoutParams(dp(150),dp(46));
         np.setMargins(dp(3),0,0,0);
-        top.addView(homeUserName,np);
+        top.addView(userAndBadge,np);
         top.addView(profileIcon,pp);
         root.addView(top,new LinearLayout.LayoutParams(-1,dp(48)));
 
@@ -1112,16 +1126,33 @@ public class MainActivity extends Activity {
                 Question found=null;
                 for(Question q:questions) if(q.q.equals(key)){found=q;break;}
                 if(found==null) continue;
-                TextView row=text("♥  "+cleanQuestionText(found.q),15);
-                row.setGravity(Gravity.RIGHT|Gravity.CENTER_VERTICAL);
-                row.setPadding(dp(14),dp(10),dp(14),dp(10));
-                row.setMaxLines(5);
-                row.setSingleLine(false);
-                row.setEllipsize(null);
+                LinearLayout row=new LinearLayout(this);
+                row.setOrientation(LinearLayout.VERTICAL);
+                row.setGravity(Gravity.CENTER_VERTICAL);
+                row.setPadding(dp(14),dp(12),dp(14),dp(12));
                 row.setBackground(bg(Color.argb(225,55,37,105),Color.argb(215,15,24,65),22));
-                LinearLayout.LayoutParams rp=new LinearLayout.LayoutParams(-1,LinearLayout.LayoutParams.WRAP_CONTENT); row.setMinimumHeight(dp(78)); rp.setMargins(0,dp(5),0,dp(5)); root.addView(row,rp);
+                TextView questionLine=text("♥  "+cleanQuestionText(found.q),15);
+                questionLine.setTextColor(Color.WHITE);
+                questionLine.setGravity(Gravity.RIGHT|Gravity.CENTER_VERTICAL);
+                questionLine.setMaxLines(5); questionLine.setSingleLine(false); questionLine.setEllipsize(null);
+                questionLine.setIncludeFontPadding(true);
+                row.addView(questionLine,new LinearLayout.LayoutParams(-1,LinearLayout.LayoutParams.WRAP_CONTENT));
+                TextView answerLine=text("پاسخ درست: "+found.correctAnswer(),14);
+                answerLine.setTextColor(Color.rgb(125,245,185));
+                answerLine.setGravity(Gravity.RIGHT|Gravity.CENTER_VERTICAL);
+                answerLine.setMaxLines(3); answerLine.setSingleLine(false); answerLine.setEllipsize(null);
+                answerLine.setPadding(0,dp(7),0,0);
+                row.addView(answerLine,new LinearLayout.LayoutParams(-1,LinearLayout.LayoutParams.WRAP_CONTENT));
+                LinearLayout.LayoutParams rp=new LinearLayout.LayoutParams(-1,LinearLayout.LayoutParams.WRAP_CONTENT); row.setMinimumHeight(dp(82)); rp.setMargins(0,dp(5),0,dp(5)); root.addView(row,rp);
+                final Question selectedQuestion=found;
                 final String removeKey=key;
-                row.setOnClickListener(v->{favorites.remove(removeKey); saveFavorites(); showFavorites();});
+                row.setOnClickListener(v->{
+                    new AlertDialog.Builder(this).setTitle(cleanQuestionText(selectedQuestion.q))
+                        .setMessage("پاسخ درست: "+selectedQuestion.correctAnswer())
+                        .setPositiveButton("باشه",(d,w)->d.dismiss())
+                        .setNegativeButton("حذف از علاقه‌مندی‌ها",(d,w)->{favorites.remove(removeKey);saveFavorites();showFavorites();})
+                        .show();
+                });
             }
         }
         addBottomNavStandalone();
